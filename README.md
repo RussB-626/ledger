@@ -1,2 +1,1 @@
-# checkkbook-register
-Person Checkbook Register
+# Checkbook Register

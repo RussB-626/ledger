@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(ng version *)",
+      "Bash(npx @angular/cli version)",
+      "Bash(npx @angular/cli new frontend --routing=false --style=scss --standalone=true --skip-git=true --no-interactive)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npx ng *)",
+      "Bash(npm run *)",
+      "Bash(pkill -f \"ng serve\")",
+      "Bash(pkill -f \"npm run dev\")",
+      "PowerShell(Stop-Process -Force)"
+    ]
+  },
+  "model": "claude-haiku-4-5-20251001"
+}
