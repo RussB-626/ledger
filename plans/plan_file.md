@@ -14,7 +14,7 @@ The current app is a Google Apps Script (GAS) web app that uses Google Sheets as
 
 **IMPORTANT:** The UI/UX design for this project must be followed **to the letter** as specified in the design system.
 
-**Design System Link:** [Checkbook Register Design (Standalone)](https://api.anthropic.com/v1/design/h/x3OlgPX7GQ-EY7FenDOLlg?open_file=Checkbook+Register+%28standalone%29.html)
+**Design System Link:** [Checkbook Register Design (Standalone)](https://api.anthropic.com/v1/design/h/zX_ZCKId8ZvLJ9UohGavug?open_file=Checkbook+Register+%28standalone%29.html)
 
 All UI components, layouts, colors, typography, spacing, and interactions must strictly adhere to this design specification. Do not deviate from the design without explicit approval.
 
