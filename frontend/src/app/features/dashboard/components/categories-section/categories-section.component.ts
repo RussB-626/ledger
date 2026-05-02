@@ -45,6 +45,7 @@ export class CategoriesSectionComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
+    // Reload when year/month changes
     if (changes['externalSelectedYear'] || changes['externalSelectedMonth']) {
       if (this.externalSelectedYear !== undefined) {
         this.selectedYear = this.externalSelectedYear;
@@ -52,6 +53,11 @@ export class CategoriesSectionComponent implements OnInit, OnChanges {
       if (this.externalSelectedMonth !== undefined) {
         this.selectedMonth = this.externalSelectedMonth;
       }
+      this.loadCategoryTotals();
+    }
+
+    // Reload when page data changes (e.g., transaction added/deleted)
+    if (changes['pageData'] && this.pageData) {
       this.loadCategoryTotals();
     }
   }

@@ -24,10 +24,11 @@ export class BalancesTabComponent {
   get balanceRows(): BalanceRow[] {
     const rows: BalanceRow[] = [];
 
-    // Add account balances
-    for (const [accountName, balance] of Object.entries(this.pageData.balances)) {
+    // Add all accounts with their balances (or 0 if no transactions)
+    for (const account of this.pageData.accounts) {
+      const balance = this.pageData.balances[account.name] ?? 0;
       rows.push({
-        accountName,
+        accountName: account.name,
         balance
       });
     }

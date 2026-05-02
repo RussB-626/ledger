@@ -125,8 +125,16 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
 
     this.apiService.deleteTransaction(activeUser.id, this.transactionToDelete.id).subscribe({
       next: () => {
-        this.transactions = this.transactions.filter(t => t.id !== this.transactionToDelete!.id);
-        this.cdr.markForCheck();
+        // Refresh page data to update balances and other components
+        this.apiService.getPageData(activeUser.id).subscribe({
+          next: (pageData) => {
+            this.pageDataService.setPageData(pageData);
+            this.cdr.markForCheck();
+          },
+          error: (error) => {
+            console.error('Error refreshing page data:', error);
+          }
+        });
       },
       error: (error) => {
         console.error('Error deleting transaction:', error);

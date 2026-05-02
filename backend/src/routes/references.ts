@@ -4,11 +4,13 @@
 import { Router, Request, Response } from 'express';
 import { asyncHandler } from '../middleware/errorHandler';
 import * as referencesController from '../controllers/references';
+import * as transactionsController from '../controllers/transactions';
 import {
   ApiResponse,
   Account,
   Category,
   Description,
+  CategoryTotals,
   CreateAccountRequest,
   UpdateAccountRequest,
   CreateCategoryRequest,
@@ -119,12 +121,14 @@ router.delete(
 
 // ====== CATEGORIES ======
 
-// GET /api/users/:userId/categories - Get all categories (or filtered by type)
+// GET /api/users/:userId/categories - Get all categories (or filtered by type) or category totals (analytics)
 router.get(
   '/:userId/categories',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
     const type = req.query.type as string | undefined;
+    const year = req.query.year ? parseInt(req.query.year as string, 10) : undefined;
+    const month = req.query.month ? parseInt(req.query.month as string, 10) : undefined;
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -132,6 +136,15 @@ router.get(
       return;
     }
 
+    // If year and month are provided, return category totals (analytics)
+    if (year !== undefined && month !== undefined) {
+      const categoryTotals = await transactionsController.getCategoryTotals(userId, year, month);
+      const response: ApiResponse<CategoryTotals> = { data: categoryTotals };
+      res.json(response);
+      return;
+    }
+
+    // Otherwise, return category list (for reference/admin)
     let categories: Category[];
 
     if (type && ['expense', 'income', 'transfer'].includes(type)) {

@@ -8,7 +8,6 @@ import {
   ApiResponse,
   Transaction,
   PageData,
-  CategoryTotals,
   MonthlyDifference,
   CreateTransactionRequest,
   UpdateTransactionRequest,
@@ -172,26 +171,6 @@ router.delete(
     }
 
     const response: ApiResponse<{ success: boolean }> = { data: { success: true } };
-    res.json(response);
-  })
-);
-
-// GET /api/users/:userId/categories - Get category totals (analytics)
-router.get(
-  '/:userId/categories',
-  asyncHandler(async (req: Request, res: Response) => {
-    const userId = parseInt(req.params.userId, 10);
-    const year = req.query.year ? parseInt(req.query.year as string, 10) : new Date().getFullYear();
-    const month = req.query.month ? parseInt(req.query.month as string, 10) : new Date().getMonth() + 1;
-
-    if (isNaN(userId)) {
-      const response: ApiResponse<never> = { error: 'Invalid user ID' };
-      res.status(400).json(response);
-      return;
-    }
-
-    const categoryTotals = await transactionsController.getCategoryTotals(userId, year, month);
-    const response: ApiResponse<CategoryTotals> = { data: categoryTotals };
     res.json(response);
   })
 );

@@ -2,12 +2,307 @@
   <div class="admin-header">
     <button class="back-btn" (click)="backToDashboard()">← Back to Dashboard</button>
     <h1>Admin Management</h1>
+    <div class="active-user" *ngIf="activeUser">
+      User: <span class="user-name">{{ activeUser.name }}</span>
+    </div>
   </div>
 
-  <div class="admin-content">
-    <p class="placeholder-text">Admin pages coming soon...</p>
-    <p class="placeholder-text">• Accounts Management</p>
-    <p class="placeholder-text">• Categories Management</p>
-    <p class="placeholder-text">• Descriptions Management</p>
+  <div class="tabs">
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'accounts'"
+      (click)="selectTab('accounts')"
+    >
+      Accounts ({{ accounts.length }})
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'categories'"
+      (click)="selectTab('categories')"
+    >
+      Categories ({{ categories.length }})
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'descriptions'"
+      (click)="selectTab('descriptions')"
+    >
+      Descriptions ({{ descriptions.length }})
+    </button>
+  </div>
+
+  <!-- ACCOUNTS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'accounts'">
+    <div class="tab-header">
+      <h2>Accounts Management</h2>
+      <button class="add-btn" (click)="openAccountModal('create')">+ Add Account</button>
+    </div>
+
+    <table class="admin-table" *ngIf="accounts.length > 0; else noAccounts">
+      <thead>
+        <tr>
+          <th>Account Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let account of accounts">
+          <td>{{ account.name }}</td>
+          <td class="actions">
+            <button
+              class="action-btn edit-btn"
+              (click)="openAccountModal('edit', account)"
+              title="Edit"
+            >
+              ✎
+            </button>
+            <button
+              class="action-btn delete-btn"
+              (click)="openDeleteConfirmation('account', account.id, account.name)"
+              title="Delete"
+            >
+              ✕
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noAccounts>
+      <div class="empty-state">No accounts yet. Create one to get started!</div>
+    </ng-template>
+  </div>
+
+  <!-- CATEGORIES TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'categories'">
+    <div class="tab-header">
+      <h2>Categories Management</h2>
+      <button class="add-btn" (click)="openCategoryModal('create')">+ Add Category</button>
+    </div>
+
+    <table class="admin-table" *ngIf="categories.length > 0; else noCategories">
+      <thead>
+        <tr>
+          <th>Category Name</th>
+          <th>Expense</th>
+          <th>Income</th>
+          <th>Transfer</th>
+          <th>Ignore</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let category of categories">
+          <td>{{ category.name }}</td>
+          <td class="checkbox-col">{{ category.is_expense ? '✓' : '' }}</td>
+          <td class="checkbox-col">{{ category.is_income ? '✓' : '' }}</td>
+          <td class="checkbox-col">{{ category.is_transfer ? '✓' : '' }}</td>
+          <td class="checkbox-col">{{ category.is_ignored ? '✓' : '' }}</td>
+          <td class="actions">
+            <button
+              class="action-btn edit-btn"
+              (click)="openCategoryModal('edit', category)"
+              title="Edit"
+            >
+              ✎
+            </button>
+            <button
+              class="action-btn delete-btn"
+              (click)="openDeleteConfirmation('category', category.id, category.name)"
+              title="Delete"
+            >
+              ✕
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noCategories>
+      <div class="empty-state">No categories yet. Create one to get started!</div>
+    </ng-template>
+  </div>
+
+  <!-- DESCRIPTIONS TAB -->
+  <div class="tab-content" *ngIf="activeTab === 'descriptions'">
+    <div class="tab-header">
+      <h2>Descriptions Management</h2>
+      <button class="add-btn" (click)="openDescriptionModal('create')">+ Add Description</button>
+    </div>
+
+    <table class="admin-table" *ngIf="descriptions.length > 0; else noDescriptions">
+      <thead>
+        <tr>
+          <th>Description Text</th>
+          <th>Is Common</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let desc of descriptions">
+          <td>{{ desc.description }}</td>
+          <td class="checkbox-col">{{ desc.is_common ? '✓' : '' }}</td>
+          <td class="actions">
+            <button
+              class="action-btn edit-btn"
+              (click)="openDescriptionModal('edit', desc)"
+              title="Edit"
+            >
+              ✎
+            </button>
+            <button
+              class="action-btn delete-btn"
+              (click)="openDeleteConfirmation('description', desc.id, desc.description)"
+              title="Delete"
+            >
+              ✕
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #noDescriptions>
+      <div class="empty-state">No descriptions yet. Create one to get started!</div>
+    </ng-template>
+  </div>
+
+  <!-- ACCOUNT MODAL -->
+  <div class="modal-overlay" *ngIf="accountModal.isOpen" (click)="closeAccountModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ accountModal.mode === 'create' ? 'Add Account' : 'Edit Account' }}</h3>
+        <button class="close-btn" (click)="closeAccountModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Account Name</label>
+          <input
+            type="text"
+            [(ngModel)]="accountFormData.name"
+            placeholder="Enter account name"
+            class="form-input"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeAccountModal()">Cancel</button>
+        <button class="btn-save" (click)="saveAccount()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- CATEGORY MODAL -->
+  <div class="modal-overlay" *ngIf="categoryModal.isOpen" (click)="closeCategoryModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ categoryModal.mode === 'create' ? 'Add Category' : 'Edit Category' }}</h3>
+        <button class="close-btn" (click)="closeCategoryModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Category Name</label>
+          <input
+            type="text"
+            [(ngModel)]="categoryFormData.name"
+            placeholder="Enter category name"
+            class="form-input"
+          />
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="categoryFormData.is_expense"
+              class="checkbox-input"
+            />
+            Is Expense
+          </label>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="categoryFormData.is_income"
+              class="checkbox-input"
+            />
+            Is Income
+          </label>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="categoryFormData.is_transfer"
+              class="checkbox-input"
+            />
+            Is Transfer
+          </label>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="categoryFormData.is_ignored"
+              class="checkbox-input"
+            />
+            Ignore (excludes from analytics)
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeCategoryModal()">Cancel</button>
+        <button class="btn-save" (click)="saveCategory()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DESCRIPTION MODAL -->
+  <div class="modal-overlay" *ngIf="descriptionModal.isOpen" (click)="closeDescriptionModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ descriptionModal.mode === 'create' ? 'Add Description' : 'Edit Description' }}</h3>
+        <button class="close-btn" (click)="closeDescriptionModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Description Text</label>
+          <input
+            type="text"
+            [(ngModel)]="descriptionFormData.description"
+            placeholder="Enter description"
+            class="form-input"
+          />
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="descriptionFormData.is_common"
+              class="checkbox-input"
+            />
+            Is Common (shows in recurring withdrawals)
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeDescriptionModal()">Cancel</button>
+        <button class="btn-save" (click)="saveDescription()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- DELETE CONFIRMATION MODAL -->
+  <div class="modal-overlay" *ngIf="deleteConfirmation.isOpen" (click)="closeDeleteConfirmation()">
+    <div class="modal confirm-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm Delete</h3>
+        <button class="close-btn" (click)="closeDeleteConfirmation()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete "{{ deleteConfirmation.itemName }}"?</p>
+        <p class="warning">This action cannot be undone.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeDeleteConfirmation()">Cancel</button>
+        <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
   </div>
 </div>
