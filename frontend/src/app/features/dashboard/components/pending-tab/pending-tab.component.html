@@ -1,6 +1,19 @@
 <div class="pending-tab-container">
   <div class="pending-header">
-    <h3>Pending Transactions</h3>
+    <div class="account-selector">
+      <label for="account-filter">Account:</label>
+      <select
+        id="account-filter"
+        [(ngModel)]="selectedAccount"
+        (change)="onSearchChange()"
+        class="account-select"
+      >
+        <option value="All">All Accounts</option>
+        @for (account of uniqueAccounts; track account) {
+          <option [value]="account">{{ account }}</option>
+        }
+      </select>
+    </div>
     <div class="search-box">
       <input
         type="text"
@@ -55,6 +68,14 @@
           </tr>
         }
       </tbody>
+      <tfoot>
+        <tr class="totals-row">
+          <td colspan="5">Total:</td>
+          <td class="text-right">{{ formatCurrency(getFilteredTotal()) }}</td>
+          <td></td>
+          <td></td>
+        </tr>
+      </tfoot>
     </table>
   </div>
 

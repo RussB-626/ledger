@@ -11,7 +11,13 @@
       "Bash(npm run *)",
       "Bash(pkill -f \"ng serve\")",
       "Bash(pkill -f \"npm run dev\")",
-      "PowerShell(Stop-Process -Force)"
+      "PowerShell(Stop-Process -Force)",
+      "Bash(git rm *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git reset *)",
+      "Bash(git clean *)"
     ]
   },
   "model": "claude-haiku-4-5-20251001"

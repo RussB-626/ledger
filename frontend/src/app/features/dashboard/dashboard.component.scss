@@ -156,11 +156,20 @@ $danger-color: #ff6b6b;
   }
 
   app-categories-section {
-    min-height: 600px;
-    max-height: 600px;
+    min-height: 350px;
+    max-height: 350px;
     overflow-y: auto;
     overflow-x: hidden;
     @include custom-scrollbar;
+  }
+}
+
+.card {
+  app-common-withdrawals {
+    display: flex;
+    flex-direction: column;
+    min-height: 350px;
+    max-height: 350px;
   }
 }
 
@@ -224,8 +233,8 @@ $danger-color: #ff6b6b;
 .combined-tabs-card {
   display: flex;
   flex-direction: column;
-  min-height: 800px;
-  max-height: 800px;
+  min-height: 600px;
+  max-height: 600px;
   overflow: hidden;
 
   .section-tabs {

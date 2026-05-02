@@ -19,6 +19,7 @@ export class PendingTabComponent implements OnChanges {
   @Output() editTransaction = new EventEmitter<Transaction>();
 
   searchTerm: string = '';
+  selectedAccount: string = 'All';
 
   // Pagination properties
   currentPage = 1;
@@ -49,18 +50,32 @@ export class PendingTabComponent implements OnChanges {
     return this.pageData?.pendingTransactions || [];
   }
 
+  get uniqueAccounts(): string[] {
+    const accounts = new Set(this.pendingTransactions.map(txn => txn.account));
+    return Array.from(accounts).sort();
+  }
+
   get filteredPendingTransactions(): Transaction[] {
-    if (!this.searchTerm.trim()) {
-      return this.pendingTransactions;
+    let filtered = this.pendingTransactions;
+
+    // Filter by selected account
+    if (this.selectedAccount !== 'All') {
+      filtered = filtered.filter(txn => txn.account === this.selectedAccount);
     }
-    const term = this.searchTerm.toLowerCase();
-    return this.pendingTransactions.filter(txn =>
-      txn.date.toLowerCase().includes(term) ||
-      txn.account.toLowerCase().includes(term) ||
-      txn.category.toLowerCase().includes(term) ||
-      (txn.description?.toLowerCase() ?? '').includes(term) ||
-      this.formatCurrency(txn.amount).toLowerCase().includes(term)
-    );
+
+    // Filter by search term
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(txn =>
+        txn.date.toLowerCase().includes(term) ||
+        txn.account.toLowerCase().includes(term) ||
+        txn.category.toLowerCase().includes(term) ||
+        (txn.description?.toLowerCase() ?? '').includes(term) ||
+        this.formatCurrency(txn.amount).toLowerCase().includes(term)
+      );
+    }
+
+    return filtered;
   }
 
   onSearchChange(): void {
@@ -213,5 +228,12 @@ export class PendingTabComponent implements OnChanges {
     return this.confirmationType === 'delete'
       ? 'Are you sure you want to delete this transaction?'
       : 'This removes the pending flag and finalizes the entry.';
+  }
+
+  getFilteredTotal(): number {
+    return this.filteredPendingTransactions.reduce((sum, txn) => {
+      const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
   }
 }

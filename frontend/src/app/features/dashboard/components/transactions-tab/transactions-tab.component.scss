@@ -20,10 +20,47 @@ $darker-bg: #0a0e13;
   gap: 20px;
 }
 
+.selectors-group {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
 .year-selector {
   display: flex;
   align-items: center;
   gap: 8px;
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  select {
+    background-color: #1a2332;
+    color: $text-light;
+    border: 1px solid $border-color;
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: $teal-accent;
+      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+    }
+  }
+}
+
+.month-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 10px;
 
   label {
     font-size: 13px;

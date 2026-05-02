@@ -16,7 +16,6 @@ import { PendingTabComponent } from './components/pending-tab/pending-tab.compon
 import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
 import { DifferencesCardComponent } from './components/differences-card/differences-card.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
-import { CreateTransactionModalComponent } from '../../shared/components/create-transaction-modal/create-transaction-modal.component';
 import { EditTransactionModalComponent } from '../../shared/components/edit-transaction-modal/edit-transaction-modal.component';
 
 @Component({

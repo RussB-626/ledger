@@ -1,16 +1,60 @@
 <div class="common-withdrawals-container">
   <div class="section-header">
     <h3>Common Withdrawals</h3>
+    <div class="selectors">
+      <div class="selector-group">
+        <label for="cw-year">Year:</label>
+        <select
+          id="cw-year"
+          [(ngModel)]="selectedYear"
+          (change)="onYearOrMonthChange()"
+        >
+          @for (year of pageData.years; track year) {
+            <option [value]="year">
+              {{ year }}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="selector-group">
+        <label for="cw-month">Month:</label>
+        <select
+          id="cw-month"
+          [(ngModel)]="selectedMonth"
+          (change)="onYearOrMonthChange()"
+        >
+          @for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) {
+            <option [value]="month">
+              {{ monthNames[month - 1] }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
   </div>
 
   @if (commonDescriptions.length > 0) {
-  <div class="descriptions-list">
-    @for (desc of commonDescriptions; track desc.id) {
-      <div class="description-item">
-        <span class="description-name">{{ desc.description }}</span>
-        <span class="badge">Recurring</span>
-      </div>
-    }
+  <div class="table-wrapper">
+    <table class="common-withdrawals-table">
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="text-right">{{ getPriorMonthName() }}</th>
+          <th class="text-right">{{ monthNames[selectedMonth - 1] }}</th>
+          <th class="text-right">Total {{ selectedYear }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (desc of commonDescriptions; track desc.id) {
+          <tr>
+            <td>{{ desc.description }}</td>
+            <td class="text-right">{{ formatCurrency(getPriorMonthTotal(desc.description)) }}</td>
+            <td class="text-right">{{ formatCurrency(getCurrentMonthTotal(desc.description)) }}</td>
+            <td class="text-right">{{ formatCurrency(getYearTotal(desc.description)) }}</td>
+          </tr>
+        }
+      </tbody>
+    </table>
   </div>
   }
 

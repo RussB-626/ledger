@@ -23,6 +23,8 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
 
   transactions: Transaction[] = [];
   selectedYear: number;
+  selectedMonth: string = 'All';
+  monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   loading = false;
   searchTerm: string = '';
   displayedColumns: string[] = ['date', 'account', 'category', 'description', 'amount', 'type', 'actions'];
@@ -70,9 +72,14 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
 
   onYearChange(year: number): void {
     this.selectedYear = year;
+    this.selectedMonth = 'All';
     this.currentPage = 1;
     this.searchTerm = '';
     this.loadTransactions();
+  }
+
+  onMonthChange(): void {
+    this.currentPage = 1;
   }
 
   onSearchChange(): void {
@@ -144,18 +151,40 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   }
 
+  get uniqueMonths(): number[] {
+    const months = new Set<number>();
+    this.transactions.forEach(txn => {
+      const date = new Date(txn.date);
+      months.add(date.getMonth() + 1);
+    });
+    return Array.from(months).sort((a, b) => a - b);
+  }
+
   get filteredTransactions(): Transaction[] {
-    if (!this.searchTerm.trim()) {
-      return this.transactions;
+    let filtered = this.transactions;
+
+    // Filter by selected month
+    if (this.selectedMonth !== 'All') {
+      const monthNum = parseInt(this.selectedMonth);
+      filtered = filtered.filter(txn => {
+        const date = new Date(txn.date);
+        return date.getMonth() + 1 === monthNum;
+      });
     }
-    const term = this.searchTerm.toLowerCase();
-    return this.transactions.filter(txn =>
-      txn.date.toLowerCase().includes(term) ||
-      txn.account.toLowerCase().includes(term) ||
-      txn.category.toLowerCase().includes(term) ||
-      (txn.description?.toLowerCase() ?? '').includes(term) ||
-      this.formatCurrency(txn.amount).toLowerCase().includes(term)
-    );
+
+    // Filter by search term
+    if (this.searchTerm.trim()) {
+      const term = this.searchTerm.toLowerCase();
+      filtered = filtered.filter(txn =>
+        txn.date.toLowerCase().includes(term) ||
+        txn.account.toLowerCase().includes(term) ||
+        txn.category.toLowerCase().includes(term) ||
+        (txn.description?.toLowerCase() ?? '').includes(term) ||
+        this.formatCurrency(txn.amount).toLowerCase().includes(term)
+      );
+    }
+
+    return filtered;
   }
 
   get totalPages(): number {
