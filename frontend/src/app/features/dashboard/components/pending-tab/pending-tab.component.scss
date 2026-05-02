@@ -1,0 +1,263 @@
+// Pending Tab styles
+
+$teal-accent: #00d9ff;
+$text-light: #e0e0e0;
+$text-muted: #999;
+$border-color: #1a1f26;
+$darker-bg: #0a0e13;
+
+.pending-tab-container {
+  width: 100%;
+  padding: 20px;
+}
+
+.pending-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 16px;
+
+  h3 {
+    margin: 0;
+    color: $text-light;
+    font-size: 16px;
+  }
+}
+
+.search-box {
+  flex-shrink: 0;
+}
+
+.search-input {
+  background-color: #1a2332;
+  color: $text-light;
+  border: 1px solid $border-color;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  min-width: 200px;
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $teal-accent;
+    box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+  }
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+}
+
+.pending-table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: $darker-bg;
+
+  thead {
+    background-color: #1a2332;
+    border-bottom: 2px solid $border-color;
+
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: $teal-accent;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+
+      &.text-right {
+        text-align: right;
+      }
+
+      &.text-center {
+        text-align: center;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba(0, 217, 255, 0.05);
+      }
+
+      td {
+        padding: 12px;
+        font-size: 14px;
+        color: $text-light;
+
+        &.text-right {
+          text-align: right;
+          font-family: 'Courier New', monospace;
+        }
+
+        &.text-center {
+          text-align: center;
+        }
+      }
+    }
+  }
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+
+  &.badge-w {
+    background-color: rgba(255, 71, 87, 0.2);
+    color: #ff4757;
+  }
+
+  &.badge-d {
+    background-color: rgba(46, 213, 115, 0.2);
+    color: #2ed573;
+  }
+
+  &.badge-tw {
+    background-color: rgba(0, 217, 255, 0.2);
+    color: $teal-accent;
+  }
+
+  &.badge-td {
+    background-color: rgba(0, 217, 255, 0.2);
+    color: $teal-accent;
+  }
+}
+
+.action-btn {
+  background: none;
+  border: none;
+  color: $text-muted;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px 8px;
+  border-radius: 3px;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: rgba(0, 217, 255, 0.1);
+    color: $teal-accent;
+  }
+
+  &.edit-btn:hover {
+    color: $teal-accent;
+  }
+
+  &.confirm-btn:hover {
+    color: #2ed573;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: $text-muted;
+  font-size: 14px;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  padding: 12px 20px;
+  border-top: 1px solid $border-color;
+  background-color: rgba(0, 0, 0, 0.2);
+  flex-wrap: wrap;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.page-size-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  label {
+    font-size: 12px;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+
+  select {
+    background-color: #1a2332;
+    color: $text-light;
+    border: 1px solid $border-color;
+    padding: 4px 8px;
+    border-radius: 3px;
+    font-size: 12px;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      border-color: $teal-accent;
+    }
+  }
+}
+
+.pagination-info {
+  font-size: 12px;
+  color: $text-muted;
+  white-space: nowrap;
+}
+
+.pagination-buttons {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-left: auto;
+
+  @media (max-width: 768px) {
+    margin-left: 0;
+    justify-content: center;
+  }
+}
+
+.page-btn {
+  background: none;
+  border: 1px solid $border-color;
+  color: $text-light;
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    border-color: $teal-accent;
+    color: $teal-accent;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.page-info {
+  font-size: 12px;
+  color: $text-light;
+  white-space: nowrap;
+}

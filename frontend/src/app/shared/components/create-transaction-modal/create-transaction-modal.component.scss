@@ -1,0 +1,174 @@
+// Create Transaction Modal styles
+// Dark theme with teal accents per CLAUDE.md
+
+$teal-accent: #00d9ff;
+$dark-bg: #0f1419;
+$darker-bg: #0a0e13;
+$text-light: #e0e0e0;
+$text-muted: #999;
+$border-color: #1a1f26;
+$error-color: #ff4757;
+
+.transaction-tabs {
+  display: flex;
+  border-bottom: 1px solid $border-color;
+  margin: -20px -20px 20px -20px;
+  padding: 0 20px;
+  background-color: $darker-bg;
+
+  .tab {
+    padding: 12px 20px;
+    border: none;
+    background: none;
+    color: $text-muted;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: $text-light;
+    }
+
+    &.active {
+      color: $teal-accent;
+      border-bottom-color: $teal-accent;
+    }
+  }
+}
+
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  select,
+  textarea {
+    background-color: #1a2332;
+    color: $text-light;
+    border: 1px solid $border-color;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+    transition: all 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $teal-accent;
+      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+    }
+
+    &::placeholder {
+      color: $text-muted;
+    }
+
+    &:disabled {
+      background-color: rgba(0, 0, 0, 0.2);
+      color: $text-muted;
+      cursor: not-allowed;
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+
+  &.checkbox {
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+
+    input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: $teal-accent;
+    }
+
+    label {
+      margin: 0;
+      text-transform: none;
+      letter-spacing: normal;
+      cursor: pointer;
+    }
+  }
+}
+
+.error-message {
+  background-color: rgba(255, 71, 87, 0.1);
+  color: $error-color;
+  border: 1px solid $error-color;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.modal {
+  max-width: 500px;
+
+  .modal-header {
+    h2 {
+      font-size: 20px;
+    }
+  }
+
+  .modal-footer {
+    .btn-primary,
+    .btn-secondary {
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: 1px solid $border-color;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+
+      &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+    }
+
+    .btn-primary {
+      background-color: $teal-accent;
+      color: $dark-bg;
+      border-color: $teal-accent;
+
+      &:not(:disabled):hover {
+        background-color: #1dd1a1;
+        border-color: #1dd1a1;
+        box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+      }
+    }
+
+    .btn-secondary {
+      background: none;
+      color: $text-light;
+
+      &:not(:disabled):hover {
+        background-color: rgba(0, 217, 255, 0.1);
+        color: $teal-accent;
+      }
+    }
+  }
+}

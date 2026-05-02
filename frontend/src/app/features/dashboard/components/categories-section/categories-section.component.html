@@ -1,0 +1,55 @@
+<div class="categories-section-container">
+  @if (loading) {
+  <div class="loading-state">
+    Loading category data...
+  </div>
+  }
+
+  @if (!loading && categoryTotals) {
+  <!-- List with Tabs -->
+  <div class="list-section">
+    <!-- Tabs -->
+    <div class="category-tabs">
+      <button
+        class="tab-btn"
+        [class.active]="selectedTab === 'expenses'"
+        (click)="selectTab('expenses')"
+      >
+        Expenses
+      </button>
+      <button
+        class="tab-btn"
+        [class.active]="selectedTab === 'incomes'"
+        (click)="selectTab('incomes')"
+      >
+        Incomes
+      </button>
+    </div>
+
+    <!-- Scrollable List -->
+    <div class="category-list">
+      @if (sortedCategoryEntries.length > 0) {
+        @for (item of sortedCategoryEntries; track item[0]) {
+          <div class="category-item">
+            <div class="item-header">
+              <span class="item-name">{{ item[0] }}</span>
+              <span class="item-amount">{{ formatCurrency(item[1]) }}</span>
+            </div>
+            <div class="item-bar">
+              <div class="progress-bar" [style.width.%]="getPercentage(item[1])"></div>
+            </div>
+            <div class="item-percentage">
+              {{ getPercentage(item[1]) }}%
+            </div>
+          </div>
+        }
+      }
+      @if (sortedCategoryEntries.length === 0) {
+        <div class="empty-list">
+          No {{ selectedTab }} this month
+        </div>
+      }
+    </div>
+  </div>
+  }
+</div>

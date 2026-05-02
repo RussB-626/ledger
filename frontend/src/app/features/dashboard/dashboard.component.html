@@ -1,0 +1,125 @@
+<div class="dashboard-container">
+  @if ((pageData$ | async); as pageData) {
+  <div class="dashboard-content">
+    <!-- Net Worth Header -->
+    <div class="net-worth-header">
+      <div class="net-worth-title">
+        <span class="label">Net worth</span>
+        <span class="amount">{{ calculateNetWorth(pageData.balances) | currency }}</span>
+      </div>
+      <app-differences-card [pageData]="pageData" [compact]="true"></app-differences-card>
+    </div>
+
+    <!-- Top Row: Combined Accounts/Transactions/Pending Tabs (Full Width) -->
+    <div class="card combined-tabs-card">
+      <div class="section-tabs">
+        <button
+          class="tab-btn"
+          [class.active]="activeMainTab === 'accounts'"
+          (click)="activeMainTab = 'accounts'">
+          Accounts
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="activeMainTab === 'transactions'"
+          (click)="activeMainTab = 'transactions'">
+          Transactions
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="activeMainTab === 'pending'"
+          (click)="activeMainTab = 'pending'">
+          Pending
+        </button>
+      </div>
+      @if (activeMainTab === 'accounts') {
+        <app-balances-tab [pageData]="pageData"></app-balances-tab>
+      }
+      @if (activeMainTab === 'transactions') {
+        <app-transactions-tab [pageData]="pageData" (editTransaction)="onEditTransaction($event)"></app-transactions-tab>
+      }
+      @if (activeMainTab === 'pending') {
+        <app-pending-tab [pageData]="pageData" (editTransaction)="onEditTransaction($event)"></app-pending-tab>
+      }
+    </div>
+
+    <!-- Bottom Row: 50/50 Split -->
+    <div class="bottom-content-row">
+      <!-- Left: Categories, Differences & Categories Data -->
+      <div class="card chart-card">
+        <!-- Categories Header with Year/Month Selectors -->
+        <div class="categories-header">
+          <h3>Categories</h3>
+          <div class="selectors">
+            <div class="selector-group">
+              <label for="category-year">Year:</label>
+              <select
+                id="category-year"
+                [(ngModel)]="selectedCategoryYear"
+                (change)="onCategoryYearMonthChange()"
+              >
+                @for (year of pageData.years; track year) {
+                  <option [value]="year">
+                    {{ year }}
+                  </option>
+                }
+              </select>
+            </div>
+            <div class="selector-group">
+              <label for="category-month">Month:</label>
+              <select
+                id="category-month"
+                [(ngModel)]="selectedCategoryMonth"
+                (change)="onCategoryYearMonthChange()"
+              >
+                @for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) {
+                  <option [value]="month">
+                    {{ monthNames[month - 1] }}
+                  </option>
+                }
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Differences Card Below Header -->
+        <div class="differences-sub-card">
+          <app-differences-card
+            [pageData]="pageData"
+            [compact]="false"
+            [selectedYear]="selectedCategoryYear"
+            [selectedMonth]="selectedCategoryMonth"
+          ></app-differences-card>
+        </div>
+
+        <!-- Categories Data Below Differences -->
+        <app-categories-section
+          #categoriesSection
+          [pageData]="pageData"
+          [externalSelectedYear]="selectedCategoryYear"
+          [externalSelectedMonth]="selectedCategoryMonth"
+          (yearMonthChanged)="onCategoryYearMonthChange()"
+        ></app-categories-section>
+      </div>
+
+      <!-- Right: Common Withdrawals -->
+      <div class="card">
+        <app-common-withdrawals [pageData]="pageData"></app-common-withdrawals>
+      </div>
+    </div>
+  </div>
+  } @else {
+  <div class="loading-state">
+    <p>Loading dashboard...</p>
+  </div>
+  }
+
+  <!-- Transaction Edit Modal -->
+  @if (showEditTransactionModal && editingTransaction) {
+    <app-edit-transaction-modal
+      [transaction]="editingTransaction"
+      (closed)="onCloseEditTransactionModal()"
+      (transactionUpdated)="onTransactionUpdated()"
+    ></app-edit-transaction-modal>
+  }
+</div>

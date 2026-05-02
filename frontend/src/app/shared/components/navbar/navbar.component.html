@@ -1,0 +1,64 @@
+<nav class="navbar">
+  <div class="navbar-left">
+    <div class="logo">
+      <span class="logo-icon">📊</span>
+      <span class="logo-text">Ledger</span>
+    </div>
+
+    <div class="nav-links">
+      <button class="nav-link" (click)="navigateToDashboard()">
+        Dashboard
+      </button>
+      <button class="nav-link" (click)="navigateToAdmin()">
+        Admin
+      </button>
+    </div>
+  </div>
+
+  <div class="navbar-right">
+    <button class="btn-new-transaction" (click)="openCreateTransactionModal()">
+      + New Transaction
+    </button>
+
+    <div class="user-switcher" clickOutside (clickOutside)="closeUserDropdown()">
+      <button class="user-button" (click)="toggleUserDropdown()">
+        <span class="user-icon">👤</span>
+        <span class="user-name">{{ (activeUser$ | async)?.name || 'Select User' }}</span>
+        <span class="dropdown-icon">▼</span>
+      </button>
+
+      @if (showUserDropdown) {
+        <div class="user-dropdown">
+          <div class="dropdown-header">
+            <span>Users</span>
+          </div>
+
+          <div class="dropdown-users">
+            @for (user of allUsers$ | async; track user.id) {
+              <button
+                class="dropdown-user-item"
+                [class.active]="(activeUser$ | async)?.id === user.id"
+                (click)="switchUser(user)"
+              >
+                {{ user.name }}
+              </button>
+            }
+          </div>
+
+          <div class="dropdown-divider"></div>
+
+          <button class="dropdown-create-user" (click)="createNewUser()">
+            + Create New User
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</nav>
+
+@if (showCreateTransactionModal) {
+  <app-create-transaction-modal
+    (closed)="closeCreateTransactionModal()"
+    (transactionCreated)="onTransactionCreated()"
+  ></app-create-transaction-modal>
+}

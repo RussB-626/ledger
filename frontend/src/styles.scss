@@ -1,0 +1,353 @@
+// Global styles for Checkbook Register app
+// Dark theme with teal/cyan accents per CLAUDE.md
+
+// Color palette
+$dark-bg: #0f1419;
+$darker-bg: #0a0e13;
+$teal-accent: #00d9ff;
+$teal-hover: #1dd1a1;
+$text-light: #e0e0e0;
+$text-muted: #999;
+$border-color: #1a1f26;
+$error-color: #ff4757;
+$success-color: #2ed573;
+$warning-color: #ffa502;
+
+// Reset and base styles
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  background-color: $dark-bg;
+  color: $text-light;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+// Scrollbar styling
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 217, 255, 0.1);
+}
+
+::-webkit-scrollbar-thumb {
+  background: $teal-accent;
+  border-radius: 4px;
+
+  &:hover {
+    background: $teal-hover;
+  }
+}
+
+// Form elements
+input, textarea, select {
+  background-color: #1a2332;
+  color: $text-light;
+  border: 1px solid $border-color;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all 0.2s ease;
+
+  &:focus {
+    outline: none;
+    border-color: $teal-accent;
+    box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+  }
+
+  &::placeholder {
+    color: $text-muted;
+  }
+
+  &:disabled {
+    background-color: rgba(0, 0, 0, 0.2);
+    color: $text-muted;
+    cursor: not-allowed;
+  }
+}
+
+// Buttons
+button {
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Tables
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: $darker-bg;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+  overflow: hidden;
+
+  thead {
+    background-color: #1a2332;
+    border-bottom: 2px solid $border-color;
+
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: $teal-accent;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba(0, 217, 255, 0.05);
+      }
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      td {
+        padding: 12px;
+        font-size: 14px;
+      }
+    }
+  }
+}
+
+// Cards
+.card {
+  background-color: $darker-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+
+  .card-header {
+    border-bottom: 1px solid $border-color;
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      color: $text-light;
+    }
+  }
+
+  .card-body {
+    padding: 0;
+  }
+}
+
+// Modals
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal {
+  background-color: $darker-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 20px;
+  max-width: 500px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid $border-color;
+    padding-bottom: 12px;
+
+    h2 {
+      margin: 0;
+      font-size: 18px;
+      color: $text-light;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: $text-muted;
+      font-size: 24px;
+      cursor: pointer;
+      padding: 0;
+
+      &:hover {
+        color: $text-light;
+      }
+    }
+  }
+
+  .modal-body {
+    margin-bottom: 20px;
+  }
+
+  .modal-footer {
+    display: flex;
+    gap: 12px;
+    justify-content: flex-end;
+    border-top: 1px solid $border-color;
+    padding-top: 16px;
+
+    button {
+      padding: 8px 16px;
+      border-radius: 4px;
+      border: 1px solid $border-color;
+      background: none;
+      color: $text-light;
+
+      &.btn-primary {
+        background-color: $teal-accent;
+        color: $dark-bg;
+        border-color: $teal-accent;
+        font-weight: 600;
+
+        &:hover {
+          background-color: $teal-hover;
+          border-color: $teal-hover;
+        }
+      }
+
+      &.btn-secondary {
+        &:hover {
+          background-color: rgba(0, 217, 255, 0.1);
+          color: $teal-accent;
+        }
+      }
+    }
+  }
+}
+
+// Tabs
+.tabs {
+  display: flex;
+  border-bottom: 1px solid $border-color;
+  margin-bottom: 20px;
+
+  .tab {
+    padding: 12px 20px;
+    border: none;
+    background: none;
+    color: $text-muted;
+    cursor: pointer;
+    font-size: 14px;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+
+    &:hover {
+      color: $text-light;
+    }
+
+    &.active {
+      color: $teal-accent;
+      border-bottom-color: $teal-accent;
+    }
+  }
+}
+
+// Utility classes
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-muted {
+  color: $text-muted;
+}
+
+.text-error {
+  color: $error-color;
+}
+
+.text-success {
+  color: $success-color;
+}
+
+.mt-0 { margin-top: 0; }
+.mt-1 { margin-top: 4px; }
+.mt-2 { margin-top: 8px; }
+.mt-3 { margin-top: 12px; }
+.mt-4 { margin-top: 16px; }
+.mt-5 { margin-top: 20px; }
+
+.mb-0 { margin-bottom: 0; }
+.mb-1 { margin-bottom: 4px; }
+.mb-2 { margin-bottom: 8px; }
+.mb-3 { margin-bottom: 12px; }
+.mb-4 { margin-bottom: 16px; }
+.mb-5 { margin-bottom: 20px; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: 4px; }
+.p-2 { padding: 8px; }
+.p-3 { padding: 12px; }
+.p-4 { padding: 16px; }
+.p-5 { padding: 20px; }
+
+.d-flex {
+  display: flex;
+}
+
+.gap-1 { gap: 4px; }
+.gap-2 { gap: 8px; }
+.gap-3 { gap: 12px; }
+.gap-4 { gap: 16px; }
+.gap-5 { gap: 20px; }
+
+.align-items-center {
+  align-items: center;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.justify-content-between {
+  justify-content: space-between;
+}
+
+// Clickoutside directive support
+[clickOutside] {
+  position: relative;
+}

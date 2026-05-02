@@ -1,0 +1,18 @@
+<div class="app-container" [class.loading]="loading">
+  <app-navbar></app-navbar>
+
+  <main class="main-content">
+    @if (loading) {
+      <div class="loading-overlay">
+        <div class="spinner"></div>
+        <p>Loading...</p>
+      </div>
+    }
+
+    @if (!loading) {
+      <div class="router-outlet-container">
+        <router-outlet></router-outlet>
+      </div>
+    }
+  </main>
+</div>

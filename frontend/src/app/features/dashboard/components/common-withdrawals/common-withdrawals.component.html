@@ -1,0 +1,22 @@
+<div class="common-withdrawals-container">
+  <div class="section-header">
+    <h3>Common Withdrawals</h3>
+  </div>
+
+  @if (commonDescriptions.length > 0) {
+  <div class="descriptions-list">
+    @for (desc of commonDescriptions; track desc.id) {
+      <div class="description-item">
+        <span class="description-name">{{ desc.description }}</span>
+        <span class="badge">Recurring</span>
+      </div>
+    }
+  </div>
+  }
+
+  @if (commonDescriptions.length === 0) {
+  <div class="empty-state">
+    <p>No common withdrawals tracked</p>
+  </div>
+  }
+</div>

@@ -1,0 +1,263 @@
+// Dashboard component styles
+// Dark theme with teal accents per CLAUDE.md
+
+$dark-bg: #0f1419;
+$darker-bg: #0a0e13;
+$teal-accent: #00d9ff;
+$text-light: #e0e0e0;
+$text-muted: #999;
+$border-color: #1a1f26;
+$success-color: #1dd1a1;
+$danger-color: #ff6b6b;
+
+@mixin custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: $border-color;
+    border-radius: 3px;
+    &:hover {
+      background: rgba(0, 217, 255, 0.3);
+    }
+  }
+}
+
+.dashboard-container {
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  padding: 20px;
+  background-color: $dark-bg;
+}
+
+.dashboard-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  animation: fadeIn 0.3s ease-in;
+}
+
+// Net Worth Header
+.net-worth-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(0, 217, 255, 0.1) 0%, rgba(0, 217, 255, 0.05) 100%);
+  border: 1px solid rgba(0, 217, 255, 0.2);
+  border-radius: 8px;
+  margin-bottom: 10px;
+}
+
+.net-worth-title {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .label {
+    font-size: 14px;
+    font-weight: 500;
+    color: $text-light;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .amount {
+    font-size: 32px;
+    font-weight: 700;
+    color: $teal-accent;
+  }
+}
+
+// Bottom Content Row - 50/50 Split
+.bottom-content-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.balances-card {
+  min-height: 300px;
+}
+
+.chart-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-height: 400px;
+  overflow: hidden;
+
+  .categories-header {
+    flex-shrink: 0;
+    padding: 16px 20px;
+    border-bottom: 1px solid $border-color;
+    background-color: rgba(0, 0, 0, 0.2);
+
+    h3 {
+      margin: 0 0 12px 0;
+      color: $text-light;
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .selectors {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .selector-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+
+      label {
+        font-size: 12px;
+        font-weight: 600;
+        color: $text-muted;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      select {
+        background-color: #1a2332;
+        color: $text-light;
+        border: 1px solid $border-color;
+        padding: 8px 10px;
+        border-radius: 4px;
+        font-size: 13px;
+        font-family: inherit;
+
+        &:focus {
+          outline: none;
+          border-color: $teal-accent;
+          box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+        }
+      }
+    }
+  }
+
+  .differences-sub-card {
+    flex-shrink: 0;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    margin: 12px;
+    padding: 5px;
+    overflow-y: auto;
+    @include custom-scrollbar;
+  }
+
+  app-categories-section {
+    min-height: 600px;
+    max-height: 600px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    @include custom-scrollbar;
+  }
+}
+
+.cards-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.card {
+  background-color: $darker-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: rgba(0, 217, 255, 0.3);
+  }
+}
+
+.combined-tabs-card,
+.transactions-section {
+  .section-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid $border-color;
+    padding: 0 20px;
+    background-color: rgba(0, 0, 0, 0.2);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 12px 20px;
+    border: none;
+    background: none;
+    color: $text-muted;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+
+    &:hover {
+      color: $text-light;
+    }
+
+    &.active {
+      color: $teal-accent;
+      border-bottom-color: $teal-accent;
+    }
+  }
+}
+
+.combined-tabs-card {
+  display: flex;
+  flex-direction: column;
+  min-height: 800px;
+  max-height: 800px;
+  overflow: hidden;
+
+  .section-tabs {
+    flex-shrink: 0;
+  }
+
+  app-balances-tab,
+  app-transactions-tab,
+  app-pending-tab {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    @include custom-scrollbar;
+  }
+}
+
+.loading-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+  color: $text-light;
+  font-size: 16px;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

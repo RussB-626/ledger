@@ -1,0 +1,88 @@
+// Balances Tab styles
+// Dark theme with teal accents per CLAUDE.md
+
+$teal-accent: #00d9ff;
+$text-light: #e0e0e0;
+$text-muted: #999;
+$border-color: #1a1f26;
+$darker-bg: #0a0e13;
+
+.balances-list-container {
+  width: 100%;
+  padding: 20px;
+}
+
+.section-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: $text-light;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.balances-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  thead {
+    background-color: rgba(0, 217, 255, 0.05);
+    border-bottom: 1px solid $border-color;
+
+    th {
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+      color: $teal-accent;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 0.5px;
+
+      &.text-right {
+        text-align: right;
+      }
+    }
+  }
+
+  tbody {
+    tr {
+      border-bottom: 1px solid $border-color;
+      transition: background-color 0.2s ease;
+
+      &:hover:not(.total-row) {
+        background-color: rgba(0, 217, 255, 0.05);
+      }
+
+      &.total-row {
+        background-color: rgba(0, 217, 255, 0.1);
+        border-top: 2px solid $border-color;
+        font-weight: 600;
+
+        td {
+          padding: 12px;
+          color: $teal-accent;
+        }
+      }
+
+      td {
+        padding: 12px;
+        font-size: 14px;
+        color: $text-light;
+
+        &.text-right {
+          text-align: right;
+          font-family: 'Courier New', monospace;
+        }
+
+        &.total-amount {
+          color: $teal-accent;
+        }
+      }
+    }
+  }
+}

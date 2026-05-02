@@ -1,0 +1,19 @@
+# Docker Compose configuration for Checkbook Register
+# App container with Express + Angular frontend
+# Note: MySQL database must be running separately (external or local instance)
+
+services:
+  # Express + Angular app container
+  app:
+    build: .
+    container_name: checkbook-app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: production
+      DB_HOST: ${DB_HOST:-localhost}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_NAME: ${DB_NAME:-checkbook_register}
+      DB_USER: ${DB_USER:-checkbook_user}
+      DB_PASSWORD: ${DB_PASSWORD:-checkbook_password}

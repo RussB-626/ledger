@@ -1,0 +1,313 @@
+<div class="modal-overlay" (clickOutside)="close()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ editingTransaction ? 'Edit Transaction' : 'New Transaction' }}</h2>
+      <button class="close-btn" (click)="close()">×</button>
+    </div>
+
+    <div class="modal-body">
+      <!-- Error message -->
+      @if (error) {
+        <div class="error-message">
+          {{ error }}
+        </div>
+      }
+
+      <!-- Tabs -->
+      <div class="transaction-tabs">
+        <button
+          class="tab"
+          [class.active]="activeTab === 'withdrawal'"
+          (click)="selectTab('withdrawal')"
+        >
+          Withdrawal
+        </button>
+        <button
+          class="tab"
+          [class.active]="activeTab === 'deposit'"
+          (click)="selectTab('deposit')"
+        >
+          Deposit
+        </button>
+        <button
+          class="tab"
+          [class.active]="activeTab === 'transfer'"
+          (click)="selectTab('transfer')"
+        >
+          Transfer
+        </button>
+      </div>
+
+      <!-- Withdrawal Tab -->
+      @if (activeTab === 'withdrawal') {
+      <form [formGroup]="withdrawalForm" class="transaction-form">
+        <div class="form-group">
+          <label for="withdrawal-date">Date</label>
+          <input
+            id="withdrawal-date"
+            type="date"
+            formControlName="date"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="withdrawal-account">Account</label>
+          <select id="withdrawal-account" formControlName="account" required>
+            <option value="">Select Account</option>
+            @for (account of accounts; track account.id) {
+              <option [value]="account.name">
+                {{ account.name }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="withdrawal-category">Category (Expense)</label>
+          <select id="withdrawal-category" formControlName="category" required>
+            <option value="">Select Category</option>
+            @for (category of getCategoriesByType('expense'); track category.id) {
+              <option [value]="category.name">
+                {{ category.name }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="withdrawal-description">Description</label>
+          <input
+            id="withdrawal-description"
+            type="text"
+            formControlName="description"
+            placeholder="Enter description"
+            list="withdrawal-descriptions"
+            required
+          />
+          <datalist id="withdrawal-descriptions">
+            @for (desc of descriptions; track desc.id) {
+              <option [value]="desc.description"></option>
+            }
+          </datalist>
+        </div>
+
+        <div class="form-group">
+          <label for="withdrawal-notes">Notes (Optional)</label>
+          <textarea id="withdrawal-notes" formControlName="notes" rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="withdrawal-amount">Amount</label>
+          <input
+            id="withdrawal-amount"
+            type="number"
+            step="0.01"
+            formControlName="amount"
+            placeholder="0.00"
+            required
+          />
+        </div>
+
+        <div class="form-group checkbox">
+          <input
+            id="withdrawal-pending"
+            type="checkbox"
+            formControlName="pending"
+          />
+          <label for="withdrawal-pending">Mark as Pending</label>
+        </div>
+      </form>
+      }
+
+      <!-- Deposit Tab -->
+      @if (activeTab === 'deposit') {
+      <form [formGroup]="depositForm" class="transaction-form">
+        <div class="form-group">
+          <label for="deposit-date">Date</label>
+          <input
+            id="deposit-date"
+            type="date"
+            formControlName="date"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="deposit-account">Account</label>
+          <select id="deposit-account" formControlName="account" required>
+            <option value="">Select Account</option>
+            @for (account of accounts; track account.id) {
+              <option [value]="account.name">
+                {{ account.name }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="deposit-category">Category (Income)</label>
+          <select id="deposit-category" formControlName="category" required>
+            <option value="">Select Category</option>
+            @for (category of getCategoriesByType('income'); track category.id) {
+              <option [value]="category.name">
+                {{ category.name }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="deposit-description">Description</label>
+          <input
+            id="deposit-description"
+            type="text"
+            formControlName="description"
+            placeholder="Enter description"
+            list="deposit-descriptions"
+            required
+          />
+          <datalist id="deposit-descriptions">
+            @for (desc of descriptions; track desc.id) {
+              <option [value]="desc.description"></option>
+            }
+          </datalist>
+        </div>
+
+        <div class="form-group">
+          <label for="deposit-notes">Notes (Optional)</label>
+          <textarea id="deposit-notes" formControlName="notes" rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="deposit-amount">Amount</label>
+          <input
+            id="deposit-amount"
+            type="number"
+            step="0.01"
+            formControlName="amount"
+            placeholder="0.00"
+            required
+          />
+        </div>
+
+        <div class="form-group checkbox">
+          <input
+            id="deposit-pending"
+            type="checkbox"
+            formControlName="pending"
+          />
+          <label for="deposit-pending">Mark as Pending</label>
+        </div>
+      </form>
+      }
+
+      <!-- Transfer Tab -->
+      @if (activeTab === 'transfer') {
+      <form [formGroup]="transferForm" class="transaction-form">
+        <div class="form-group">
+          <label for="transfer-date">Date</label>
+          <input
+            id="transfer-date"
+            type="date"
+            formControlName="date"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="transfer-from">From Account</label>
+          <select id="transfer-from" formControlName="fromAccount" required>
+            <option value="">Select Account</option>
+            @for (account of getAccountsByType('fromAccount'); track account.id) {
+              <option [value]="account.name">
+                {{ account.name }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="transfer-to">To Account</label>
+          <select id="transfer-to" formControlName="toAccount" required>
+            <option value="">Select Account</option>
+            @for (account of getAccountsByType('toAccount'); track account.id) {
+              <option [value]="account.name">
+                {{ account.name }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="transfer-category">Category (Transfer)</label>
+          <select id="transfer-category" formControlName="category" required>
+            <option value="">Select Category</option>
+            @for (category of getCategoriesByType('transfer'); track category.id) {
+              <option [value]="category.name">
+                {{ category.name }}
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="transfer-description">Description</label>
+          <input
+            id="transfer-description"
+            type="text"
+            formControlName="description"
+            placeholder="Enter description"
+            list="transfer-descriptions"
+            required
+          />
+          <datalist id="transfer-descriptions">
+            @for (desc of descriptions; track desc.id) {
+              <option [value]="desc.description"></option>
+            }
+          </datalist>
+        </div>
+
+        <div class="form-group">
+          <label for="transfer-notes">Notes (Optional)</label>
+          <textarea id="transfer-notes" formControlName="notes" rows="2"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="transfer-amount">Amount</label>
+          <input
+            id="transfer-amount"
+            type="number"
+            step="0.01"
+            formControlName="amount"
+            placeholder="0.00"
+            required
+          />
+        </div>
+
+        <div class="form-group checkbox">
+          <input
+            id="transfer-pending"
+            type="checkbox"
+            formControlName="pending"
+          />
+          <label for="transfer-pending">Mark as Pending</label>
+        </div>
+      </form>
+      }
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="close()" [disabled]="loading">
+        Cancel
+      </button>
+      <button
+        class="btn-primary"
+        (click)="submit()"
+        [disabled]="loading || !getActiveForm().valid"
+      >
+        {{ loading ? (editingTransaction ? 'Updating...' : 'Creating...') : (editingTransaction ? 'Update Transaction' : 'Create Transaction') }}
+      </button>
+    </div>
+  </div>
+</div>

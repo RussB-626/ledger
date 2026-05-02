@@ -1,0 +1,247 @@
+// Edit Transaction Modal styles
+
+$dark-bg: #0f1419;
+$darker-bg: #0a0e13;
+$teal-accent: #00d9ff;
+$text-light: #e0e0e0;
+$text-muted: #999;
+$border-color: #1a1f26;
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal {
+  background-color: $darker-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid $border-color;
+
+  h2 {
+    margin: 0;
+    color: $text-light;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: $text-muted;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+
+  &:hover {
+    color: $text-light;
+  }
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.error-message {
+  background-color: rgba(255, 107, 107, 0.1);
+  border: 1px solid #ff6b6b;
+  color: #ff6b6b;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+
+.transaction-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    font-size: 12px;
+    font-weight: 600;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  input[type="text"],
+  input[type="date"],
+  input[type="number"],
+  select,
+  textarea {
+    background-color: #1a2332;
+    color: $text-light;
+    border: 1px solid $border-color;
+    padding: 10px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-family: inherit;
+
+    &::placeholder {
+      color: $text-muted;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: $teal-accent;
+      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+    }
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 60px;
+  }
+}
+
+.form-group.full-width {
+  grid-column: 1 / -1;
+}
+
+.type-selector {
+  grid-column: 1 / -1;
+}
+
+.type-buttons {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 8px;
+}
+
+.type-btn {
+  background-color: #1a2332;
+  color: $text-light;
+  border: 1px solid $border-color;
+  padding: 10px 12px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-transform: capitalize;
+  line-height: 1.3;
+
+  &:hover {
+    border-color: $teal-accent;
+    color: $teal-accent;
+  }
+
+  &.active {
+    background-color: $teal-accent;
+    border-color: $teal-accent;
+    color: $dark-bg;
+    font-weight: 600;
+  }
+}
+
+.checkbox-group {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: $teal-accent;
+  }
+
+  label {
+    margin: 0;
+    text-transform: capitalize;
+    cursor: pointer;
+    font-weight: 500;
+    color: $text-light;
+  }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid $border-color;
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.btn-secondary,
+.btn-primary {
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.btn-secondary {
+  background-color: #1a2332;
+  color: $text-light;
+  border: 1px solid $border-color;
+
+  &:hover:not(:disabled) {
+    border-color: $text-light;
+    color: $text-light;
+  }
+}
+
+.btn-primary {
+  background-color: $teal-accent;
+  color: $dark-bg;
+
+  &:hover:not(:disabled) {
+    background-color: #1dd1a1;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+}

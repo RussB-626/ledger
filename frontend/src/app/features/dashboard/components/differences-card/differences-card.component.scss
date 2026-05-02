@@ -1,0 +1,147 @@
+// Differences Card styles
+
+$teal-accent: #00d9ff;
+$text-light: #e0e0e0;
+$text-muted: #999;
+$border-color: #1a1f26;
+$success-color: #1dd1a1;
+$danger-color: #ff6b6b;
+
+// Compact view for header
+.differences-card-compact {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+
+  .compact-income,
+  .compact-expenses {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    align-items: flex-end;
+
+    .label {
+      font-size: 12px;
+      font-weight: 500;
+      color: $text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .amount {
+      font-size: 20px;
+      font-weight: 700;
+      font-family: 'Courier New', monospace;
+
+      &.positive {
+        color: $success-color;
+      }
+
+      &.negative {
+        color: $danger-color;
+      }
+    }
+  }
+}
+
+.differences-card-container {
+  width: 100%;
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.card-selectors {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 5px;
+
+  .selector-group {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    label {
+      font-size: 13px;
+      font-weight: 500;
+      color: $text-light;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    select {
+      background-color: #1a2332;
+      color: $text-light;
+      border: 1px solid $border-color;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      cursor: pointer;
+
+      &:focus {
+        outline: none;
+        border-color: $teal-accent;
+        box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
+      }
+    }
+  }
+}
+
+.card-body {
+  padding: 0;
+}
+
+.net-total-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.net-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  &.net-total {
+    background-color: rgba(0, 217, 255, 0.08);
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    padding: 5px;
+    margin-top: 3px;
+  }
+
+  .net-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: $text-light;
+  }
+
+  .net-amount {
+    font-size: 14px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+    color: $text-light;
+
+    &.positive {
+      color: $success-color;
+    }
+
+    &.negative {
+      color: $danger-color;
+    }
+  }
+}
+
+.loading-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: $text-muted;
+  font-size: 14px;
+}
