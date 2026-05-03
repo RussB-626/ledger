@@ -128,6 +128,17 @@
 - **Date Format:** `YYYY-MM-DD` (DATE in MySQL, string in JSON)
 - **Amount Format:** `DECIMAL(12,2)` in DB, number in JSON (not string)
 
+### 7a. Referential Integrity & Cascade Operations
+- **Foreign Key Constraints:** All reference tables have `ON DELETE CASCADE ON UPDATE CASCADE`
+  - When an **account** is deleted → all transactions with that account are automatically deleted
+  - When an **account name** is updated → all transactions with that account automatically update
+  - When a **category** is deleted → all transactions with that category are automatically deleted
+  - When a **category name** is updated → all transactions with that category automatically update
+  - When a **description** is deleted → all transactions with that description are automatically deleted
+  - When a **description** is updated → all transactions with that description automatically update
+- **Database Enforcement:** All cascade operations are enforced at MySQL level, not application level
+- **No Application-Level Checks:** Backend delete functions are simple and rely on database constraints
+
 ### 8. Verification Before Mark-Complete
 - [ ] Backend runs: `npm run dev` (TypeScript) or `npm run build && node dist/index.js` (compiled)
 - [ ] All endpoints return `{ data, error }` format

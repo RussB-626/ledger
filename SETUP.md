@@ -154,6 +154,13 @@ docker-compose down -v
 - **Port:** 3306
 - **Tables:** users, transactions, accounts, categories, descriptions
 - **Seed Data:** Test users (Russ, Jane) with sample transactions
+- **Referential Integrity:** Foreign key constraints with `ON DELETE CASCADE ON UPDATE CASCADE`
+  - Deleting an account automatically deletes all related transactions
+  - Updating an account name automatically updates all related transactions
+  - Deleting a category automatically deletes all related transactions
+  - Updating a category name automatically updates all related transactions
+  - Deleting a description automatically deletes all related transactions
+  - Updating a description automatically updates all related transactions
 
 ---
 
@@ -181,6 +188,28 @@ docker-compose down -v
 ### Analytics
 - `GET /api/users/:userId/categories?year=YYYY&month=MM` — Category totals
 - `GET /api/users/:userId/monthly-difference?year=YYYY&month=MM` — (Income - Expenses)
+
+---
+
+## Data Management & Cascade Behavior
+
+### Deleting Reference Items
+
+When you delete an account, category, or description from the Admin panel:
+- **Delete Account:** All transactions using that account are automatically deleted
+- **Delete Category:** All transactions using that category are automatically deleted
+- **Delete Description:** All transactions using that description are automatically deleted
+
+This cascading behavior is enforced at the database level via MySQL foreign key constraints, ensuring data consistency.
+
+### Updating Reference Items
+
+When you edit (rename) an account, category, or description:
+- **Rename Account:** All transactions using that account automatically reflect the new name
+- **Rename Category:** All transactions using that category automatically reflect the new name
+- **Update Description:** All transactions using that description automatically reflect the change
+
+Updates propagate through the database automatically without requiring manual transaction updates.
 
 ---
 
