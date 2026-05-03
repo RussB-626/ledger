@@ -134,7 +134,13 @@ $success-color: #2ed573;
     font-size: 20px;
   }
 
-  .add-btn {
+  .button-group {
+    display: flex;
+    gap: 8px;
+  }
+
+  .add-btn,
+  .bulk-add-btn {
     background: $teal-accent;
     border: none;
     color: $bg-dark;
@@ -393,6 +399,42 @@ $success-color: #2ed573;
   }
 }
 
+.radio-group {
+  margin: 16px 0;
+  padding: 12px;
+  background: $bg-darker;
+  border: 1px solid $border-color;
+  border-radius: 4px;
+
+  .radio-label {
+    color: $text-light;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 0 0 10px 0;
+  }
+
+  .radio-option {
+    display: flex;
+    align-items: center;
+    color: $text-light;
+    font-size: 13px;
+    cursor: pointer;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .radio-input {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      accent-color: $teal-accent;
+    }
+  }
+}
+
 // BUTTONS
 .btn-cancel,
 .btn-save,
@@ -472,4 +514,45 @@ $success-color: #2ed573;
       background: rgba(0, 217, 255, 0.08);
     }
   }
+
+  .help-text {
+    color: $text-lighter;
+    font-size: 13px;
+    margin-bottom: 12px;
+  }
+
+  .bulk-textarea {
+    width: 100%;
+    padding: 10px 12px;
+    background: $bg-darker;
+    border: 1px solid $border-color;
+    border-radius: 4px;
+    color: $text-light;
+    font-size: 13px;
+    font-family: monospace;
+    resize: vertical;
+    transition: border-color 0.2s ease;
+
+    &:focus {
+      outline: none;
+      border-color: $teal-accent;
+      box-shadow: 0 0 8px rgba(0, 217, 255, 0.1);
+    }
+
+    &::placeholder {
+      color: $text-lighter;
+    }
+  }
+
+  .error-message {
+    color: $danger-color;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+}
+
+// DISABLED STATE
+button[disabled] {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

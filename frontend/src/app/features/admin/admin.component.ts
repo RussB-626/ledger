@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, forkJoin, of } from 'rxjs';
+import { Subject, forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UserService } from '../../core/services/user.service';
 import { ApiService } from '../../core/services/api.service';
@@ -68,6 +68,26 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   descriptionModal: ModalState = { isOpen: false, mode: 'create' };
   descriptionFormData: DescriptionModalData = { description: '', is_common: false };
+
+  // Bulk add modal state
+  bulkAddModal = { isOpen: false };
+  bulkAccountsText = '';
+  bulkAddError = '';
+  bulkAddLoading = false;
+
+  // Bulk add categories modal state
+  bulkCategoryModal = { isOpen: false };
+  bulkCategoriesText = '';
+  bulkCategoryType: 'expense' | 'income' | 'transfer' = 'expense';
+  bulkCategoryError = '';
+  bulkCategoryLoading = false;
+
+  // Bulk add descriptions modal state
+  bulkDescriptionModal = { isOpen: false };
+  bulkDescriptionsText = '';
+  bulkDescriptionIsCommon = false;
+  bulkDescriptionError = '';
+  bulkDescriptionLoading = false;
 
   deleteConfirmation: {
     isOpen: boolean;
@@ -166,6 +186,160 @@ export class AdminComponent implements OnInit, OnDestroy {
           this.refreshPageDataInDashboard();
         });
     }
+  }
+
+  openBulkAddModal(): void {
+    this.bulkAddModal = { isOpen: true };
+    this.bulkAccountsText = '';
+    this.bulkAddError = '';
+    this.bulkAddLoading = false;
+  }
+
+  closeBulkAddModal(): void {
+    this.bulkAddModal = { isOpen: false };
+    this.bulkAccountsText = '';
+    this.bulkAddError = '';
+  }
+
+  saveBulkAccounts(): void {
+    if (!this.activeUser || !this.bulkAccountsText.trim()) {
+      this.bulkAddError = 'Please paste account names';
+      return;
+    }
+
+    const accountNames = this.bulkAccountsText
+      .split(',')
+      .map(name => name.trim())
+      .filter(name => name.length > 0);
+
+    if (accountNames.length === 0) {
+      this.bulkAddError = 'No valid account names found';
+      return;
+    }
+
+    this.bulkAddLoading = true;
+    this.bulkAddError = '';
+
+    this.apiService.bulkCreateAccounts(this.activeUser.id, accountNames)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.closeBulkAddModal();
+          this.loadAllData();
+          this.refreshPageDataInDashboard();
+          this.bulkAddLoading = false;
+        },
+        error: (error: unknown) => {
+          this.bulkAddLoading = false;
+          const err = error as { error?: { error?: string } };
+          const errorMsg = err?.error?.error || 'Failed to add accounts';
+          this.bulkAddError = errorMsg;
+        }
+      });
+  }
+
+  openBulkCategoryModal(): void {
+    this.bulkCategoryModal = { isOpen: true };
+    this.bulkCategoriesText = '';
+    this.bulkCategoryType = 'expense';
+    this.bulkCategoryError = '';
+    this.bulkCategoryLoading = false;
+  }
+
+  closeBulkCategoryModal(): void {
+    this.bulkCategoryModal = { isOpen: false };
+    this.bulkCategoriesText = '';
+    this.bulkCategoryType = 'expense';
+    this.bulkCategoryError = '';
+  }
+
+  saveBulkCategories(): void {
+    if (!this.activeUser || !this.bulkCategoriesText.trim()) {
+      this.bulkCategoryError = 'Please paste category names';
+      return;
+    }
+
+    const categoryNames = this.bulkCategoriesText
+      .split(',')
+      .map(name => name.trim())
+      .filter(name => name.length > 0);
+
+    if (categoryNames.length === 0) {
+      this.bulkCategoryError = 'No valid category names found';
+      return;
+    }
+
+    this.bulkCategoryLoading = true;
+    this.bulkCategoryError = '';
+
+    this.apiService.bulkCreateCategories(this.activeUser.id, categoryNames, this.bulkCategoryType)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.closeBulkCategoryModal();
+          this.loadAllData();
+          this.refreshPageDataInDashboard();
+          this.bulkCategoryLoading = false;
+        },
+        error: (error: unknown) => {
+          this.bulkCategoryLoading = false;
+          const err = error as { error?: { error?: string } };
+          const errorMsg = err?.error?.error || 'Failed to add categories';
+          this.bulkCategoryError = errorMsg;
+        }
+      });
+  }
+
+  openBulkDescriptionModal(): void {
+    this.bulkDescriptionModal = { isOpen: true };
+    this.bulkDescriptionsText = '';
+    this.bulkDescriptionIsCommon = false;
+    this.bulkDescriptionError = '';
+    this.bulkDescriptionLoading = false;
+  }
+
+  closeBulkDescriptionModal(): void {
+    this.bulkDescriptionModal = { isOpen: false };
+    this.bulkDescriptionsText = '';
+    this.bulkDescriptionIsCommon = false;
+    this.bulkDescriptionError = '';
+  }
+
+  saveBulkDescriptions(): void {
+    if (!this.activeUser || !this.bulkDescriptionsText.trim()) {
+      this.bulkDescriptionError = 'Please paste description text';
+      return;
+    }
+
+    const descriptions = this.bulkDescriptionsText
+      .split(',')
+      .map(desc => desc.trim())
+      .filter(desc => desc.length > 0);
+
+    if (descriptions.length === 0) {
+      this.bulkDescriptionError = 'No valid descriptions found';
+      return;
+    }
+
+    this.bulkDescriptionLoading = true;
+    this.bulkDescriptionError = '';
+
+    this.apiService.bulkCreateDescriptions(this.activeUser.id, descriptions, this.bulkDescriptionIsCommon)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.closeBulkDescriptionModal();
+          this.loadAllData();
+          this.refreshPageDataInDashboard();
+          this.bulkDescriptionLoading = false;
+        },
+        error: (error: unknown) => {
+          this.bulkDescriptionLoading = false;
+          const err = error as { error?: { error?: string } };
+          const errorMsg = err?.error?.error || 'Failed to add descriptions';
+          this.bulkDescriptionError = errorMsg;
+        }
+      });
   }
 
   openDeleteConfirmation(type: 'user' | 'account' | 'category' | 'description', itemId: number, itemName: string): void {

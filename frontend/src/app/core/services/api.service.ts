@@ -125,6 +125,20 @@ export class ApiService {
     ).pipe(map(response => response.data || { success: false }));
   }
 
+  bulkCreateAccounts(userId: number, names: string[]): Observable<Account[]> {
+    return this.http.post<ApiResponse<Account[]>>(
+      `${this.baseUrl}/users/${userId}/accounts/bulk`,
+      { names }
+    ).pipe(map(response => response.data || []));
+  }
+
+  bulkCreateCategories(userId: number, names: string[], type: 'expense' | 'income' | 'transfer'): Observable<Category[]> {
+    return this.http.post<ApiResponse<Category[]>>(
+      `${this.baseUrl}/users/${userId}/categories/bulk`,
+      { names, type }
+    ).pipe(map(response => response.data || []));
+  }
+
   // ====== CATEGORIES ======
 
   getCategories(userId: number, type?: string): Observable<Category[]> {
@@ -199,6 +213,13 @@ export class ApiService {
     return this.http.delete<ApiResponse<{ success: boolean }>>(
       `${this.baseUrl}/users/${userId}/txn-descriptions/${descriptionId}`
     ).pipe(map(response => response.data || { success: false }));
+  }
+
+  bulkCreateDescriptions(userId: number, descriptions: string[], isCommon: boolean): Observable<Description[]> {
+    return this.http.post<ApiResponse<Description[]>>(
+      `${this.baseUrl}/users/${userId}/txn-descriptions/bulk`,
+      { descriptions, is_common: isCommon }
+    ).pipe(map(response => response.data || []));
   }
 
   // ====== ANALYTICS ======

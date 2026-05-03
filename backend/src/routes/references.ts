@@ -23,6 +23,45 @@ const router = Router();
 
 // ====== ACCOUNTS ======
 
+// POST /api/users/:userId/accounts/bulk - Bulk create accounts (skip duplicates)
+router.post(
+  '/:userId/accounts/bulk',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = parseInt(req.params.userId, 10);
+    const { names } = req.body as { names?: string[] };
+
+    if (isNaN(userId)) {
+      const response: ApiResponse<never> = { error: 'Invalid user ID' };
+      res.status(400).json(response);
+      return;
+    }
+
+    if (!Array.isArray(names) || names.length === 0) {
+      const response: ApiResponse<never> = { error: 'Account names array is required' };
+      res.status(400).json(response);
+      return;
+    }
+
+    const createdAccounts: Account[] = [];
+
+    for (const name of names) {
+      const trimmedName = name.trim();
+      if (!trimmedName) continue;
+
+      try {
+        const account = await referencesController.createAccount(userId, { name: trimmedName });
+        createdAccounts.push(account);
+      } catch {
+        // Skip accounts that already exist or fail to create
+        continue;
+      }
+    }
+
+    const response: ApiResponse<Account[]> = { data: createdAccounts };
+    res.status(201).json(response);
+  })
+);
+
 // GET /api/users/:userId/accounts - Get all accounts for user
 router.get(
   '/:userId/accounts',
@@ -120,6 +159,81 @@ router.delete(
 );
 
 // ====== CATEGORIES ======
+
+// POST /api/users/:userId/categories/bulk - Bulk create categories (update if exists with different type)
+router.post(
+  '/:userId/categories/bulk',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = parseInt(req.params.userId, 10);
+    const { names, type } = req.body as { names?: string[], type?: string };
+
+    if (isNaN(userId)) {
+      const response: ApiResponse<never> = { error: 'Invalid user ID' };
+      res.status(400).json(response);
+      return;
+    }
+
+    if (!Array.isArray(names) || names.length === 0) {
+      const response: ApiResponse<never> = { error: 'Category names array is required' };
+      res.status(400).json(response);
+      return;
+    }
+
+    if (!type || !['expense', 'income', 'transfer'].includes(type)) {
+      const response: ApiResponse<never> = { error: 'Category type must be expense, income, or transfer' };
+      res.status(400).json(response);
+      return;
+    }
+
+    // Get all existing categories for this user
+    const existingCategories = await referencesController.getCategoriesByUserId(userId);
+
+    const resultCategories: Category[] = [];
+    const typeKey = `is_${type}` as 'is_expense' | 'is_income' | 'is_transfer';
+
+    for (const name of names) {
+      const trimmedName = name.trim();
+      if (!trimmedName) continue;
+
+      const existing = existingCategories.find(cat => cat.name === trimmedName);
+
+      if (!existing) {
+        // Category doesn't exist, create it
+        try {
+          const category = await referencesController.createCategory(userId, {
+            name: trimmedName,
+            is_expense: type === 'expense',
+            is_income: type === 'income',
+            is_transfer: type === 'transfer',
+            is_ignored: false
+          });
+          resultCategories.push(category);
+        } catch {
+          // Skip if creation fails
+          continue;
+        }
+      } else if (!existing[typeKey]) {
+        // Category exists but doesn't have this type, update it
+        try {
+          const updatePayload: UpdateCategoryRequest = {};
+          updatePayload[typeKey] = true;
+
+          const updated = await referencesController.updateCategory(userId, existing.id, updatePayload);
+          if (updated) {
+            resultCategories.push(updated);
+          }
+        } catch {
+          // Skip if update fails
+          continue;
+        }
+      }
+      // else: category already has this type, skip it silently (no error)
+    }
+
+    const response: ApiResponse<Category[]> = { data: resultCategories };
+    res.status(201).json(response);
+  })
+);
 
 // GET /api/users/:userId/categories - Get all categories (or filtered by type) or category totals (analytics)
 router.get(
@@ -237,6 +351,56 @@ router.delete(
 );
 
 // ====== DESCRIPTIONS ======
+
+// POST /api/users/:userId/txn-descriptions/bulk - Bulk create descriptions (skip duplicates)
+router.post(
+  '/:userId/txn-descriptions/bulk',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = parseInt(req.params.userId, 10);
+    const { descriptions, is_common } = req.body as { descriptions?: string[], is_common?: boolean };
+
+    if (isNaN(userId)) {
+      const response: ApiResponse<never> = { error: 'Invalid user ID' };
+      res.status(400).json(response);
+      return;
+    }
+
+    if (!Array.isArray(descriptions) || descriptions.length === 0) {
+      const response: ApiResponse<never> = { error: 'Descriptions array is required' };
+      res.status(400).json(response);
+      return;
+    }
+
+    // Get all existing descriptions for this user
+    const existingDescriptions = await referencesController.getDescriptionsByUserId(userId);
+
+    const createdDescriptions: Description[] = [];
+
+    for (const desc of descriptions) {
+      const trimmedDesc = desc.trim();
+      if (!trimmedDesc) continue;
+
+      const exists = existingDescriptions.some(d => d.description === trimmedDesc);
+
+      if (!exists) {
+        try {
+          const description = await referencesController.createDescription(userId, {
+            description: trimmedDesc,
+            is_common: is_common ?? false
+          });
+          createdDescriptions.push(description);
+        } catch {
+          // Skip if creation fails
+          continue;
+        }
+      }
+      // else: description already exists, skip it silently (no error)
+    }
+
+    const response: ApiResponse<Description[]> = { data: createdDescriptions };
+    res.status(201).json(response);
+  })
+);
 
 // GET /api/users/:userId/txn-descriptions - Get all descriptions (or filtered by common flag)
 router.get(

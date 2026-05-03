@@ -38,7 +38,10 @@
   <div class="tab-content" *ngIf="activeTab === 'accounts'">
     <div class="tab-header">
       <h2>Accounts Management</h2>
-      <button class="add-btn" (click)="openAccountModal('create')">+ Add Account</button>
+      <div class="button-group">
+        <button class="add-btn" (click)="openAccountModal('create')">+ Add Account</button>
+        <button class="bulk-add-btn" (click)="openBulkAddModal()">Bulk Add</button>
+      </div>
     </div>
 
     <table class="admin-table" *ngIf="accounts.length > 0; else noAccounts">
@@ -80,7 +83,10 @@
   <div class="tab-content" *ngIf="activeTab === 'categories'">
     <div class="tab-header">
       <h2>Categories Management</h2>
-      <button class="add-btn" (click)="openCategoryModal('create')">+ Add Category</button>
+      <div class="button-group">
+        <button class="add-btn" (click)="openCategoryModal('create')">+ Add Category</button>
+        <button class="bulk-add-btn" (click)="openBulkCategoryModal()">Bulk Add</button>
+      </div>
     </div>
 
     <table class="admin-table" *ngIf="categories.length > 0; else noCategories">
@@ -130,7 +136,10 @@
   <div class="tab-content" *ngIf="activeTab === 'descriptions'">
     <div class="tab-header">
       <h2>Descriptions Management</h2>
-      <button class="add-btn" (click)="openDescriptionModal('create')">+ Add Description</button>
+      <div class="button-group">
+        <button class="add-btn" (click)="openDescriptionModal('create')">+ Add Description</button>
+        <button class="bulk-add-btn" (click)="openBulkDescriptionModal()">Bulk Add</button>
+      </div>
     </div>
 
     <table class="admin-table" *ngIf="descriptions.length > 0; else noDescriptions">
@@ -350,6 +359,131 @@
       <div class="modal-footer">
         <button class="btn-cancel" (click)="closeDeleteConfirmation()">Cancel</button>
         <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK ADD ACCOUNTS MODAL -->
+  <div class="modal-overlay" *ngIf="bulkAddModal.isOpen" (click)="closeBulkAddModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Bulk Add Accounts</h3>
+        <button class="close-btn" (click)="closeBulkAddModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="help-text">Paste a comma-separated list of account names:</p>
+        <textarea
+          [(ngModel)]="bulkAccountsText"
+          placeholder="e.g., Checking, Savings, Credit Card, Paypal"
+          class="bulk-textarea"
+          rows="6"
+        ></textarea>
+        <div *ngIf="bulkAddError" class="error-message">{{ bulkAddError }}</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeBulkAddModal()" [disabled]="bulkAddLoading">Cancel</button>
+        <button class="btn-save" (click)="saveBulkAccounts()" [disabled]="bulkAddLoading">
+          {{ bulkAddLoading ? 'Adding...' : 'Add Accounts' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK ADD CATEGORIES MODAL -->
+  <div class="modal-overlay" *ngIf="bulkCategoryModal.isOpen" (click)="closeBulkCategoryModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Bulk Add Categories</h3>
+        <button class="close-btn" (click)="closeBulkCategoryModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="help-text">Paste a comma-separated list of category names:</p>
+        <textarea
+          [(ngModel)]="bulkCategoriesText"
+          placeholder="e.g., Groceries, Gas, Entertainment, Salary"
+          class="bulk-textarea"
+          rows="6"
+        ></textarea>
+
+        <div class="radio-group">
+          <p class="radio-label">Category Type:</p>
+          <label class="radio-option">
+            <input
+              type="radio"
+              name="categoryType"
+              value="expense"
+              [(ngModel)]="bulkCategoryType"
+              class="radio-input"
+            />
+            Expense
+          </label>
+          <label class="radio-option">
+            <input
+              type="radio"
+              name="categoryType"
+              value="income"
+              [(ngModel)]="bulkCategoryType"
+              class="radio-input"
+            />
+            Income
+          </label>
+          <label class="radio-option">
+            <input
+              type="radio"
+              name="categoryType"
+              value="transfer"
+              [(ngModel)]="bulkCategoryType"
+              class="radio-input"
+            />
+            Transfer
+          </label>
+        </div>
+
+        <div *ngIf="bulkCategoryError" class="error-message">{{ bulkCategoryError }}</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeBulkCategoryModal()" [disabled]="bulkCategoryLoading">Cancel</button>
+        <button class="btn-save" (click)="saveBulkCategories()" [disabled]="bulkCategoryLoading">
+          {{ bulkCategoryLoading ? 'Adding...' : 'Add Categories' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BULK ADD DESCRIPTIONS MODAL -->
+  <div class="modal-overlay" *ngIf="bulkDescriptionModal.isOpen" (click)="closeBulkDescriptionModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Bulk Add Descriptions</h3>
+        <button class="close-btn" (click)="closeBulkDescriptionModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="help-text">Paste a comma-separated list of descriptions:</p>
+        <textarea
+          [(ngModel)]="bulkDescriptionsText"
+          placeholder="e.g., Grocery Store, Gas Station, Restaurant, Transfer"
+          class="bulk-textarea"
+          rows="6"
+        ></textarea>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="bulkDescriptionIsCommon"
+              class="checkbox-input"
+            />
+            Mark as Common (for recurring withdrawals)
+          </label>
+        </div>
+
+        <div *ngIf="bulkDescriptionError" class="error-message">{{ bulkDescriptionError }}</div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeBulkDescriptionModal()" [disabled]="bulkDescriptionLoading">Cancel</button>
+        <button class="btn-save" (click)="saveBulkDescriptions()" [disabled]="bulkDescriptionLoading">
+          {{ bulkDescriptionLoading ? 'Adding...' : 'Add Descriptions' }}
+        </button>
       </div>
     </div>
   </div>
