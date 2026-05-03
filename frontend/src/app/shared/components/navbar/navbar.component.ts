@@ -25,6 +25,8 @@ export class NavbarComponent implements OnInit {
   allUsers$: Observable<User[]>;
   showUserDropdown = false;
   showCreateTransactionModal = false;
+  showCreateUserModal = false;
+  newUserName = '';
 
   constructor(
     private userService: UserService,
@@ -73,23 +75,35 @@ export class NavbarComponent implements OnInit {
     });
   }
 
-  createNewUser(): void {
-    const name = prompt('Enter new user name:');
-    if (!name || !name.trim()) {
+  openCreateUserModal(): void {
+    this.closeUserDropdown();
+    this.showCreateUserModal = true;
+    this.newUserName = '';
+  }
+
+  createNewUserFromNavbar(): void {
+    if (!this.newUserName.trim()) {
+      alert('Please enter a user name');
       return;
     }
 
-    this.apiService.createUser(name).subscribe({
+    this.apiService.createUser(this.newUserName).subscribe({
       next: (user: User) => {
         const allUsers = this.userService.getAllUsersSync();
         this.userService.setAllUsers([...allUsers, user]);
         this.switchUser(user);
+        this.closeCreateUserModal();
       },
       error: (error) => {
         console.error('Failed to create user:', error);
         alert('Failed to create user');
       }
     });
+  }
+
+  closeCreateUserModal(): void {
+    this.showCreateUserModal = false;
+    this.newUserName = '';
   }
 
   openCreateTransactionModal(): void {

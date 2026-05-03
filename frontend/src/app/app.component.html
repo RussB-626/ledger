@@ -14,5 +14,33 @@
         <router-outlet></router-outlet>
       </div>
     }
+
+    <!-- APP INITIALIZATION MODAL (required, no cancel) -->
+    @if (showUserSelectionModal) {
+      <div class="modal-overlay">
+        <div class="modal" (click)="$event.stopPropagation()">
+          <div class="modal-header">
+            <h3>Create New User</h3>
+          </div>
+          <div class="modal-body">
+            <p>No users exist. Please create a new user:</p>
+            <div class="form-group">
+              <label>User Name</label>
+              <input
+                type="text"
+                [(ngModel)]="newUserName"
+                placeholder="Enter new user name"
+                class="form-input"
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button class="btn-save" (click)="createNewUserOnInit()">
+              Create User
+            </button>
+          </div>
+        </div>
+      </div>
+    }
   </main>
 </div>

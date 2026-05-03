@@ -4,6 +4,9 @@
     <h1>Admin Management</h1>
     <div class="active-user" *ngIf="activeUser">
       User: <span class="user-name">{{ activeUser.name }}</span>
+      <button class="delete-user-btn" (click)="deleteCurrentUser()" title="Delete this user and all their data">
+        Delete User
+      </button>
     </div>
   </div>
 
@@ -167,6 +170,46 @@
     </ng-template>
   </div>
 
+  <!-- USER DELETION MODAL (required - no cancel) -->
+  <div class="modal-overlay" *ngIf="showUserDeletionModal" (click)="$event.stopPropagation()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ availableUsers.length > 0 ? 'Select a User' : 'Create New User' }}</h3>
+      </div>
+      <div class="modal-body">
+        <p *ngIf="availableUsers.length > 0">The current user has been deleted. Please select another user:</p>
+        <p *ngIf="availableUsers.length === 0">No users exist. Please create a new user:</p>
+
+        <!-- User list (if users exist) -->
+        <div *ngIf="availableUsers.length > 0" class="user-list">
+          <button
+            *ngFor="let user of availableUsers"
+            class="user-option-btn"
+            (click)="selectUserAndContinue(user)"
+          >
+            {{ user.name }}
+          </button>
+        </div>
+
+        <!-- Create new user form (if no users) -->
+        <div *ngIf="availableUsers.length === 0" class="form-group">
+          <label>User Name</label>
+          <input
+            type="text"
+            [(ngModel)]="newUserName"
+            placeholder="Enter new user name"
+            class="form-input"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button *ngIf="availableUsers.length === 0" class="btn-save" (click)="createUserAndContinue()">
+          Create User
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- ACCOUNT MODAL -->
   <div class="modal-overlay" *ngIf="accountModal.isOpen" (click)="closeAccountModal()">
     <div class="modal" (click)="$event.stopPropagation()">
@@ -297,7 +340,12 @@
       </div>
       <div class="modal-body">
         <p>Are you sure you want to delete "{{ deleteConfirmation.itemName }}"?</p>
-        <p class="warning">This action cannot be undone.</p>
+        <p class="warning" *ngIf="deleteConfirmation.type === 'user'">
+          ⚠️ Deleting this user will permanently remove all their accounts, categories, descriptions, and transactions. This cannot be undone.
+        </p>
+        <p class="warning" *ngIf="deleteConfirmation.type !== 'user'">
+          This action cannot be undone.
+        </p>
       </div>
       <div class="modal-footer">
         <button class="btn-cancel" (click)="closeDeleteConfirmation()">Cancel</button>
@@ -305,4 +353,5 @@
       </div>
     </div>
   </div>
+
 </div>

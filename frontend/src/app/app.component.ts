@@ -1,9 +1,12 @@
 // Root app component
 // Per CLAUDE.md: Strict TypeScript typing, all components typed with explicit interfaces
 
-import { Component, OnInit, ChangeDetectorRef, NgZone } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef, NgZone } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { UserService } from './core/services/user.service';
 import { ApiService } from './core/services/api.service';
 import { PageDataService } from './core/services/page-data.service';
@@ -15,11 +18,16 @@ import { User } from './core/models/index';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SharedModule]
+  imports: [CommonModule, RouterOutlet, SharedModule, FormsModule]
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, OnDestroy {
   title = 'Checkbook Register';
   loading = true;
+  showUserSelectionModal = false;
+  hasExistingUsers = false;
+  availableUsers: User[] = [];
+  newUserName = '';
+  private destroy$ = new Subject<void>();
 
   constructor(
     private userService: UserService,
@@ -32,6 +40,11 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.initializeApp();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private initializeApp(): void {
@@ -55,8 +68,7 @@ export class AppComponent implements OnInit {
                 this.userService.setActiveUser(users[0]);
                 this.loadPageData(users[0].id);
               } else {
-                this.loading = false;
-                this.cdr.markForCheck();
+                this.showUserCreationModal();
               }
             }
           } else {
@@ -65,8 +77,7 @@ export class AppComponent implements OnInit {
               this.userService.setActiveUser(users[0]);
               this.loadPageData(users[0].id);
             } else {
-              this.loading = false;
-              this.cdr.markForCheck();
+              this.showUserCreationModal();
             }
           }
         });
@@ -98,5 +109,43 @@ export class AppComponent implements OnInit {
         });
       }
     });
+  }
+
+  private showUserCreationModal(): void {
+    this.showUserSelectionModal = true;
+    this.loading = false;
+    this.cdr.markForCheck();
+  }
+
+  createNewUserOnInit(): void {
+    if (!this.newUserName.trim()) {
+      alert('Please enter a user name');
+      return;
+    }
+
+    this.apiService.createUser(this.newUserName).subscribe({
+      next: (user) => {
+        this.ngZone.run(() => {
+          // Update all users list
+          const allUsers = this.userService.getAllUsersSync();
+          this.userService.setAllUsers([...allUsers, user]);
+
+          this.userService.setActiveUser(user);
+          this.loadPageData(user.id);
+          this.closeUserSelectionModal();
+        });
+      },
+      error: (error) => {
+        this.ngZone.run(() => {
+          const errorMsg = error?.error?.error || 'Failed to create user';
+          alert(errorMsg);
+        });
+      }
+    });
+  }
+
+  closeUserSelectionModal(): void {
+    this.showUserSelectionModal = false;
+    this.newUserName = '';
   }
 }

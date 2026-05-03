@@ -47,7 +47,7 @@
 
           <div class="dropdown-divider"></div>
 
-          <button class="dropdown-create-user" (click)="createNewUser()">
+          <button class="dropdown-create-user" (click)="openCreateUserModal()">
             + Create New User
           </button>
         </div>
@@ -61,4 +61,35 @@
     (closed)="closeCreateTransactionModal()"
     (transactionCreated)="onTransactionCreated()"
   ></app-create-transaction-modal>
+}
+
+<!-- NAVBAR CREATE USER MODAL (optional, has cancel) -->
+@if (showCreateUserModal) {
+  <div class="modal-overlay" (click)="closeCreateUserModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Create New User</h3>
+        <button class="close-btn" (click)="closeCreateUserModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>User Name</label>
+          <input
+            type="text"
+            [(ngModel)]="newUserName"
+            placeholder="Enter new user name"
+            class="form-input"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeCreateUserModal()">
+          Cancel
+        </button>
+        <button class="btn-save" (click)="createNewUserFromNavbar()">
+          Create User
+        </button>
+      </div>
+    </div>
+  </div>
 }

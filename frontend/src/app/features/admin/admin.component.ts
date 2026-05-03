@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Subject, forkJoin } from 'rxjs';
+import { Subject, forkJoin, of } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { UserService } from '../../core/services/user.service';
 import { ApiService } from '../../core/services/api.service';
@@ -48,6 +48,11 @@ export class AdminComponent implements OnInit, OnDestroy {
   categories: Category[] = [];
   descriptions: Description[] = [];
 
+  // User deletion modal state
+  showUserDeletionModal = false;
+  availableUsers: User[] = [];
+  newUserName = '';
+
   // Modal states
   accountModal: ModalState = { isOpen: false, mode: 'create' };
   accountFormData: AccountModalData = { name: '' };
@@ -66,7 +71,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   deleteConfirmation: {
     isOpen: boolean;
-    type: 'account' | 'category' | 'description' | null;
+    type: 'user' | 'account' | 'category' | 'description' | null;
     itemId?: number;
     itemName?: string;
   } = {
@@ -163,7 +168,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     }
   }
 
-  openDeleteConfirmation(type: 'account' | 'category' | 'description', itemId: number, itemName: string): void {
+  openDeleteConfirmation(type: 'user' | 'account' | 'category' | 'description', itemId: number, itemName: string): void {
     this.deleteConfirmation = { isOpen: true, type, itemId, itemName };
   }
 
@@ -172,29 +177,46 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(): void {
-    if (!this.activeUser || !this.deleteConfirmation.type || !this.deleteConfirmation.itemId) return;
+    if (!this.deleteConfirmation.type || !this.deleteConfirmation.itemId) return;
 
-    const userId = this.activeUser.id;
     const itemId = this.deleteConfirmation.itemId;
     const type = this.deleteConfirmation.type;
 
     let deleteCall;
-    if (type === 'account') {
-      deleteCall = this.apiService.deleteAccount(userId, itemId);
+    if (type === 'user') {
+      deleteCall = this.apiService.deleteUser(itemId);
+    } else if (type === 'account') {
+      if (!this.activeUser) return;
+      deleteCall = this.apiService.deleteAccount(this.activeUser.id, itemId);
     } else if (type === 'category') {
-      deleteCall = this.apiService.deleteCategory(userId, itemId);
+      if (!this.activeUser) return;
+      deleteCall = this.apiService.deleteCategory(this.activeUser.id, itemId);
     } else {
-      deleteCall = this.apiService.deleteDescription(userId, itemId);
+      if (!this.activeUser) return;
+      deleteCall = this.apiService.deleteDescription(this.activeUser.id, itemId);
     }
 
-    deleteCall.subscribe(() => {
-      this.closeDeleteConfirmation();
-      this.loadAllData();
-      if (type === 'account' || type === 'category' || type === 'description') {
-        this.refreshPageDataInDashboard();
+    deleteCall.subscribe({
+      next: () => {
+        this.closeDeleteConfirmation();
+
+        if (type === 'user') {
+          this.openUserDeletionModal();
+        } else {
+          this.loadAllData();
+          if (this.activeUser) {
+            this.refreshPageDataInDashboard();
+          }
+        }
+      },
+      error: (error) => {
+        this.closeDeleteConfirmation();
+        const errorMsg = error?.error?.error || 'Failed to delete item';
+        alert(errorMsg);
       }
     });
   }
+
 
   // ====== CATEGORY OPERATIONS ======
 
@@ -306,6 +328,75 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   selectTab(tab: 'accounts' | 'categories' | 'descriptions'): void {
     this.activeTab = tab;
+  }
+
+  deleteCurrentUser(): void {
+    if (!this.activeUser) return;
+    this.openDeleteConfirmation('user', this.activeUser.id, this.activeUser.name);
+  }
+
+  private openUserDeletionModal(): void {
+    this.apiService.getAllUsers().subscribe(users => {
+      this.availableUsers = users;
+      // Update UserService so navbar dropdown shows current users
+      this.userService.setAllUsers(users);
+      this.showUserDeletionModal = true;
+      this.newUserName = '';
+      this.cdr.markForCheck();
+    });
+  }
+
+  selectUserAndContinue(user: User): void {
+    this.userService.setActiveUser(user);
+    this.apiService.getPageData(user.id).subscribe({
+      next: (pageData) => {
+        this.pageDataService.setPageData(pageData);
+        this.closeUserDeletionModal();
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error) => {
+        console.error('Failed to load page data:', error);
+        this.closeUserDeletionModal();
+        this.router.navigate(['/dashboard']);
+      }
+    });
+  }
+
+  createUserAndContinue(): void {
+    if (!this.newUserName.trim()) {
+      alert('Please enter a user name');
+      return;
+    }
+
+    this.apiService.createUser(this.newUserName).subscribe({
+      next: (user) => {
+        const allUsers = this.userService.getAllUsersSync();
+        this.userService.setAllUsers([...allUsers, user]);
+        this.userService.setActiveUser(user);
+        this.apiService.getPageData(user.id).subscribe({
+          next: (pageData) => {
+            this.pageDataService.setPageData(pageData);
+            this.closeUserDeletionModal();
+            this.router.navigate(['/dashboard']);
+          },
+          error: (error) => {
+            console.error('Failed to load page data:', error);
+            this.closeUserDeletionModal();
+            this.router.navigate(['/dashboard']);
+          }
+        });
+      },
+      error: (error) => {
+        const errorMsg = error?.error?.error || 'Failed to create user';
+        alert(errorMsg);
+      }
+    });
+  }
+
+  closeUserDeletionModal(): void {
+    this.showUserDeletionModal = false;
+    this.availableUsers = [];
+    this.newUserName = '';
   }
 
   backToDashboard(): void {

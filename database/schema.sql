@@ -9,6 +9,28 @@ CREATE TABLE users (
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- Accounts table: Bank/savings account names per user
+CREATE TABLE accounts (
+  id      INT AUTO_INCREMENT PRIMARY KEY,
+  user_id INT NOT NULL,
+  name    VARCHAR(100) NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  UNIQUE KEY unique_user_account (user_id, name)
+);
+
+-- Categories table: Unified category list with type flags and is_ignored flag
+CREATE TABLE categories (
+  id          INT AUTO_INCREMENT PRIMARY KEY,
+  user_id     INT NOT NULL,
+  name        VARCHAR(100) NOT NULL,
+  is_expense  TINYINT(1) NOT NULL DEFAULT 0,
+  is_income   TINYINT(1) NOT NULL DEFAULT 0,
+  is_transfer TINYINT(1) NOT NULL DEFAULT 0,
+  is_ignored  TINYINT(1) NOT NULL DEFAULT 0,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  UNIQUE KEY unique_user_category (user_id, name)
+);
+
 -- Descriptions table: Transaction descriptions with common flag
 -- MUST be created before transactions table (FK dependency)
 CREATE TABLE descriptions (
@@ -34,31 +56,11 @@ CREATE TABLE transactions (
   pending           TINYINT(1) NOT NULL DEFAULT 0,
   created_at        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (description_id) REFERENCES descriptions(id),
+  FOREIGN KEY (description_id) REFERENCES descriptions(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (user_id, account) REFERENCES accounts(user_id, name) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (user_id, category) REFERENCES categories(user_id, name) ON DELETE CASCADE ON UPDATE CASCADE,
   INDEX idx_user_id (user_id),
   INDEX idx_date (date),
   INDEX idx_type (type),
   INDEX idx_description_id (description_id)
-);
-
--- Accounts table: Bank/savings account names per user
-CREATE TABLE accounts (
-  id      INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  name    VARCHAR(100) NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  UNIQUE KEY unique_user_account (user_id, name)
-);
-
--- Categories table: Unified category list with type flags and is_ignored flag
-CREATE TABLE categories (
-  id          INT AUTO_INCREMENT PRIMARY KEY,
-  user_id     INT NOT NULL,
-  name        VARCHAR(100) NOT NULL,
-  is_expense  TINYINT(1) NOT NULL DEFAULT 0,
-  is_income   TINYINT(1) NOT NULL DEFAULT 0,
-  is_transfer TINYINT(1) NOT NULL DEFAULT 0,
-  is_ignored  TINYINT(1) NOT NULL DEFAULT 0,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  UNIQUE KEY unique_user_category (user_id, name)
 );
