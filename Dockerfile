@@ -23,6 +23,9 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+# Copy database schema
+COPY --from=builder /app/database ./database
+
 # Copy backend dist (compiled TypeScript)
 COPY --from=builder /app/backend/dist ./backend/dist
 COPY --from=builder /app/backend/node_modules ./backend/node_modules
