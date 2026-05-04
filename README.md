@@ -13,14 +13,100 @@ A self-hosted full-stack financial ledger application built with Express.js, Ang
 - **Customizable formatting** — Currency symbols, decimal separators, negative amount formatting
 - **Backup system** — Automatic and manual backups with scheduled jobs
 - **Responsive design** — Dark theme with teal/cyan accents
+- **Containerized** — Docker support for easy deployment
 
 ## Requirements
 
-- **Node.js** v18+ (backend and frontend build)
-- **MySQL** v5.7+ (or compatible)
+- **Docker** and **Docker Compose** (for containerized deployment)
+- **MySQL** v5.7+ (database server, can be local, remote, or in separate container)
+
+*For local development without Docker:*
+- **Node.js** v18+
 - **npm** v9+
 
-## Setup
+## Quick Start (Docker)
+
+### 1. Database Setup
+
+Ensure MySQL is running and accessible. Create a database and user:
+
+```bash
+mysql -u root -p
+```
+
+```sql
+CREATE DATABASE checkbook_register;
+CREATE USER 'checkbook_user'@'%' IDENTIFIED BY 'checkbook_password';
+GRANT ALL PRIVILEGES ON checkbook_register.* TO 'checkbook_user'@'%';
+GRANT CREATE ON checkbook_register.* TO 'checkbook_user'@'%';
+FLUSH PRIVILEGES;
+```
+
+> **Note:** Replace `'%'` with your specific host (e.g., `'localhost'`, `'192.168.1.100'`) for security.
+> The `GRANT CREATE` permission is required for automatic schema initialization.
+
+### 2. Configure Docker Environment
+
+Create a `.env` file in the project root:
+
+```bash
+cp .env.example .env  # Or create manually
+```
+
+**.env file contents:**
+```
+DB_HOST=192.168.1.100        # Your MySQL server IP/hostname
+DB_PORT=3306
+DB_NAME=checkbook_register
+DB_USER=checkbook_user
+DB_PASSWORD=checkbook_password
+```
+
+Or use `localhost` if MySQL is running on your machine:
+```
+DB_HOST=localhost
+DB_PORT=3306
+DB_NAME=checkbook_register
+DB_USER=checkbook_user
+DB_PASSWORD=checkbook_password
+```
+
+### 3. Build and Run with Docker
+
+```bash
+# Build the Docker image
+docker-compose build
+
+# Start the container
+docker-compose up -d
+
+# View logs
+docker-compose logs -f app
+```
+
+The app will be available at **http://localhost:3000**
+
+### 4. Stop the Container
+
+```bash
+docker-compose down
+```
+
+### 5. View Backups
+
+Backups are stored in a Docker volume and accessible via:
+
+```bash
+docker-compose exec app ls -la /app/backups/
+```
+
+Or from your filesystem at: `./backups/` (mounted directory)
+
+---
+
+## Local Development (Without Docker)
+
+For development, you can run the backend and frontend in separate terminals:
 
 ### 1. Database Setup
 
@@ -34,12 +120,9 @@ mysql -u root -p
 CREATE DATABASE checkbook_register;
 CREATE USER 'checkbook_user'@'localhost' IDENTIFIED BY 'your_password';
 GRANT ALL PRIVILEGES ON checkbook_register.* TO 'checkbook_user'@'localhost';
--- IMPORTANT: Must grant CREATE permission for schema auto-initialization
 GRANT CREATE ON checkbook_register.* TO 'checkbook_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
-
-> **Note:** If using a remote MySQL server, replace `'localhost'` with your host IP. The backend will automatically create tables from `database/schema.sql` on first run, but the MySQL user **must have CREATE TABLE permissions**.
 
 ### 2. Backend Setup
 
@@ -50,11 +133,7 @@ cd backend
 npm install
 
 # Create .env file
-cp .env.example .env  # Or create manually with:
-```
-
-**.env file contents:**
-```
+cat > .env << EOF
 DB_HOST=localhost
 DB_PORT=3306
 DB_NAME=checkbook_register
@@ -62,40 +141,23 @@ DB_USER=checkbook_user
 DB_PASSWORD=your_password
 PORT=3000
 NODE_ENV=development
-```
+EOF
 
-**Start backend (development):**
-```bash
+# Start backend (development mode with auto-reload)
 npm run dev
 ```
 
-Or **build and run (production):**
-```bash
-npm run build
-node dist/index.js
-```
-
-The backend will:
-1. Connect to MySQL
-2. Check if tables exist
-3. If missing, automatically create them from `database/schema.sql`
-4. Start Express server on http://localhost:3000
-
-**Expected startup logs:**
+**Expected output:**
 ```
 ✓ Database connected successfully
 [Database] Starting initialization...
-[Database] Connected to database, checking for existing tables...
-⚙  Database tables not found, initializing schema...
-[Database] Found 5 SQL statements to execute
-[Database] Executing statement 1/5...
 ✓ Database schema initialized successfully
 ✓ Express server running on http://localhost:3000
-  Environment: development
-[Scheduler] Initializing backup scheduler...
 ```
 
 ### 3. Frontend Setup
+
+In a **new terminal**:
 
 ```bash
 cd frontend
@@ -103,23 +165,26 @@ cd frontend
 # Install dependencies
 npm install
 
-# Start development server
+# Start Angular dev server (with proxy to backend)
 ng serve --proxy-config proxy.conf.json
 ```
 
-Frontend will run on http://localhost:4200 and proxy API requests to the backend at http://localhost:3000.
+Frontend runs on **http://localhost:4200** and proxies API requests to http://localhost:3000.
+
+---
 
 ## Usage
 
-1. Open http://localhost:4200 in your browser
-2. Use the **User dropdown** (top-right) to switch between users or create new users
-3. **Dashboard tab:**
+Open the app in your browser and:
+
+1. **User Management** — Use the **User dropdown** (top-right) to switch users or create new users
+2. **Dashboard tab:**
    - View account balances
    - See pending transactions
    - Browse transaction history with year/month filtering
    - View category analytics
    - Check net worth and monthly differences
-4. **Admin tab:**
+3. **Admin tab:**
    - Manage accounts, categories, descriptions
    - Configure user settings (theme, currency formatting, negative format)
    - Access backup settings and manage backups
@@ -135,40 +200,78 @@ Transfers are created as paired TW/TD transactions with identical amounts.
 
 ## Troubleshooting
 
+### Docker: Can't connect to MySQL
+
+The app container is trying to reach MySQL at the DB_HOST you specified in `.env`.
+
+**If MySQL is on localhost (same machine):**
+```env
+DB_HOST=host.docker.internal  # Special hostname Docker provides
+```
+
+**If MySQL is on a remote server:**
+```env
+DB_HOST=192.168.1.100  # Use the server's IP address
+```
+
+**Test connection:**
+```bash
+mysql -h <DB_HOST> -u checkbook_user -p
+```
+
+### Docker: "address already in use" for port 3000
+
+Another container is using port 3000. Kill it or use a different port:
+
+```bash
+# Stop all containers
+docker-compose down
+
+# Or use a different port in docker-compose.yml:
+# Change "3000:3000" to "8080:3000"
+```
+
 ### Database initialization fails with "CREATE command denied"
 
 The MySQL user doesn't have CREATE permissions. Fix with:
 
 ```sql
-GRANT CREATE ON checkbook_register.* TO 'checkbook_user'@'localhost';
+GRANT CREATE ON checkbook_register.* TO 'checkbook_user'@'%';
 FLUSH PRIVILEGES;
+```
+
+Then restart the app container:
+```bash
+docker-compose restart app
 ```
 
 ### GET /api/users returns 500 error
 
-- Ensure database user has CREATE permissions (see above)
-- Check `.env` file in backend folder for correct DB credentials
-- Verify MySQL is running: `mysql -u root -p` to test connection
-- Check backend logs for detailed error message
+Check the Docker logs:
+```bash
+docker-compose logs app
+```
 
-### Frontend can't connect to backend
+Common issues:
+- Database credentials in `.env` are incorrect
+- MySQL server is not running or not accessible from the container
+- User doesn't have proper permissions (see "CREATE command denied" above)
+
+### Local development: Frontend can't connect to backend
 
 - Ensure backend is running on http://localhost:3000
 - Check `frontend/proxy.conf.json` for correct proxy target
-- Check browser console for CORS errors
+- Restart frontend: `ng serve`
 
-### Port 3000 already in use
-
-```bash
-# Kill process using port 3000
-lsof -ti:3000 | xargs kill -9  # Mac/Linux
-netstat -ano | findstr :3000   # Windows (then taskkill /PID <pid> /F)
-```
+---
 
 ## Project Structure
 
 ```
 checkbook-register/
+├── docker-compose.yml          # Docker Compose configuration
+├── Dockerfile                  # Multi-stage build for app container
+├── .env.example                # Environment variables template
 ├── database/
 │   └── schema.sql              # Database schema (auto-applied on startup)
 ├── backend/
@@ -191,6 +294,7 @@ checkbook-register/
 │   │   │   ├── features/       # Feature modules (dashboard, admin)
 │   │   │   └── shared/         # Reusable components, pipes
 │   │   └── index.html
+│   ├── dist/                   # Compiled Angular (generated)
 │   ├── proxy.conf.json         # Dev proxy to backend
 │   └── angular.json
 ├── plans/
@@ -200,64 +304,113 @@ checkbook-register/
 └── README.md                    # This file
 ```
 
-## Key Files
+## Docker Images
 
-- **`database/schema.sql`** — MySQL table definitions (users, transactions, accounts, categories, descriptions)
-- **`backend/src/database.ts`** — Auto-initializes schema on startup
-- **`backend/src/index.ts`** — Express app setup
-- **`frontend/src/app/features/dashboard/dashboard.component.ts`** — Main dashboard logic
-- **`frontend/src/app/features/admin/admin.component.ts`** — Admin panel (themes, settings, backups)
+The `Dockerfile` uses a multi-stage build:
+
+1. **Builder stage** — Compiles backend TypeScript and builds Angular frontend
+2. **Final stage** — Contains only compiled code and node_modules (lightweight)
+
+Result: A single container running both backend (Express) and frontend (served by Express).
+
+```bash
+# Build manually
+docker build -t checkbook-register .
+
+# Run manually
+docker run -p 3000:3000 \
+  -e DB_HOST=localhost \
+  -e DB_USER=checkbook_user \
+  -e DB_PASSWORD=checkbook_password \
+  -v ./backups:/app/backups \
+  checkbook-register
+```
+
+Or use Docker Compose (recommended): `docker-compose up`
 
 ## Architecture
+
+### Deployment (Docker)
+
+```
+┌─────────────────────┐
+│   Docker Container  │
+├─────────────────────┤
+│ Angular Frontend    │ → Served by Express
+│ + Express Backend   │ → http://localhost:3000
+└─────────────────────┘
+         ↓
+   ┌───────────────┐
+   │  MySQL DB     │
+   │  (external)   │
+   └───────────────┘
+```
 
 ### Data Flow
 
 1. **Frontend** (Angular) — User interactions → API requests
-2. **Backend** (Express) — Receives requests, validates, queries database, returns `{ data, error }`
+2. **Backend** (Express) — Validates requests, queries database, returns `{ data, error }`
 3. **Database** (MySQL) — Persistent data storage with referential integrity
-
-### State Management
-
-- **Frontend:** BehaviorSubject services (UserService, PageDataService, ThemeService)
-- **Backend:** Async controller methods with error handling
 
 ### User Isolation
 
-All API endpoints are scoped by `user_id` in the URL path:
+All API endpoints are scoped by `user_id`:
 - `/api/users/:userId/transactions`
 - `/api/users/:userId/accounts`
 - `/api/users/:userId/categories`
 
-No cross-user data leakage is possible — all queries filter by `user_id`.
+No cross-user data leakage — all queries filter by `user_id`.
 
 ## Development
 
 ### Building
 
 ```bash
-# Backend
+# Backend only
 cd backend && npm run build
 
-# Frontend
+# Frontend only
 cd frontend && npm run build
+
+# Both (via Docker)
+docker-compose build
 ```
 
 ### Testing
 
+**Backend API:**
 ```bash
-# Backend API with Postman/Thunder Client
+# Using curl
+curl http://localhost:3000/api/users
+
+# Or use Postman/Thunder Client
 GET http://localhost:3000/api/users
-POST http://localhost:3000/api/users (create user)
 ```
 
-## Deployment
+**Frontend:**
+Visit http://localhost:3000 (or http://localhost:4200 for dev mode)
 
-The app is designed for Docker containerization:
-- Backend container (Express + Node)
-- Frontend container (Angular)
-- MySQL container (database)
+## Key Files
 
-Refer to `CLAUDE.md` for full deployment specifications.
+- **`database/schema.sql`** — MySQL table definitions (auto-created)
+- **`backend/src/database.ts`** — Auto-initializes schema on startup
+- **`backend/src/index.ts`** — Express app and server setup
+- **`Dockerfile`** — Multi-stage build configuration
+- **`docker-compose.yml`** — Docker Compose service definition
+- **`frontend/src/app/features/dashboard/`** — Main dashboard component
+- **`frontend/src/app/features/admin/`** — Admin panel component
+
+## Deployment Checklist
+
+- [ ] MySQL database created and user has CREATE permissions
+- [ ] `.env` file configured with correct DB_HOST, DB_USER, DB_PASSWORD
+- [ ] Docker and Docker Compose installed
+- [ ] Run: `docker-compose build`
+- [ ] Run: `docker-compose up -d`
+- [ ] Verify logs: `docker-compose logs app`
+- [ ] Access app: http://localhost:3000
+- [ ] Create a test user and transaction
+- [ ] Verify data persists after restart: `docker-compose restart app`
 
 ## Implementation Status
 
@@ -269,6 +422,7 @@ Refer to `CLAUDE.md` for full deployment specifications.
 - ✅ Theme system with 6 themes
 - ✅ Backup scheduling and restore
 - ✅ Admin panel with settings
+- ✅ Docker containerization
 
 ## Documentation
 
