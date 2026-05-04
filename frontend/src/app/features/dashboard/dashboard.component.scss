@@ -149,9 +149,7 @@
   app-categories-section {
     min-height: 350px;
     max-height: 350px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    @include custom-scrollbar;
+    overflow: hidden;
   }
 }
 
@@ -224,8 +222,8 @@
 .combined-tabs-card {
   display: flex;
   flex-direction: column;
-  min-height: 600px;
-  max-height: 600px;
+  min-height: 880px;
+  max-height: 880px;
   overflow: hidden;
 
   .section-tabs {

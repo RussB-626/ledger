@@ -146,7 +146,7 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
     });
   }
 
-  formatCurrency(amount: number): string {
+  formatCurrency(amount: number, type?: string): string {
     const user = this.userService.getActiveUser();
     if (!user) {
       return `$${amount.toFixed(2)}`;
@@ -155,22 +155,42 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
     const symbol = user.currency_symbol;
     const decimalPlaces = user.decimal_places;
     const thousandSep = user.thousand_separator;
+    const decimalSep = user.decimal_separator;
     const currencyPos = user.currency_position;
+    const negativeFormat = user.negative_format;
 
     const absAmount = Math.abs(amount);
-    const isNegative = amount < 0;
+    const isNegative = type ? (type === 'W' || type === 'TW') : amount < 0;
 
     const parts = absAmount.toFixed(decimalPlaces).split('.');
     const intPart = parts[0];
     const decPart = parts[1];
 
     const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
-    const formatted = decPart !== undefined ? `${withThousands}.${decPart}` : withThousands;
+    const formatted = decPart !== undefined ? `${withThousands}${decimalSep}${decPart}` : withThousands;
     const withCurrency = currencyPos === 'before'
       ? `${symbol}${formatted}`
       : `${formatted}${symbol}`;
 
-    return isNegative ? `-${withCurrency}` : withCurrency;
+    if (!isNegative) {
+      return withCurrency;
+    }
+
+    return this.applyNegativeFormat(withCurrency, negativeFormat);
+  }
+
+  private applyNegativeFormat(value: string, format: string): string {
+    switch (format) {
+      case 'parentheses':
+        return `(${value})`;
+      case 'brackets':
+        return `[${value}]`;
+      case 'braces':
+        return `{${value}}`;
+      case '-prefix':
+      default:
+        return `-${value}`;
+    }
   }
 
   formatDate(dateString: string): string {

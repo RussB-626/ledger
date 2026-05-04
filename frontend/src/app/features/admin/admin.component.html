@@ -122,6 +122,14 @@
           <button
             class="pagination-btn"
             [disabled]="accountsPage === 1"
+            (click)="accountsPage = 1"
+            title="First page"
+          >
+            ⌂ Home
+          </button>
+          <button
+            class="pagination-btn"
+            [disabled]="accountsPage === 1"
             (click)="accountsPage = accountsPage - 1"
           >
             ← Previous
@@ -135,6 +143,14 @@
             (click)="accountsPage = accountsPage + 1"
           >
             Next →
+          </button>
+          <button
+            class="pagination-btn"
+            [disabled]="accountsPage === getTotalAccountsPages()"
+            (click)="accountsPage = getTotalAccountsPages()"
+            title="Last page"
+          >
+            End ⌂
           </button>
         </div>
       } @else {
@@ -209,6 +225,14 @@
           <button
             class="pagination-btn"
             [disabled]="categoriesPage === 1"
+            (click)="categoriesPage = 1"
+            title="First page"
+          >
+            ⌂ Home
+          </button>
+          <button
+            class="pagination-btn"
+            [disabled]="categoriesPage === 1"
             (click)="categoriesPage = categoriesPage - 1"
           >
             ← Previous
@@ -222,6 +246,14 @@
             (click)="categoriesPage = categoriesPage + 1"
           >
             Next →
+          </button>
+          <button
+            class="pagination-btn"
+            [disabled]="categoriesPage === getTotalCategoriesPages()"
+            (click)="categoriesPage = getTotalCategoriesPages()"
+            title="Last page"
+          >
+            End ⌂
           </button>
         </div>
       } @else {
@@ -290,6 +322,14 @@
           <button
             class="pagination-btn"
             [disabled]="descriptionsPage === 1"
+            (click)="descriptionsPage = 1"
+            title="First page"
+          >
+            ⌂ Home
+          </button>
+          <button
+            class="pagination-btn"
+            [disabled]="descriptionsPage === 1"
             (click)="descriptionsPage = descriptionsPage - 1"
           >
             ← Previous
@@ -303,6 +343,14 @@
             (click)="descriptionsPage = descriptionsPage + 1"
           >
             Next →
+          </button>
+          <button
+            class="pagination-btn"
+            [disabled]="descriptionsPage === getTotalDescriptionsPages()"
+            (click)="descriptionsPage = getTotalDescriptionsPages()"
+            title="Last page"
+          >
+            End ⌂
           </button>
         </div>
       } @else {

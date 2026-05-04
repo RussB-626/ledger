@@ -458,9 +458,9 @@ export async function getCategoryTotals(
       const total = Number(row.total);
       const category = row.category as string;
 
-      if (row.type === 'W' || row.type === 'TW') {
+      if (row.type === 'W') {
         expenses[category] = (expenses[category] || 0) + total;
-      } else if (row.type === 'D' || row.type === 'TD') {
+      } else if (row.type === 'D') {
         incomes[category] = (incomes[category] || 0) + total;
       }
     }
@@ -498,9 +498,9 @@ export async function getMonthlyDifference(
 
     for (const row of rows) {
       const total = Number(row.total);
-      if (row.type === 'D' || row.type === 'TD') {
+      if (row.type === 'D') {
         income += total;
-      } else if (row.type === 'W' || row.type === 'TW') {
+      } else if (row.type === 'W') {
         expenses += total;
       }
     }
