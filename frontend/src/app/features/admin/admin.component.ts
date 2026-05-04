@@ -55,7 +55,7 @@ interface ParsedTransaction {
 })
 export class AdminComponent implements OnInit, OnDestroy {
   activeUser: User | null = null;
-  activeTab: 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups' = 'accounts';
+  activeTab: 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups' | 'themes' = 'accounts';
 
   // Data arrays
   accounts: Account[] = [];
@@ -842,7 +842,7 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   // ====== NAVIGATION ======
 
-  selectTab(tab: 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups'): void {
+  selectTab(tab: 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups' | 'themes'): void {
     this.activeTab = tab;
   }
 

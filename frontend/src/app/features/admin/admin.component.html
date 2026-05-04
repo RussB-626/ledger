@@ -50,6 +50,13 @@
     </button>
     <button
       class="tab-btn"
+      [class.active]="activeTab === 'themes'"
+      (click)="selectTab('themes')"
+    >
+      Themes
+    </button>
+    <button
+      class="tab-btn"
       [class.active]="activeTab === 'backups'"
       (click)="selectTab('backups')"
     >
@@ -493,6 +500,19 @@
             }
           </p>
         </div>
+      </div>
+    </div>
+  }
+
+  <!-- THEMES TAB -->
+  @if (activeTab === 'themes') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <h2>Themes</h2>
+      </div>
+
+      <div class="themes-section">
+        <p>Theme customization options coming soon...</p>
       </div>
     </div>
   }

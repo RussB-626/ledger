@@ -14,6 +14,7 @@ CREATE TABLE users (
   negative_format     VARCHAR(20) NOT NULL DEFAULT '-prefix',
   negative_color      VARCHAR(7) NOT NULL DEFAULT '#ff6b6b',
   positive_color      VARCHAR(7) NOT NULL DEFAULT '#1dd1a1',
+  theme               VARCHAR(50) NOT NULL DEFAULT 'default',
   backup_enabled      TINYINT(1) NOT NULL DEFAULT 1,
   backup_frequency    VARCHAR(20) NOT NULL DEFAULT 'weekly',
   backup_time         TIME NOT NULL DEFAULT '02:00:00',
