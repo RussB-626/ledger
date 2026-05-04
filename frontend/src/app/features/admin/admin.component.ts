@@ -7,6 +7,7 @@ import { takeUntil } from 'rxjs/operators';
 import { UserService } from '../../core/services/user.service';
 import { ApiService } from '../../core/services/api.service';
 import { PageDataService } from '../../core/services/page-data.service';
+import { ThemeService } from '../../core/services/theme.service';
 import { User, Account, Category, Description } from '../../core/models/index';
 
 interface ModalState {
@@ -44,6 +45,12 @@ interface ParsedTransaction {
   pending: boolean;
   originalDate: string;
   parseError?: string;
+}
+
+interface Theme {
+  id: string;
+  name: string;
+  description: string;
 }
 
 @Component({
@@ -169,6 +176,43 @@ export class AdminComponent implements OnInit, OnDestroy {
   showRestoreSuccessModal = false;
   restoreSuccessMessage = '';
 
+  // Theme state
+  selectedTheme = 'default';
+  savingTheme = false;
+  themeError = '';
+  themes: Theme[] = [
+    {
+      id: 'default',
+      name: 'Default',
+      description: 'Dark theme with teal/cyan accents (current)'
+    },
+    {
+      id: 'light',
+      name: 'Light',
+      description: 'Light background with dark text'
+    },
+    {
+      id: 'high-contrast',
+      name: 'High Contrast',
+      description: 'High contrast colors for better visibility'
+    },
+    {
+      id: 'colorblind-deuteranopia',
+      name: 'Color Blind (Red-Green)',
+      description: 'Optimized for deuteranopia (red-green color blindness)'
+    },
+    {
+      id: 'colorblind-protanopia',
+      name: 'Color Blind (Red-Green Alt)',
+      description: 'Alternative optimized for protanopia'
+    },
+    {
+      id: 'colorblind-tritanopia',
+      name: 'Color Blind (Blue-Yellow)',
+      description: 'Optimized for tritanopia (blue-yellow color blindness)'
+    }
+  ];
+
   deleteConfirmation: {
     isOpen: boolean;
     type: 'user' | 'account' | 'category' | 'description' | null;
@@ -186,6 +230,7 @@ export class AdminComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private apiService: ApiService,
     private pageDataService: PageDataService,
+    private themeService: ThemeService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -197,6 +242,7 @@ export class AdminComponent implements OnInit, OnDestroy {
         if (user) {
           this.loadMoneyFormatPreferences();
           this.loadBackupSettings();
+          this.loadThemePreference();
           this.loadAllData();
         }
       });
@@ -1043,6 +1089,43 @@ export class AdminComponent implements OnInit, OnDestroy {
           console.error('Failed to save backup settings:', error);
           this.backupError = 'Failed to save settings';
           this.savingBackupSettings = false;
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  loadThemePreference(): void {
+    if (this.activeUser) {
+      this.selectedTheme = this.activeUser.theme || 'default';
+    }
+  }
+
+  saveTheme(): void {
+    if (!this.activeUser) return;
+
+    this.savingTheme = true;
+    this.themeError = '';
+
+    // Store the theme to be set
+    const themeToSave = this.selectedTheme;
+
+    // Apply theme immediately
+    this.themeService.applyTheme(themeToSave);
+
+    this.apiService.updateUserTheme(this.activeUser.id, themeToSave)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (updatedUser: User) => {
+          this.activeUser = updatedUser;
+          this.selectedTheme = updatedUser.theme || 'default';
+          this.userService.setActiveUser(updatedUser);
+          this.savingTheme = false;
+          this.cdr.markForCheck();
+        },
+        error: (error: unknown) => {
+          console.error('Failed to save theme:', error);
+          this.themeError = 'Failed to save theme';
+          this.savingTheme = false;
           this.cdr.markForCheck();
         }
       });

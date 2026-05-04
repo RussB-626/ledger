@@ -10,6 +10,7 @@ import { takeUntil } from 'rxjs/operators';
 import { UserService } from './core/services/user.service';
 import { ApiService } from './core/services/api.service';
 import { PageDataService } from './core/services/page-data.service';
+import { ThemeService } from './core/services/theme.service';
 import { SharedModule } from './shared/shared.module';
 import { User } from './core/models/index';
 
@@ -33,6 +34,7 @@ export class AppComponent implements OnInit, OnDestroy {
     private userService: UserService,
     private apiService: ApiService,
     private pageDataService: PageDataService,
+    private themeService: ThemeService,
     private router: Router,
     private cdr: ChangeDetectorRef,
     private ngZone: NgZone
@@ -61,11 +63,13 @@ export class AppComponent implements OnInit, OnDestroy {
             const user = users.find(u => u.id === userId);
             if (user) {
               this.userService.setActiveUser(user);
+              this.themeService.applyTheme(user.theme || 'default');
               this.loadPageData(userId);
             } else {
               // User was deleted, select first user
               if (users.length > 0) {
                 this.userService.setActiveUser(users[0]);
+                this.themeService.applyTheme(users[0].theme || 'default');
                 this.loadPageData(users[0].id);
               } else {
                 this.showUserCreationModal();
@@ -75,6 +79,7 @@ export class AppComponent implements OnInit, OnDestroy {
             // No stored user, select first user
             if (users.length > 0) {
               this.userService.setActiveUser(users[0]);
+              this.themeService.applyTheme(users[0].theme || 'default');
               this.loadPageData(users[0].id);
             } else {
               this.showUserCreationModal();
@@ -131,6 +136,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.userService.setAllUsers([...allUsers, user]);
 
           this.userService.setActiveUser(user);
+          this.themeService.applyTheme(user.theme || 'default');
           this.loadPageData(user.id);
           this.closeUserSelectionModal();
         });

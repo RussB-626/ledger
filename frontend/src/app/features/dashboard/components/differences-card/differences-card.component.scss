@@ -1,11 +1,5 @@
 // Differences Card styles
 
-$teal-accent: #00d9ff;
-$text-light: #e0e0e0;
-$text-muted: #999;
-$border-color: #1a1f26;
-$success-color: #1dd1a1;
-$danger-color: #ff6b6b;
 
 // Compact view for header
 .differences-card-compact {
@@ -23,7 +17,7 @@ $danger-color: #ff6b6b;
     .label {
       font-size: 12px;
       font-weight: 500;
-      color: $text-muted;
+      color: var(--color-text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
@@ -34,11 +28,11 @@ $danger-color: #ff6b6b;
       font-family: 'Courier New', monospace;
 
       &.positive {
-        color: $success-color;
+        color: var(--color-success);
       }
 
       &.negative {
-        color: $danger-color;
+        color: var(--color-error);
       }
     }
   }
@@ -65,15 +59,15 @@ $danger-color: #ff6b6b;
     label {
       font-size: 13px;
       font-weight: 500;
-      color: $text-light;
+      color: var(--color-text);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     select {
-      background-color: #1a2332;
-      color: $text-light;
-      border: 1px solid $border-color;
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
       padding: 4px 8px;
       border-radius: 4px;
       font-size: 12px;
@@ -81,7 +75,7 @@ $danger-color: #ff6b6b;
 
       &:focus {
         outline: none;
-        border-color: $teal-accent;
+        border-color: var(--color-primary);
         box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
       }
     }
@@ -103,15 +97,15 @@ $danger-color: #ff6b6b;
   justify-content: space-between;
   align-items: center;
   padding: 5px;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid var(--color-border);
 
   &:last-child {
     border-bottom: none;
   }
 
   &.net-total {
-    background-color: rgba(0, 217, 255, 0.08);
-    border: 1px solid $border-color;
+    background-color: var(--color-surface-alt);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     padding: 5px;
     margin-top: 3px;
@@ -120,21 +114,21 @@ $danger-color: #ff6b6b;
   .net-label {
     font-size: 13px;
     font-weight: 500;
-    color: $text-light;
+    color: var(--color-text);
   }
 
   .net-amount {
     font-size: 14px;
     font-weight: 700;
     font-family: 'Courier New', monospace;
-    color: $text-light;
+    color: var(--color-text);
 
     &.positive {
-      color: $success-color;
+      color: var(--color-success);
     }
 
     &.negative {
-      color: $danger-color;
+      color: var(--color-error);
     }
   }
 }
@@ -142,6 +136,6 @@ $danger-color: #ff6b6b;
 .loading-state {
   text-align: center;
   padding: 40px 20px;
-  color: $text-muted;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }

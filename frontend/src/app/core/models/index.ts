@@ -21,6 +21,7 @@ export interface User {
   backup_day_of_month?: number;
   backup_count: number;
   last_backup_date?: string;
+  theme: string;
   created_at: string;
 }
 

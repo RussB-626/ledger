@@ -1,11 +1,6 @@
 // Balances Tab styles
 // Dark theme with teal accents per CLAUDE.md
 
-$teal-accent: #00d9ff;
-$text-light: #e0e0e0;
-$text-muted: #999;
-$border-color: #1a1f26;
-$darker-bg: #0a0e13;
 
 .balances-list-container {
   width: 100%;
@@ -16,7 +11,7 @@ $darker-bg: #0a0e13;
   margin: 0 0 16px 0;
   font-size: 16px;
   font-weight: 600;
-  color: $text-light;
+  color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -31,14 +26,14 @@ $darker-bg: #0a0e13;
   border-collapse: collapse;
 
   thead {
-    background-color: rgba(0, 217, 255, 0.05);
-    border-bottom: 1px solid $border-color;
+    background-color: var(--color-surface-alt);
+    border-bottom: 1px solid var(--color-border);
 
     th {
       padding: 12px;
       text-align: left;
       font-weight: 600;
-      color: $teal-accent;
+      color: var(--color-primary);
       text-transform: uppercase;
       font-size: 12px;
       letter-spacing: 0.5px;
@@ -51,28 +46,29 @@ $darker-bg: #0a0e13;
 
   tbody {
     tr {
-      border-bottom: 1px solid $border-color;
+      background-color: var(--color-background);
+      border-bottom: 1px solid var(--color-border);
       transition: background-color 0.2s ease;
 
       &:hover:not(.total-row) {
-        background-color: rgba(0, 217, 255, 0.05);
+        background-color: var(--color-surface-alt);
       }
 
       &.total-row {
-        background-color: rgba(0, 217, 255, 0.1);
-        border-top: 2px solid $border-color;
+        background-color: var(--color-surface);
+        border-top: 2px solid var(--color-border);
         font-weight: 600;
 
         td {
           padding: 12px;
-          color: $teal-accent;
+          color: var(--color-primary);
         }
       }
 
       td {
         padding: 12px;
         font-size: 14px;
-        color: $text-light;
+        color: var(--color-text);
 
         &.text-right {
           text-align: right;
@@ -80,7 +76,7 @@ $darker-bg: #0a0e13;
         }
 
         &.total-amount {
-          color: $teal-accent;
+          color: var(--color-primary);
         }
       }
     }

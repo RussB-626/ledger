@@ -1,10 +1,4 @@
-$dark-bg: #0f1419;
-$darker-bg: #0a0e13;
-$teal-accent: #00d9ff;
-$text-light: #e0e0e0;
-$text-muted: #999;
-$border-color: #1a1f26;
-$danger-color: #ff6b6b;
+// Uses CSS custom properties for dynamic theming
 
 .modal-overlay {
   position: fixed;
@@ -20,8 +14,8 @@ $danger-color: #ff6b6b;
 }
 
 .modal {
-  background-color: $darker-bg;
-  border: 1px solid $border-color;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   width: 90%;
   max-width: 400px;
@@ -33,11 +27,11 @@ $danger-color: #ff6b6b;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid var(--color-border);
 
   h2 {
     margin: 0;
-    color: $text-light;
+    color: var(--color-text);
     font-size: 18px;
     font-weight: 600;
   }
@@ -46,7 +40,7 @@ $danger-color: #ff6b6b;
 .close-btn {
   background: none;
   border: none;
-  color: $text-muted;
+  color: var(--color-text-secondary);
   font-size: 24px;
   cursor: pointer;
   padding: 0;
@@ -58,7 +52,7 @@ $danger-color: #ff6b6b;
   transition: color 0.2s ease;
 
   &:hover {
-    color: $text-light;
+    color: var(--color-text);
   }
 }
 
@@ -67,7 +61,7 @@ $danger-color: #ff6b6b;
 
   p {
     margin: 0;
-    color: $text-light;
+    color: var(--color-text);
     font-size: 14px;
     line-height: 1.6;
   }
@@ -78,7 +72,7 @@ $danger-color: #ff6b6b;
   justify-content: flex-end;
   gap: 12px;
   padding: 20px;
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--color-border);
   background-color: rgba(0, 0, 0, 0.2);
 }
 
@@ -99,22 +93,22 @@ $danger-color: #ff6b6b;
 
 .cancel-btn {
   background-color: #1a2332;
-  color: $text-light;
-  border: 1px solid $border-color;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
 
   &:hover:not(:disabled) {
-    border-color: $text-light;
-    color: $text-light;
+    border-color: var(--color-text);
+    color: var(--color-text);
   }
 }
 
 .confirm-btn {
-  background-color: $danger-color;
+  background-color: var(--color-error);
   color: white;
   border: none;
 
   &:hover:not(:disabled) {
-    background-color: darken($danger-color, 10%);
+    opacity: 0.9;
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
   }

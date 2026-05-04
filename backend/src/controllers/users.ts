@@ -10,7 +10,7 @@ export async function getAllUsers(): Promise<User[]> {
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, name, currency_symbol, decimal_places, thousand_separator, decimal_separator, currency_position, negative_format, negative_color, positive_color, created_at FROM users ORDER BY name ASC'
+      'SELECT id, name, currency_symbol, decimal_places, thousand_separator, decimal_separator, currency_position, negative_format, negative_color, positive_color, theme, created_at FROM users ORDER BY name ASC'
     );
     return rows as User[];
   } finally {
@@ -23,7 +23,7 @@ export async function getUserById(userId: number): Promise<User | null> {
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, name, currency_symbol, decimal_places, thousand_separator, decimal_separator, currency_position, negative_format, negative_color, positive_color, created_at FROM users WHERE id = ?',
+      'SELECT id, name, currency_symbol, decimal_places, thousand_separator, decimal_separator, currency_position, negative_format, negative_color, positive_color, theme, backup_enabled, backup_frequency, backup_time, backup_day_of_week, backup_day_of_month, backup_count, last_backup_date, created_at FROM users WHERE id = ?',
       [userId]
     );
     if (rows.length === 0) {
@@ -74,6 +74,27 @@ export async function updateUserPreferences(userId: number, preferences: any): P
         preferences.positive_color,
         userId
       ]
+    );
+
+    const user = await getUserById(userId);
+
+    if (!user) {
+      throw new Error('Failed to retrieve updated user');
+    }
+
+    return user;
+  } finally {
+    connection.release();
+  }
+}
+
+// Update user theme
+export async function updateUserTheme(userId: number, theme: string): Promise<User> {
+  const connection = await pool.getConnection();
+  try {
+    await connection.query(
+      'UPDATE users SET theme = ? WHERE id = ?',
+      [theme, userId]
     );
 
     const user = await getUserById(userId);

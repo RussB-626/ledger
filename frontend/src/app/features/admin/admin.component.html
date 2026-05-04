@@ -512,7 +512,32 @@
       </div>
 
       <div class="themes-section">
-        <p>Theme customization options coming soon...</p>
+        <div class="section-header">
+          <h3>Select Theme</h3>
+        </div>
+
+        <div class="setting-row">
+          <label for="theme-select">Theme</label>
+          <select
+            id="theme-select"
+            [(ngModel)]="selectedTheme"
+            (change)="saveTheme()"
+            class="select-input"
+            [disabled]="savingTheme"
+          >
+            @for (theme of themes; track theme.id) {
+              <option [value]="theme.id">{{ theme.name }} - {{ theme.description }}</option>
+            }
+          </select>
+        </div>
+
+        @if (themeError) {
+          <div class="error-message">{{ themeError }}</div>
+        }
+
+        @if (savingTheme) {
+          <p class="saving-indicator">Applying theme...</p>
+        }
       </div>
     </div>
   }

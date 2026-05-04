@@ -54,6 +54,31 @@ router.put(
   })
 );
 
+// PUT /api/users/:id/theme - Update user theme
+router.put(
+  '/:id/theme',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = parseInt(req.params.id, 10);
+    const { theme } = req.body;
+
+    if (isNaN(userId)) {
+      const response: ApiResponse<never> = { error: 'Invalid user ID' };
+      res.status(400).json(response);
+      return;
+    }
+
+    if (!theme) {
+      const response: ApiResponse<never> = { error: 'Theme is required' };
+      res.status(400).json(response);
+      return;
+    }
+
+    const user = await usersController.updateUserTheme(userId, theme);
+    const response: ApiResponse<User> = { data: user };
+    res.json(response);
+  })
+);
+
 // DELETE /api/users/:id - Delete a user
 router.delete(
   '/:id',

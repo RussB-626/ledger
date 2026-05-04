@@ -301,4 +301,11 @@ export class ApiService {
       settings
     ).pipe(map(response => response.data!));
   }
+
+  updateUserTheme(userId: number, theme: string): Observable<User> {
+    return this.http.put<ApiResponse<User>>(
+      `${this.baseUrl}/users/${userId}/theme`,
+      { theme }
+    ).pipe(map(response => response.data!));
+  }
 }

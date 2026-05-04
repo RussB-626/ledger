@@ -1,14 +1,26 @@
 // App component styles
-// Dark theme with teal/cyan accents per CLAUDE.md
+// Uses CSS variables for dynamic theming
 
-$dark-bg: #0f1419;
-$teal-accent: #00d9ff;
+:root {
+  --color-primary: #00d9ff;
+  --color-secondary: #1dd1a1;
+  --color-accent: #0066cc;
+  --color-background: #0f1419;
+  --color-surface: #1a1f2e;
+  --color-surface-alt: #252d3d;
+  --color-text: #e0e0e0;
+  --color-text-secondary: #a0a0a0;
+  --color-success: #1dd1a1;
+  --color-error: #ff6b6b;
+  --color-border: #2a3447;
+  --color-button-hover: #005fa3;
+}
 
 .app-container {
   width: 100%;
   min-height: 100vh;
-  background-color: $dark-bg;
-  color: #e0e0e0;
+  background-color: var(--color-background);
+  color: var(--color-text);
   display: flex;
   flex-direction: column;
 
@@ -37,7 +49,7 @@ $teal-accent: #00d9ff;
     width: 40px;
     height: 40px;
     border: 4px solid rgba(0, 217, 255, 0.2);
-    border-top-color: $teal-accent;
+    border-top-color: var(--color-primary);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
@@ -45,7 +57,7 @@ $teal-accent: #00d9ff;
   p {
     margin-top: 20px;
     font-size: 16px;
-    color: $teal-accent;
+    color: var(--color-primary);
   }
 }
 
@@ -83,8 +95,8 @@ $teal-accent: #00d9ff;
 }
 
 .modal {
-  background: #1a1f26;
-  border: 1px solid #1a1f26;
+  background: var(--color-surface);
+  border: 1px solid var(--color-surface);
   border-radius: 8px;
   width: 90%;
   max-width: 500px;
@@ -108,11 +120,11 @@ $teal-accent: #00d9ff;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid #1a1f26;
+  border-bottom: 1px solid var(--color-surface);
 
   h3 {
     margin: 0;
-    color: #e0e0e0;
+    color: var(--color-text);
     font-size: 18px;
   }
 }
@@ -121,7 +133,7 @@ $teal-accent: #00d9ff;
   padding: 20px;
 
   p {
-    color: #e0e0e0;
+    color: var(--color-text);
     margin: 0 0 16px 0;
     font-size: 14px;
   }
@@ -132,7 +144,7 @@ $teal-accent: #00d9ff;
   justify-content: flex-end;
   gap: 10px;
   padding: 20px;
-  border-top: 1px solid #1a1f26;
+  border-top: 1px solid var(--color-surface);
 }
 
 .form-group {
@@ -140,7 +152,7 @@ $teal-accent: #00d9ff;
 
   label {
     display: block;
-    color: #e0e0e0;
+    color: var(--color-text);
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 8px;
@@ -149,29 +161,29 @@ $teal-accent: #00d9ff;
   .form-input {
     width: 100%;
     padding: 10px 12px;
-    background: #0a0e14;
-    border: 1px solid #1a1f26;
+    background: var(--color-background);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
-    color: #e0e0e0;
+    color: var(--color-text);
     font-size: 13px;
     transition: border-color 0.2s ease;
 
     &:focus {
       outline: none;
-      border-color: $teal-accent;
+      border-color: var(--color-primary);
       box-shadow: 0 0 8px rgba(0, 217, 255, 0.1);
     }
 
     &::placeholder {
-      color: #b0b0b0;
+      color: var(--color-text-secondary);
     }
   }
 }
 
 .btn-cancel {
-  background: #0a0e14;
-  color: #e0e0e0;
-  border: 1px solid #1a1f26;
+  background: var(--color-background);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   padding: 10px 16px;
   border-radius: 4px;
   font-size: 13px;
@@ -180,13 +192,13 @@ $teal-accent: #00d9ff;
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: #e0e0e0;
+    border-color: var(--color-text);
   }
 }
 
 .btn-save {
-  background: $teal-accent;
-  color: #0f1419;
+  background: var(--color-primary);
+  color: var(--color-background);
   padding: 10px 16px;
   border: none;
   border-radius: 4px;

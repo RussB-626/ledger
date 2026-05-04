@@ -1,10 +1,5 @@
 // Pending Tab styles
 
-$teal-accent: #00d9ff;
-$text-light: #e0e0e0;
-$text-muted: #999;
-$border-color: #1a1f26;
-$darker-bg: #0a0e13;
 
 .pending-tab-container {
   width: 100%;
@@ -28,7 +23,7 @@ $darker-bg: #0a0e13;
   label {
     font-size: 12px;
     font-weight: 600;
-    color: $text-muted;
+    color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
@@ -36,9 +31,9 @@ $darker-bg: #0a0e13;
 }
 
 .account-select {
-  background-color: #1a2332;
-  color: $text-light;
-  border: 1px solid $border-color;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   padding: 8px 10px;
   border-radius: 4px;
   font-size: 13px;
@@ -47,7 +42,7 @@ $darker-bg: #0a0e13;
 
   &:focus {
     outline: none;
-    border-color: $teal-accent;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
   }
 }
@@ -57,21 +52,21 @@ $darker-bg: #0a0e13;
 }
 
 .search-input {
-  background-color: #1a2332;
-  color: $text-light;
-  border: 1px solid $border-color;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   padding: 8px 12px;
   border-radius: 4px;
   font-size: 13px;
   min-width: 200px;
 
   &::placeholder {
-    color: $text-muted;
+    color: var(--color-text-secondary);
   }
 
   &:focus {
     outline: none;
-    border-color: $teal-accent;
+    border-color: var(--color-primary);
     box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
   }
 }
@@ -79,24 +74,24 @@ $darker-bg: #0a0e13;
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
-  border: 1px solid $border-color;
+  border: 1px solid var(--color-border);
   border-radius: 4px;
 }
 
 .pending-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: $darker-bg;
+  background-color: var(--color-surface);
 
   thead {
-    background-color: #1a2332;
-    border-bottom: 2px solid $border-color;
+    background-color: var(--color-surface);
+    border-bottom: 2px solid var(--color-border);
 
     th {
       padding: 12px;
       text-align: left;
       font-weight: 600;
-      color: $teal-accent;
+      color: var(--color-primary);
       text-transform: uppercase;
       font-size: 12px;
       letter-spacing: 0.5px;
@@ -113,17 +108,17 @@ $darker-bg: #0a0e13;
 
   tbody {
     tr {
-      border-bottom: 1px solid $border-color;
+      border-bottom: 1px solid var(--color-border);
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: rgba(0, 217, 255, 0.05);
+        background-color: var(--color-surface-alt);
       }
 
       td {
         padding: 12px;
         font-size: 14px;
-        color: $text-light;
+        color: var(--color-text);
 
         &.text-right {
           text-align: right;
@@ -139,14 +134,14 @@ $darker-bg: #0a0e13;
 
   tfoot {
     tr.totals-row {
-      border-top: 2px solid $border-color;
-      background-color: rgba(0, 217, 255, 0.05);
+      border-top: 2px solid var(--color-border);
+      background-color: var(--color-surface-alt);
       font-weight: 600;
 
       td {
         padding: 12px;
         font-size: 14px;
-        color: $teal-accent;
+        color: var(--color-primary);
 
         &.text-right {
           text-align: right;
@@ -177,20 +172,20 @@ $darker-bg: #0a0e13;
   }
 
   &.badge-tw {
-    background-color: rgba(0, 217, 255, 0.2);
-    color: $teal-accent;
+    background-color: var(--color-surface);
+    color: var(--color-primary);
   }
 
   &.badge-td {
-    background-color: rgba(0, 217, 255, 0.2);
-    color: $teal-accent;
+    background-color: var(--color-surface);
+    color: var(--color-primary);
   }
 }
 
 .action-btn {
   background: none;
   border: none;
-  color: $text-muted;
+  color: var(--color-text-secondary);
   cursor: pointer;
   font-size: 16px;
   padding: 4px 8px;
@@ -198,12 +193,12 @@ $darker-bg: #0a0e13;
   transition: all 0.2s ease;
 
   &:hover {
-    background-color: rgba(0, 217, 255, 0.1);
-    color: $teal-accent;
+    background-color: var(--color-surface);
+    color: var(--color-primary);
   }
 
   &.edit-btn:hover {
-    color: $teal-accent;
+    color: var(--color-primary);
   }
 
   &.confirm-btn:hover {
@@ -214,7 +209,7 @@ $darker-bg: #0a0e13;
 .empty-state {
   text-align: center;
   padding: 40px 20px;
-  color: $text-muted;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
@@ -223,7 +218,7 @@ $darker-bg: #0a0e13;
   gap: 20px;
   align-items: center;
   padding: 12px 20px;
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--color-border);
   background-color: rgba(0, 0, 0, 0.2);
   flex-wrap: wrap;
 
@@ -240,16 +235,16 @@ $darker-bg: #0a0e13;
 
   label {
     font-size: 12px;
-    color: $text-muted;
+    color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     white-space: nowrap;
   }
 
   select {
-    background-color: #1a2332;
-    color: $text-light;
-    border: 1px solid $border-color;
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
     padding: 4px 8px;
     border-radius: 3px;
     font-size: 12px;
@@ -257,14 +252,14 @@ $darker-bg: #0a0e13;
 
     &:focus {
       outline: none;
-      border-color: $teal-accent;
+      border-color: var(--color-primary);
     }
   }
 }
 
 .pagination-info {
   font-size: 12px;
-  color: $text-muted;
+  color: var(--color-text-secondary);
   white-space: nowrap;
 }
 
@@ -282,8 +277,8 @@ $darker-bg: #0a0e13;
 
 .page-btn {
   background: none;
-  border: 1px solid $border-color;
-  color: $text-light;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
   padding: 6px 12px;
   border-radius: 3px;
   font-size: 12px;
@@ -292,8 +287,8 @@ $darker-bg: #0a0e13;
   white-space: nowrap;
 
   &:hover:not(:disabled) {
-    border-color: $teal-accent;
-    color: $teal-accent;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
   }
 
   &:disabled {
@@ -304,6 +299,6 @@ $darker-bg: #0a0e13;
 
 .page-info {
   font-size: 12px;
-  color: $text-light;
+  color: var(--color-text);
   white-space: nowrap;
 }

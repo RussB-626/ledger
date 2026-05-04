@@ -33,7 +33,7 @@
           <div class="category-item">
             <div class="item-header">
               <span class="item-name">{{ item[0] }}</span>
-              <span class="item-amount" style="color: #ffffff;">{{ item[1] | formatCurrency }}</span>
+              <span class="item-amount" style="color: var(--color-text);">{{ item[1] | formatCurrency }}</span>
             </div>
             <div class="item-bar">
               <div class="progress-bar" [style.width.%]="getPercentage(item[1])"></div>

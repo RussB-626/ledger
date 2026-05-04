@@ -48,7 +48,7 @@
             <td>{{ txn.category }}</td>
             <td>{{ txn.description }}</td>
             <td [title]="txn.note || ''">{{ truncateText(txn.note) }}</td>
-            <td class="text-right" [style.color]="txn.amount === 0 ? '#ffffff' : ((txn.type === 'W' || txn.type === 'TW') ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">{{ txn.amount | formatCurrency }}</td>
+            <td class="text-right" [style.color]="txn.amount === 0 ? 'var(--color-zero)' : ((txn.type === 'W' || txn.type === 'TW') ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">{{ txn.amount | formatCurrency }}</td>
             <td>
               <span class="badge" [ngClass]="'badge-' + txn.type.toLowerCase()">
                 {{ txn.type }}
@@ -71,7 +71,7 @@
       <tfoot>
         <tr class="totals-row">
           <td colspan="5">Total:</td>
-          <td class="text-right" [style.color]="getFilteredTotal() === 0 ? '#ffffff' : (isFilteredTotalNegative() ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">{{ getFilteredTotal() | formatCurrency }}</td>
+          <td class="text-right" [style.color]="getFilteredTotal() === 0 ? 'var(--color-zero)' : (isFilteredTotalNegative() ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">{{ getFilteredTotal() | formatCurrency }}</td>
           <td></td>
           <td></td>
         </tr>

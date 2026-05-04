@@ -1,11 +1,5 @@
 // Edit Transaction Modal styles
-
-$dark-bg: #0f1419;
-$darker-bg: #0a0e13;
-$teal-accent: #00d9ff;
-$text-light: #e0e0e0;
-$text-muted: #999;
-$border-color: #1a1f26;
+// Uses CSS custom properties for dynamic theming
 
 .modal-overlay {
   position: fixed;
@@ -21,8 +15,8 @@ $border-color: #1a1f26;
 }
 
 .modal {
-  background-color: $darker-bg;
-  border: 1px solid $border-color;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   width: 90%;
   max-width: 600px;
@@ -36,11 +30,11 @@ $border-color: #1a1f26;
   justify-content: space-between;
   align-items: center;
   padding: 20px;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid var(--color-border);
 
   h2 {
     margin: 0;
-    color: $text-light;
+    color: var(--color-text);
     font-size: 18px;
     font-weight: 600;
   }
@@ -49,7 +43,7 @@ $border-color: #1a1f26;
 .close-btn {
   background: none;
   border: none;
-  color: $text-muted;
+  color: var(--color-text-secondary);
   font-size: 24px;
   cursor: pointer;
   padding: 0;
@@ -61,7 +55,7 @@ $border-color: #1a1f26;
   transition: color 0.2s ease;
 
   &:hover {
-    color: $text-light;
+    color: var(--color-text);
   }
 }
 
@@ -71,8 +65,8 @@ $border-color: #1a1f26;
 
 .error-message {
   background-color: rgba(255, 107, 107, 0.1);
-  border: 1px solid #ff6b6b;
-  color: #ff6b6b;
+  border: 1px solid var(--color-error);
+  color: var(--color-error);
   padding: 12px;
   border-radius: 4px;
   margin-bottom: 16px;
@@ -99,7 +93,7 @@ $border-color: #1a1f26;
   label {
     font-size: 12px;
     font-weight: 600;
-    color: $text-muted;
+    color: var(--color-text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -110,20 +104,20 @@ $border-color: #1a1f26;
   select,
   textarea {
     background-color: #1a2332;
-    color: $text-light;
-    border: 1px solid $border-color;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
     padding: 10px 12px;
     border-radius: 4px;
     font-size: 14px;
     font-family: inherit;
 
     &::placeholder {
-      color: $text-muted;
+      color: var(--color-text-secondary);
     }
 
     &:focus {
       outline: none;
-      border-color: $teal-accent;
+      border-color: var(--color-primary);
       box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
     }
   }
@@ -150,8 +144,8 @@ $border-color: #1a1f26;
 
 .type-btn {
   background-color: #1a2332;
-  color: $text-light;
-  border: 1px solid $border-color;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
   padding: 10px 12px;
   border-radius: 4px;
   font-size: 12px;
@@ -162,14 +156,14 @@ $border-color: #1a1f26;
   line-height: 1.3;
 
   &:hover {
-    border-color: $teal-accent;
-    color: $teal-accent;
+    border-color: var(--color-primary);
+    color: var(--color-primary);
   }
 
   &.active {
-    background-color: $teal-accent;
-    border-color: $teal-accent;
-    color: $dark-bg;
+    background-color: var(--color-primary);
+    border-color: var(--color-primary);
+    color: var(--color-background);
     font-weight: 600;
   }
 }
@@ -183,7 +177,7 @@ $border-color: #1a1f26;
     width: 18px;
     height: 18px;
     cursor: pointer;
-    accent-color: $teal-accent;
+    accent-color: var(--color-primary);
   }
 
   label {
@@ -191,7 +185,7 @@ $border-color: #1a1f26;
     text-transform: capitalize;
     cursor: pointer;
     font-weight: 500;
-    color: $text-light;
+    color: var(--color-text);
   }
 }
 
@@ -200,7 +194,7 @@ $border-color: #1a1f26;
   justify-content: flex-end;
   gap: 12px;
   padding: 20px;
-  border-top: 1px solid $border-color;
+  border-top: 1px solid var(--color-border);
   background-color: rgba(0, 0, 0, 0.2);
 }
 
@@ -222,21 +216,21 @@ $border-color: #1a1f26;
 
 .btn-secondary {
   background-color: #1a2332;
-  color: $text-light;
-  border: 1px solid $border-color;
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
 
   &:hover:not(:disabled) {
-    border-color: $text-light;
-    color: $text-light;
+    border-color: var(--color-text);
+    color: var(--color-text);
   }
 }
 
 .btn-primary {
-  background-color: $teal-accent;
-  color: $dark-bg;
+  background-color: var(--color-primary);
+  color: var(--color-background);
 
   &:hover:not(:disabled) {
-    background-color: #1dd1a1;
+    background-color: var(--color-secondary);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
   }

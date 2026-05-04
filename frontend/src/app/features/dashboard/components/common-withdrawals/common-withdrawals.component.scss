@@ -1,9 +1,5 @@
 // Common Withdrawals styles
 
-$teal-accent: #00d9ff;
-$text-light: #e0e0e0;
-$text-muted: #999;
-$border-color: #1a1f26;
 
 .common-withdrawals-container {
   width: 100%;
@@ -16,7 +12,7 @@ $border-color: #1a1f26;
 .section-header {
   flex-shrink: 0;
   padding: 16px 20px;
-  border-bottom: 1px solid $border-color;
+  border-bottom: 1px solid var(--color-border);
   background-color: rgba(0, 0, 0, 0.2);
   display: flex;
   flex-direction: column;
@@ -24,7 +20,7 @@ $border-color: #1a1f26;
 
   h3 {
     margin: 0;
-    color: $text-light;
+    color: var(--color-text);
     font-size: 16px;
     font-weight: 600;
   }
@@ -43,15 +39,15 @@ $border-color: #1a1f26;
     label {
       font-size: 12px;
       font-weight: 600;
-      color: $text-muted;
+      color: var(--color-text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
     }
 
     select {
-      background-color: #1a2332;
-      color: $text-light;
-      border: 1px solid $border-color;
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
       padding: 8px 10px;
       border-radius: 4px;
       font-size: 13px;
@@ -60,7 +56,7 @@ $border-color: #1a1f26;
 
       &:focus {
         outline: none;
-        border-color: $teal-accent;
+        border-color: var(--color-primary);
         box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
       }
     }
@@ -82,11 +78,11 @@ $border-color: #1a1f26;
   }
 
   &::-webkit-scrollbar-thumb {
-    background: $border-color;
+    background: var(--color-border);
     border-radius: 3px;
 
     &:hover {
-      background: rgba(0, 217, 255, 0.3);
+      background: var(--color-surface);
     }
   }
 }
@@ -94,17 +90,17 @@ $border-color: #1a1f26;
 .common-withdrawals-table {
   width: 100%;
   border-collapse: collapse;
-  background-color: #0a0e13;
+  background-color: var(--color-surface);
 
   thead {
-    background-color: #1a2332;
-    border-bottom: 2px solid $border-color;
+    background-color: var(--color-surface);
+    border-bottom: 2px solid var(--color-border);
 
     th {
       padding: 12px;
       text-align: left;
       font-weight: 600;
-      color: $teal-accent;
+      color: var(--color-primary);
       text-transform: uppercase;
       font-size: 12px;
       letter-spacing: 0.5px;
@@ -121,17 +117,17 @@ $border-color: #1a1f26;
 
   tbody {
     tr {
-      border-bottom: 1px solid $border-color;
+      border-bottom: 1px solid var(--color-border);
       transition: background-color 0.2s ease;
 
       &:hover {
-        background-color: rgba(0, 217, 255, 0.05);
+        background-color: var(--color-surface-alt);
       }
 
       td {
         padding: 12px;
         font-size: 14px;
-        color: $text-light;
+        color: var(--color-text);
 
         &.text-center {
           text-align: center;
@@ -152,6 +148,6 @@ $border-color: #1a1f26;
   align-items: center;
   justify-content: center;
   padding: 20px;
-  color: $text-muted;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }

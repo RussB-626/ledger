@@ -1,14 +1,6 @@
 // Dashboard component styles
 // Dark theme with teal accents per CLAUDE.md
-
-$dark-bg: #0f1419;
-$darker-bg: #0a0e13;
-$teal-accent: #00d9ff;
-$text-light: #e0e0e0;
-$text-muted: #999;
-$border-color: #1a1f26;
-$success-color: #1dd1a1;
-$danger-color: #ff6b6b;
+// Uses CSS custom properties for dynamic theming
 
 @mixin custom-scrollbar {
   &::-webkit-scrollbar {
@@ -18,7 +10,7 @@ $danger-color: #ff6b6b;
     background: transparent;
   }
   &::-webkit-scrollbar-thumb {
-    background: $border-color;
+    background: var(--color-border);
     border-radius: 3px;
     &:hover {
       background: rgba(0, 217, 255, 0.3);
@@ -30,7 +22,7 @@ $danger-color: #ff6b6b;
   width: 100%;
   min-height: calc(100vh - 60px);
   padding: 20px;
-  background-color: $dark-bg;
+  background-color: var(--color-background);
 }
 
 .dashboard-content {
@@ -61,7 +53,7 @@ $danger-color: #ff6b6b;
   .label {
     font-size: 14px;
     font-weight: 500;
-    color: $text-light;
+    color: var(--color-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
@@ -97,12 +89,12 @@ $danger-color: #ff6b6b;
   .categories-header {
     flex-shrink: 0;
     padding: 16px 20px;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--color-border);
     background-color: rgba(0, 0, 0, 0.2);
 
     h3 {
       margin: 0 0 12px 0;
-      color: $text-light;
+      color: var(--color-text);
       font-size: 16px;
       font-weight: 600;
     }
@@ -121,15 +113,15 @@ $danger-color: #ff6b6b;
       label {
         font-size: 12px;
         font-weight: 600;
-        color: $text-muted;
+        color: var(--color-text-secondary);
         text-transform: uppercase;
         letter-spacing: 0.5px;
       }
 
       select {
-        background-color: #1a2332;
-        color: $text-light;
-        border: 1px solid $border-color;
+        background-color: var(--color-surface);
+        color: var(--color-text);
+        border: 1px solid var(--color-border);
         padding: 8px 10px;
         border-radius: 4px;
         font-size: 13px;
@@ -137,7 +129,7 @@ $danger-color: #ff6b6b;
 
         &:focus {
           outline: none;
-          border-color: $teal-accent;
+          border-color: var(--color-primary);
           box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
         }
       }
@@ -146,7 +138,7 @@ $danger-color: #ff6b6b;
 
   .differences-sub-card {
     flex-shrink: 0;
-    border: 1px solid $border-color;
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     margin: 12px;
     padding: 5px;
@@ -183,8 +175,8 @@ $danger-color: #ff6b6b;
 }
 
 .card {
-  background-color: $darker-bg;
-  border: 1px solid $border-color;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow: hidden;
   transition: border-color 0.2s ease;
@@ -199,7 +191,7 @@ $danger-color: #ff6b6b;
   .section-tabs {
     display: flex;
     gap: 0;
-    border-bottom: 1px solid $border-color;
+    border-bottom: 1px solid var(--color-border);
     padding: 0 20px;
     background-color: rgba(0, 0, 0, 0.2);
   }
@@ -209,7 +201,7 @@ $danger-color: #ff6b6b;
     padding: 12px 20px;
     border: none;
     background: none;
-    color: $text-muted;
+    color: var(--color-text-secondary);
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -219,12 +211,12 @@ $danger-color: #ff6b6b;
     letter-spacing: 0.5px;
 
     &:hover {
-      color: $text-light;
+      color: var(--color-text);
     }
 
     &.active {
-      color: $teal-accent;
-      border-bottom-color: $teal-accent;
+      color: var(--color-primary);
+      border-bottom-color: var(--color-primary);
     }
   }
 }
@@ -255,7 +247,7 @@ $danger-color: #ff6b6b;
   justify-content: center;
   align-items: center;
   min-height: 400px;
-  color: $text-light;
+  color: var(--color-text);
   font-size: 16px;
 }
 
