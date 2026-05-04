@@ -9,9 +9,11 @@ CREATE TABLE users (
   currency_symbol     VARCHAR(10) NOT NULL DEFAULT '$',
   decimal_places      TINYINT NOT NULL DEFAULT 2,
   thousand_separator  VARCHAR(1) NOT NULL DEFAULT ',',
+  decimal_separator   VARCHAR(1) NOT NULL DEFAULT '.',
   currency_position   VARCHAR(10) NOT NULL DEFAULT 'before',
   negative_format     VARCHAR(20) NOT NULL DEFAULT '-prefix',
   negative_color      VARCHAR(7) NOT NULL DEFAULT '#ff6b6b',
+  positive_color      VARCHAR(7) NOT NULL DEFAULT '#1dd1a1',
   created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

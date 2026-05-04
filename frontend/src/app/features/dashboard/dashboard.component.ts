@@ -87,13 +87,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
     const symbol = user.currency_symbol;
     const decimalPlaces = user.decimal_places;
     const thousandSep = user.thousand_separator;
+    const decimalSep = user.decimal_separator;
     const currencyPos = user.currency_position;
     const negativeFormat = user.negative_format;
 
     const absAmount = Math.abs(netWorth);
     const isNegative = netWorth < 0;
 
-    const formatted = this.formatNumber(absAmount, decimalPlaces, thousandSep);
+    const formatted = this.formatNumber(absAmount, decimalPlaces, thousandSep, decimalSep);
     const withCurrency = currencyPos === 'before'
       ? `${symbol}${formatted}`
       : `${formatted}${symbol}`;
@@ -105,13 +106,13 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return this.applyNegativeFormat(withCurrency, negativeFormat);
   }
 
-  private formatNumber(num: number, decimalPlaces: number, thousandSep: string): string {
+  private formatNumber(num: number, decimalPlaces: number, thousandSep: string, decimalSep: string): string {
     const parts = num.toFixed(decimalPlaces).split('.');
     const intPart = parts[0];
     const decPart = parts[1];
 
     const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
-    return decPart !== undefined ? `${withThousands}.${decPart}` : withThousands;
+    return decPart !== undefined ? `${withThousands}${decimalSep}${decPart}` : withThousands;
   }
 
   private applyNegativeFormat(value: string, format: string): string {

@@ -12,7 +12,7 @@
         @for (row of balanceRows; track row.accountName) {
         <tr [class.total-row]="row.isTotal">
           <td>{{ row.accountName }}</td>
-          <td class="text-right" [class.total-amount]="row.isTotal" [style.color]="row.balance < 0 ? (activeUser?.negative_color || '#ff6b6b') : 'inherit'">
+          <td class="text-right" [class.total-amount]="row.isTotal" [style.color]="row.balance === 0 ? '#ffffff' : (row.balance < 0 ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">
             {{ row.balance | formatCurrency }}
           </td>
         </tr>

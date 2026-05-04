@@ -377,6 +377,23 @@
             </select>
           </div>
 
+          <!-- Decimal Separator -->
+          <div class="setting-item">
+            <label for="decimal-separator">Decimal Separator</label>
+            <select
+              id="decimal-separator"
+              [(ngModel)]="decimalSeparator"
+              (change)="saveMoneyFormatPreferences()"
+              class="select-input"
+            >
+              @for (sep of decimalSeparatorOptions; track sep) {
+                <option [value]="sep">
+                  {{ sep === '.' ? 'Period (.)' : 'Comma (,)' }}
+                </option>
+              }
+            </select>
+          </div>
+
           <!-- Currency Position -->
           <div class="setting-item">
             <label for="currency-position">Currency Position</label>
@@ -420,43 +437,58 @@
               <span class="color-value">{{ negativeColor }}</span>
             </div>
           </div>
+
+          <!-- Positive Color -->
+          <div class="setting-item">
+            <label for="positive-color">Positive Amount Color</label>
+            <div class="color-input-wrapper">
+              <input
+                id="positive-color"
+                type="color"
+                [(ngModel)]="positiveColor"
+                (change)="saveMoneyFormatPreferences()"
+                class="color-input"
+              />
+              <span class="color-value">{{ positiveColor }}</span>
+            </div>
+          </div>
         </div>
 
         <!-- Preview -->
         <div class="preview-box">
           <p><strong>Preview (Positive):</strong></p>
-          <p class="preview-amount">
+          <p class="preview-amount" [style.color]="positiveColor">
             @if (currencyPosition === 'before') {
-              {{ currencySymbol }}1,234.50
+              {{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50
             }@else {
-              1,234.50{{ currencySymbol }}
+              1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }}
             }
           </p>
-          <p><strong>Preview (Negative):</strong></p>
+          <p class="preview-label-negative"><strong>Preview (Negative):</strong></p>
           <p class="preview-amount-negative" [style.color]="negativeColor">
             @if (negativeFormat === '-prefix') {
               @if (currencyPosition === 'before') {
-                -{{ currencySymbol }}1,234.50
+                -{{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50
               }@else {
-                -1,234.50{{ currencySymbol }}
+                -1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }}
               }
             }@else if (negativeFormat === 'parentheses') {
               @if (currencyPosition === 'before') {
-                ({{ currencySymbol }}1,234.50)
+                ({{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50)
               }@else {
-                (1,234.50{{ currencySymbol }})
+                (1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }})
               }
             }@else if (negativeFormat === 'brackets') {
               @if (currencyPosition === 'before') {
-                [{{ currencySymbol }}1,234.50]
+                [{{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50]
               }@else {
-                [1,234.50{{ currencySymbol }}]
+                [1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }}]
               }
             }@else {
               @if (currencyPosition === 'before') {
-                <span>&#123;</span>{{ currencySymbol }}1,234.50<span>&#125;</span>
+                <span>&#123;</span>{{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50<span>&#125;</span>
               }@else {
-                <span>&#123;</span>1,234.50{{ currencySymbol }}<span>&#125;</span>
+                <span>&#123;</span>1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }}<span>&#125;</span>
               }
             }
           </p>

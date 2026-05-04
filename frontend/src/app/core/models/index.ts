@@ -9,9 +9,11 @@ export interface User {
   currency_symbol: string;
   decimal_places: number;
   thousand_separator: string;
+  decimal_separator: string;
   currency_position: 'before' | 'after';
   negative_format: string;
   negative_color: string;
+  positive_color: string;
   created_at: string;
 }
 

@@ -70,7 +70,7 @@
               <td>{{ txn.category }}</td>
               <td>{{ txn.description }}</td>
               <td [title]="txn.note || ''">{{ truncateText(txn.note) }}</td>
-              <td class="text-right" [style.color]="(txn.type === 'W' || txn.type === 'TW') ? (activeUser?.negative_color || '#ff6b6b') : 'inherit'">{{ txn.amount | formatCurrency }}</td>
+              <td class="text-right" [style.color]="txn.amount === 0 ? '#ffffff' : ((txn.type === 'W' || txn.type === 'TW') ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">{{ txn.amount | formatCurrency }}</td>
               <td>
                 <span class="badge" [ngClass]="'badge-' + txn.type.toLowerCase()">
                   {{ txn.type }}

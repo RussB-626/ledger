@@ -77,12 +77,15 @@ export class AdminComponent implements OnInit, OnDestroy {
   currencySymbol = '$';
   decimalPlaces = 2;
   thousandSeparator = ',';
+  decimalSeparator = '.';
   currencyPosition: 'before' | 'after' = 'before';
   negativeFormat = '-prefix';
   negativeColor = '#ff6b6b';
+  positiveColor = '#1dd1a1';
   currencySymbolOptions = ['$', '€', '£', '¥', '₹', 'USD', 'EUR'];
   decimalPlacesOptions = [2, 3];
   thousandSeparatorOptions = [',', '.', ' '];
+  decimalSeparatorOptions = ['.', ','];
   currencyPositionOptions: Array<'before' | 'after'> = ['before', 'after'];
   negativeFormatOptions: Array<{ value: string; label: string }> = [
     { value: '-prefix', label: '-$1.00' },
@@ -947,9 +950,11 @@ export class AdminComponent implements OnInit, OnDestroy {
       this.currencySymbol = this.activeUser.currency_symbol ?? '$';
       this.decimalPlaces = this.activeUser.decimal_places ?? 2;
       this.thousandSeparator = this.activeUser.thousand_separator ?? ',';
+      this.decimalSeparator = this.activeUser.decimal_separator ?? '.';
       this.currencyPosition = this.activeUser.currency_position ?? 'before';
       this.negativeFormat = this.activeUser.negative_format ?? '-prefix';
       this.negativeColor = this.activeUser.negative_color ?? '#ff6b6b';
+      this.positiveColor = this.activeUser.positive_color ?? '#1dd1a1';
     }
   }
 
@@ -960,9 +965,11 @@ export class AdminComponent implements OnInit, OnDestroy {
       currency_symbol: this.currencySymbol,
       decimal_places: this.decimalPlaces,
       thousand_separator: this.thousandSeparator,
+      decimal_separator: this.decimalSeparator,
       currency_position: this.currencyPosition,
       negative_format: this.negativeFormat,
-      negative_color: this.negativeColor
+      negative_color: this.negativeColor,
+      positive_color: this.positiveColor
     }).subscribe({
       next: (updatedUser) => {
         this.activeUser = updatedUser;
