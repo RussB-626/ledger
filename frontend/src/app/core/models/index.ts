@@ -14,6 +14,13 @@ export interface User {
   negative_format: string;
   negative_color: string;
   positive_color: string;
+  backup_enabled: boolean;
+  backup_frequency: 'daily' | 'weekly' | 'monthly';
+  backup_time: string;
+  backup_day_of_week?: number;
+  backup_day_of_month?: number;
+  backup_count: number;
+  last_backup_date?: string;
   created_at: string;
 }
 
@@ -75,6 +82,15 @@ export interface MonthlyDifference {
   income: number;
   expenses: number;
   difference: number;
+}
+
+export interface BackupSettings {
+  backup_enabled: boolean;
+  backup_frequency: 'daily' | 'weekly' | 'monthly';
+  backup_time: string;
+  backup_day_of_week?: number;
+  backup_day_of_month?: number;
+  backup_count: number;
 }
 
 export interface ApiResponse<T> {

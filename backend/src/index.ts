@@ -7,6 +7,8 @@ import { errorHandler } from './middleware/errorHandler';
 import userRoutes from './routes/users';
 import transactionRoutes from './routes/transactions';
 import referenceRoutes from './routes/references';
+import backupRoutes from './routes/backups';
+import { initializeBackupScheduler } from './scheduler/backupScheduler';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -24,6 +26,7 @@ app.use((req, _res, next) => {
 app.use('/api/users', userRoutes);
 app.use('/api/users', transactionRoutes);
 app.use('/api/users', referenceRoutes);
+app.use('/api/users', backupRoutes);
 
 // Health check endpoint
 app.get('/api/health', (_req, res) => {
@@ -39,7 +42,10 @@ app.use((_req, res) => {
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`✓ Express server running on http://localhost:${PORT}`);
   console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
+
+  // Initialize backup scheduler
+  await initializeBackupScheduler();
 });

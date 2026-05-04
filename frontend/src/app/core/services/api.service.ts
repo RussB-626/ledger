@@ -14,7 +14,8 @@ import {
   Description,
   PageData,
   CategoryTotals,
-  MonthlyDifference
+  MonthlyDifference,
+  BackupSettings
 } from '../models/index';
 import { UserService } from './user.service';
 
@@ -257,6 +258,47 @@ export class ApiService {
     return this.http.post<ApiResponse<any>>(
       `${this.baseUrl}/users/${userId}/transactions/bulk-upload`,
       { transactions }
+    ).pipe(map(response => response.data!));
+  }
+
+  // ====== BACKUPS ======
+
+  createBackup(userId: number): Observable<{ filename?: string }> {
+    return this.http.post<ApiResponse<{ filename?: string }>>(
+      `${this.baseUrl}/users/${userId}/backups`,
+      {}
+    ).pipe(map(response => response.data || {}));
+  }
+
+  restoreBackup(
+    userId: number,
+    file: File,
+    targetUserId: number,
+    mode: 'overwrite' | 'merge'
+  ): Observable<{ restored: boolean }> {
+    const reader = new FileReader();
+    return new Observable(observer => {
+      reader.onload = () => {
+        const backupData = (reader.result as string).split(',')[1]; // Remove data:text/plain;base64, prefix
+        this.http.post<ApiResponse<{ restored: boolean }>>(
+          `${this.baseUrl}/users/${userId}/backups/restore`,
+          { backupData, targetUserId, mode }
+        ).subscribe(
+          response => {
+            observer.next(response.data || { restored: false });
+            observer.complete();
+          },
+          error => observer.error(error)
+        );
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  updateBackupSettings(userId: number, settings: any): Observable<User> {
+    return this.http.put<ApiResponse<User>>(
+      `${this.baseUrl}/users/${userId}/backups/settings`,
+      settings
     ).pipe(map(response => response.data!));
   }
 }

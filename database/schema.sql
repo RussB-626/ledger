@@ -14,6 +14,13 @@ CREATE TABLE users (
   negative_format     VARCHAR(20) NOT NULL DEFAULT '-prefix',
   negative_color      VARCHAR(7) NOT NULL DEFAULT '#ff6b6b',
   positive_color      VARCHAR(7) NOT NULL DEFAULT '#1dd1a1',
+  backup_enabled      TINYINT(1) NOT NULL DEFAULT 1,
+  backup_frequency    VARCHAR(20) NOT NULL DEFAULT 'weekly',
+  backup_time         TIME NOT NULL DEFAULT '02:00:00',
+  backup_day_of_week  TINYINT UNSIGNED,
+  backup_day_of_month TINYINT UNSIGNED,
+  backup_count        TINYINT NOT NULL DEFAULT 5,
+  last_backup_date    DATETIME,
   created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

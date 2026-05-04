@@ -499,12 +499,251 @@
 
   <!-- BACKUPS TAB -->
   @if (activeTab === 'backups') {
-    <div class="tab-content">
-      <div class="tab-header">
-        <h2>Backups</h2>
+    <div class="tab-content backups-content">
+      <!-- BACKUP SETTINGS SECTION -->
+      <div class="backups-section">
+        <div class="section-header">
+          <h3>Backup Settings</h3>
+        </div>
+
+        <div class="settings-group">
+          <!-- Enable Backups -->
+          <div class="setting-row">
+            <label>Enable Automatic Backups</label>
+            <input type="checkbox" [(ngModel)]="backupEnabled" />
+          </div>
+
+          @if (backupEnabled) {
+            <!-- Backup Frequency -->
+            <div class="setting-row">
+              <label for="frequency-select">Backup Frequency</label>
+              <select id="frequency-select" [(ngModel)]="backupFrequency" class="select-input">
+                <option value="daily">Daily</option>
+                <option value="weekly">Weekly</option>
+                <option value="monthly">Monthly</option>
+              </select>
+            </div>
+
+            <!-- Backup Time -->
+            <div class="setting-row">
+              <label for="time-select">Backup Time (HH:MM)</label>
+              <input type="time" id="time-select" [(ngModel)]="backupTime" class="input-field" />
+            </div>
+
+            <!-- Day of Week (Weekly) -->
+            @if (backupFrequency === 'weekly') {
+              <div class="setting-row">
+                <label for="day-of-week">Day of Week</label>
+                <select id="day-of-week" [(ngModel)]="backupDayOfWeek" class="select-input">
+                  <option value="0">Sunday</option>
+                  <option value="1">Monday</option>
+                  <option value="2">Tuesday</option>
+                  <option value="3">Wednesday</option>
+                  <option value="4">Thursday</option>
+                  <option value="5">Friday</option>
+                  <option value="6">Saturday</option>
+                </select>
+              </div>
+            }
+
+            <!-- Day of Month (Monthly) -->
+            @if (backupFrequency === 'monthly') {
+              <div class="setting-row">
+                <label for="day-of-month">Day of Month</label>
+                <select id="day-of-month" [(ngModel)]="backupDayOfMonth" class="select-input">
+                  @for (day of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]; track day) {
+                    <option [value]="day">{{ day }}</option>
+                  }
+                </select>
+              </div>
+            }
+
+            <!-- Backup Retention Count -->
+            <div class="setting-row">
+              <label for="backup-count">Number of Backups to Keep</label>
+              <input type="number" id="backup-count" [(ngModel)]="backupCount" min="1" max="50" class="input-field" />
+            </div>
+          }
+
+          @if (backupError) {
+            <div class="error-message">{{ backupError }}</div>
+          }
+
+          <button class="save-btn" (click)="saveBackupSettings()" [disabled]="savingBackupSettings">
+            {{ savingBackupSettings ? 'Saving...' : 'Save Settings' }}
+          </button>
+        </div>
       </div>
-      <div class="empty-state" style="padding: 40px; text-align: center;">
-        <p>Backup features coming soon...</p>
+
+      <!-- BACKUP MANAGEMENT SECTION -->
+      <div class="backups-section">
+        <div class="section-header">
+          <h3>Backup Management</h3>
+        </div>
+
+        <div class="management-group">
+          <div class="button-group">
+            <button class="action-btn primary-btn" (click)="onCreateManualBackup()" [disabled]="backupLoading">
+              {{ backupLoading ? 'Creating...' : '+ Create Backup Now' }}
+            </button>
+            <button class="action-btn secondary-btn" (click)="showRestoreModal = true" [disabled]="restoreLoading">
+              ↑ Upload & Restore Backup
+            </button>
+          </div>
+
+          <div class="info-box">
+            <p><strong>💾 Access Your Backups</strong></p>
+            <p>Backup files are stored on the server at: <code>/backups/user-{{ activeUser?.name }}/</code></p>
+            <p>You can access this directory to view, download, or manage your backup files directly.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- BACKUP SUCCESS MODAL -->
+  @if (showBackupSuccessModal) {
+    <div class="modal-overlay" (click)="showBackupSuccessModal = false">
+      <div class="modal" (click)="$event.stopPropagation()" style="max-width: 600px;">
+        <div class="modal-header">
+          <h3>✓ Backup Created</h3>
+          <button class="close-btn" (click)="showBackupSuccessModal = false">×</button>
+        </div>
+        <div class="modal-body">
+          <p>{{ backupSuccessMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-save" (click)="showBackupSuccessModal = false">
+            OK
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- RESTORE BACKUP MODAL -->
+  @if (showRestoreModal) {
+    <div class="modal-overlay" (click)="showRestoreModal = false">
+      <div class="modal restore-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Restore Backup</h3>
+          <button class="close-btn" (click)="showRestoreModal = false">×</button>
+        </div>
+
+        <div class="modal-body">
+          <!-- File Upload Section -->
+          @if (!restoreFile) {
+            <div class="restore-file-input">
+              <p>Select a backup file (.sql or .sql.gz):</p>
+              <input
+                type="file"
+                accept=".sql,.sql.gz,.gz"
+                (change)="onUploadBackupFile($event)"
+                class="file-input"
+              />
+              @if (restoreError) {
+                <div class="error-message">{{ restoreError }}</div>
+              }
+            </div>
+          }
+
+          <!-- Mode Selection -->
+          @if (restoreFile && !restoreLoading) {
+            <div class="restore-mode-selection">
+              <p><strong>How should the backup be restored?</strong></p>
+
+              <div class="mode-option-group">
+                <label class="mode-option">
+                  <input
+                    type="radio"
+                    [value]="'overwrite'"
+                    [(ngModel)]="restoreMode"
+                    name="restoreMode"
+                  />
+                  <div class="mode-info">
+                    <strong>Overwrite</strong>
+                    <span class="mode-desc">Replace all current data with backup</span>
+                    <small>Deletes: transactions, accounts, categories, descriptions</small>
+                  </div>
+                </label>
+
+                <label class="mode-option">
+                  <input
+                    type="radio"
+                    [value]="'merge'"
+                    [(ngModel)]="restoreMode"
+                    name="restoreMode"
+                  />
+                  <div class="mode-info">
+                    <strong>Merge</strong>
+                    <span class="mode-desc">Add backup data alongside current data</span>
+                    <small>Combines both datasets (may create duplicates)</small>
+                  </div>
+                </label>
+              </div>
+
+              <div class="warning-box">
+                <strong>⚠️ Warning:</strong> This action will restore data from the backup and remap it to your current account.
+              </div>
+
+              @if (restoreError) {
+                <div class="error-message">{{ restoreError }}</div>
+              }
+            </div>
+          }
+
+          <!-- Loading State -->
+          @if (restoreLoading) {
+            <div class="loading-state">
+              <p>Restoring backup... This may take a moment.</p>
+            </div>
+          }
+
+          <!-- File Selected Display -->
+          @if (restoreFile) {
+            <div class="selected-file">
+              <p>Selected file: <strong>{{ restoreFile.name }}</strong></p>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          @if (!restoreFile || restoreLoading) {
+            <button class="btn-cancel" (click)="showRestoreModal = false; restoreFile = null;" [disabled]="restoreLoading">
+              {{ restoreLoading ? 'Restoring...' : 'Cancel' }}
+            </button>
+          } @else {
+            <button
+              class="btn-cancel"
+              (click)="showRestoreModal = false; restoreFile = null; restoreMode = 'overwrite'; restoreOriginalUserId = null;"
+            >
+              Back
+            </button>
+            <button class="btn-save" (click)="onRestoreBackup()" [disabled]="restoreLoading">
+              {{ restoreLoading ? 'Restoring...' : 'Confirm Restore' }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- RESTORE SUCCESS MODAL -->
+  @if (showRestoreSuccessModal) {
+    <div class="modal-overlay" (click)="showRestoreSuccessModal = false">
+      <div class="modal" (click)="$event.stopPropagation()" style="max-width: 600px;">
+        <div class="modal-header">
+          <h3>✓ Success</h3>
+          <button class="close-btn" (click)="showRestoreSuccessModal = false">×</button>
+        </div>
+        <div class="modal-body">
+          <p>{{ restoreSuccessMessage }}</p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-save" (click)="showRestoreSuccessModal = false">
+            OK
+          </button>
+        </div>
       </div>
     </div>
   }
