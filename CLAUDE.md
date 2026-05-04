@@ -23,17 +23,29 @@
 - **All buttons, modals, tables, forms, and layouts must match the UI images exactly**
 - **No deviations from the design without explicit user approval in this CLAUDE.md file**
 
-### 2. Database Schema
-- **Create MySQL database with EXACT table definitions from `plan_file.md` sections:**
+### 2. Database Schema & Initialization
+- **Database auto-initialization:** Backend automatically creates tables from `database/schema.sql` on first run
+  - Check: Backend logs `✓ Database tables already exist` if tables present, or initializes if missing
+  - **REQUIREMENT:** MySQL user must have CREATE permissions on the database
+    - If you see `CREATE command denied`, grant permissions:
+      ```sql
+      GRANT CREATE ON database_name.* TO 'user'@'host';
+      FLUSH PRIVILEGES;
+      ```
+- **Table definitions (auto-created from `database/schema.sql`):**
   - `users` — user profiles (no auth, no passwords)
   - `transactions` — financial ledger (W/D/TW/TD types)
   - `accounts` — account names per user
   - `categories` — unified table with `is_expense`, `is_income`, `is_transfer`, `ignore` flags
-  - `descriptions` — transaction descriptions with `is_common` flag (replaces old reference tables)
+  - `descriptions` — transaction descriptions with `is_common` flag
 - **Add all indexes, foreign keys, and unique constraints exactly as specified**
 - **Data isolation: ALL queries must filter by `user_id` — NO cross-user data leakage**
 
 ### 3. Backend (Express + TypeScript)
+- **Database initialization:** `backend/src/database.ts` automatically creates schema on startup
+  - Runs before Express server starts listening
+  - Checks if tables exist; if missing, executes `database/schema.sql`
+  - Logs progress: `[Database] Starting initialization...` → `✓ Database schema initialized successfully`
 - **Strict TypeScript mode enabled — no `any` types except where unavoidable**
 - **All code MUST be TypeScript with explicit types on all functions and parameters**
 - **All API responses use format: `{ data?: T, error?: string }`**
@@ -140,7 +152,11 @@
 - **No Application-Level Checks:** Backend delete functions are simple and rely on database constraints
 
 ### 8. Verification Before Mark-Complete
+- [ ] MySQL user has CREATE TABLE permissions on the database
+  - If error `CREATE command denied`, run: `GRANT CREATE ON database_name.* TO 'user'@'host'; FLUSH PRIVILEGES;`
 - [ ] Backend runs: `npm run dev` (TypeScript) or `npm run build && node dist/index.js` (compiled)
+  - Logs: `[Database] Starting initialization...` → `✓ Database schema initialized successfully`
+  - Or: `✓ Database tables already exist` (if already initialized)
 - [ ] All endpoints return `{ data, error }` format
 - [ ] All endpoints tested with Postman/Thunder Client
 - [ ] Frontend runs: `ng serve` with dev proxy to backend
@@ -231,10 +247,13 @@ export class UserService {
 ```
 backend/
 ├── src/
-│   ├── types/index.ts (all shared interfaces)
+│   ├── database.ts (schema auto-initialization on startup)
 │   ├── db.ts (MySQL connection pool with typed config)
+│   ├── index.ts (Express app entry point)
+│   ├── types/index.ts (all shared interfaces)
 │   ├── routes/ (typed route handlers)
 │   ├── controllers/ (business logic)
+│   ├── services/ (backup and scheduler services)
 │   └── middleware/errorHandler.ts (centralized error handling)
 
 frontend/
