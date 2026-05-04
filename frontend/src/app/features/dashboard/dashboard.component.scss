@@ -154,11 +154,16 @@
 }
 
 .card {
+  display: flex;
+  flex-direction: column;
+  min-height: 700px;
+  max-height: 700px;
+
   app-common-withdrawals {
     display: flex;
     flex-direction: column;
-    min-height: 350px;
-    max-height: 350px;
+    flex: 1;
+    min-height: 0;
   }
 }
 
