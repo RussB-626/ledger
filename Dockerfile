@@ -1,7 +1,7 @@
 # Multi-stage build for Checkbook Register app
 # Per CLAUDE.md: Compiles backend, builds Angular frontend, serves both from Express
 
-FROM node:18-alpine as builder
+FROM node:20-alpine as builder
 
 WORKDIR /app
 
@@ -19,7 +19,7 @@ RUN npm install
 RUN npm run build
 
 # Final stage
-FROM node:18-alpine
+FROM node:20-alpine
 
 WORKDIR /app
 

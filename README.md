@@ -18,10 +18,11 @@ A self-hosted full-stack financial ledger application built with Express.js, Ang
 ## Requirements
 
 - **Docker** and **Docker Compose** (for containerized deployment)
+  - Docker uses Node.js v20 (handled automatically in container)
 - **MySQL** v5.7+ (database server, can be local, remote, or in separate container)
 
 *For local development without Docker:*
-- **Node.js** v18+
+- **Node.js** v20.19 or higher (Angular requirement)
 - **npm** v9+
 
 ## Quick Start (Docker)

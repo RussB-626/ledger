@@ -24,7 +24,9 @@
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
-            "assets": [],
+            "assets": [
+              "src/assets"
+            ],
             "styles": [
               "src/styles.scss"
             ],
@@ -87,7 +89,9 @@
               "zone.js/testing"
             ],
             "tsConfig": "tsconfig.spec.json",
-            "assets": [],
+            "assets": [
+              "src/assets"
+            ],
             "styles": [
               "src/styles.scss"
             ],
