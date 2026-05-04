@@ -9,6 +9,7 @@ import transactionRoutes from './routes/transactions';
 import referenceRoutes from './routes/references';
 import backupRoutes from './routes/backups';
 import { initializeBackupScheduler } from './scheduler/backupScheduler';
+import { initializeDatabase } from './database';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,10 +43,22 @@ app.use((_req, res) => {
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, async () => {
-  console.log(`✓ Express server running on http://localhost:${PORT}`);
-  console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
+const startServer = async () => {
+  try {
+    // Initialize database schema if needed
+    await initializeDatabase();
 
-  // Initialize backup scheduler
-  await initializeBackupScheduler();
-});
+    app.listen(PORT, async () => {
+      console.log(`✓ Express server running on http://localhost:${PORT}`);
+      console.log(`  Environment: ${process.env.NODE_ENV || 'development'}`);
+
+      // Initialize backup scheduler
+      await initializeBackupScheduler();
+    });
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+startServer();
