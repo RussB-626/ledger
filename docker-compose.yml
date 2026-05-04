@@ -17,3 +17,5 @@ services:
       DB_NAME: ${DB_NAME:-checkbook_register}
       DB_USER: ${DB_USER:-checkbook_user}
       DB_PASSWORD: ${DB_PASSWORD:-checkbook_password}
+    volumes:
+      - ./backups:/app/backups
