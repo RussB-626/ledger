@@ -79,6 +79,9 @@ export class PendingTabComponent implements OnChanges {
       );
     }
 
+    // Sort by date in ascending order
+    filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+
     return filtered;
   }
 
