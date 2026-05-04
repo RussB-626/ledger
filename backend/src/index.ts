@@ -3,6 +3,7 @@
 
 import 'dotenv/config';
 import express from 'express';
+import path from 'path';
 import { errorHandler } from './middleware/errorHandler';
 import userRoutes from './routes/users';
 import transactionRoutes from './routes/transactions';
@@ -23,6 +24,10 @@ app.use((req, _res, next) => {
   next();
 });
 
+// Serve Angular frontend static files
+const frontendPath = path.join(__dirname, '../frontend/dist/checkbook-register-frontend');
+app.use(express.static(frontendPath));
+
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/users', transactionRoutes);
@@ -34,9 +39,9 @@ app.get('/api/health', (_req, res) => {
   res.json({ status: 'ok' });
 });
 
-// 404 handler
-app.use((_req, res) => {
-  res.status(404).json({ error: 'Not found' });
+// SPA fallback: serve index.html for client-side routing
+app.get('*', (_req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
 });
 
 // Error handler (must be last)
