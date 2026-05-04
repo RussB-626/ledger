@@ -137,4 +137,8 @@ export class NavbarComponent implements OnInit {
   navigateToAdmin(): void {
     this.router.navigate(['/admin']);
   }
+
+  isOnAdminPage(): boolean {
+    return this.router.url.startsWith('/admin');
+  }
 }

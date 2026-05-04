@@ -2,13 +2,15 @@ import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PageData, Transaction } from '../../../../core/models/index';
+import { UserService } from '../../../../core/services/user.service';
+import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
   selector: 'app-common-withdrawals',
   templateUrl: './common-withdrawals.component.html',
   styleUrls: ['./common-withdrawals.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, FormatCurrencyPipe]
 })
 export class CommonWithdrawalsComponent implements OnChanges {
   @Input() pageData!: PageData;
@@ -17,7 +19,7 @@ export class CommonWithdrawalsComponent implements OnChanges {
   selectedMonth: number;
   monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
-  constructor() {
+  constructor(private userService: UserService) {
     const now = new Date();
     this.selectedYear = now.getFullYear();
     this.selectedMonth = now.getMonth() + 1;
@@ -82,7 +84,30 @@ export class CommonWithdrawalsComponent implements OnChanges {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    const user = this.userService.getActiveUser();
+    if (!user) {
+      return `$${amount.toFixed(2)}`;
+    }
+
+    const symbol = user.currency_symbol;
+    const decimalPlaces = user.decimal_places;
+    const thousandSep = user.thousand_separator;
+    const currencyPos = user.currency_position;
+
+    const absAmount = Math.abs(amount);
+    const isNegative = amount < 0;
+
+    const parts = absAmount.toFixed(decimalPlaces).split('.');
+    const intPart = parts[0];
+    const decPart = parts[1];
+
+    const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
+    const formatted = decPart !== undefined ? `${withThousands}.${decPart}` : withThousands;
+    const withCurrency = currencyPos === 'before'
+      ? `${symbol}${formatted}`
+      : `${formatted}${symbol}`;
+
+    return isNegative ? `-${withCurrency}` : withCurrency;
   }
 
   getPriorMonthName(): string {

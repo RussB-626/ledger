@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
-import { PageData, MonthlyDifference } from '../../../../core/models/index';
+import { PageData, MonthlyDifference, User } from '../../../../core/models/index';
 
 @Component({
   selector: 'app-differences-card',
@@ -18,6 +18,7 @@ export class DifferencesCardComponent implements OnInit, OnChanges {
   @Input() selectedYear?: number;
   @Input() selectedMonth?: number;
 
+  activeUser: User | null = null;
   year: number;
   month: number;
   difference: MonthlyDifference | null = null;
@@ -36,6 +37,7 @@ export class DifferencesCardComponent implements OnInit, OnChanges {
     const today = new Date();
     this.year = today.getFullYear();
     this.month = today.getMonth() + 1;
+    this.activeUser = this.userService.getActiveUser();
   }
 
   ngOnInit(): void {
@@ -84,10 +86,53 @@ export class DifferencesCardComponent implements OnInit, OnChanges {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    const user = this.activeUser;
+    if (!user) {
+      return `$${amount.toFixed(2)}`;
+    }
+
+    const symbol = user.currency_symbol;
+    const decimalPlaces = user.decimal_places;
+    const thousandSep = user.thousand_separator;
+    const currencyPos = user.currency_position;
+    const negativeFormat = user.negative_format;
+
+    const absAmount = Math.abs(amount);
+    const isNegative = amount < 0;
+
+    const formatted = this.formatNumber(absAmount, decimalPlaces, thousandSep);
+    const withCurrency = currencyPos === 'before'
+      ? `${symbol}${formatted}`
+      : `${formatted}${symbol}`;
+
+    if (!isNegative) {
+      return withCurrency;
+    }
+
+    return this.applyNegativeFormat(withCurrency, negativeFormat);
+  }
+
+  private formatNumber(num: number, decimalPlaces: number, thousandSep: string): string {
+    const parts = num.toFixed(decimalPlaces).split('.');
+    const intPart = parts[0];
+    const decPart = parts[1];
+
+    const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
+    return decPart !== undefined ? `${withThousands}.${decPart}` : withThousands;
+  }
+
+  private applyNegativeFormat(value: string, format: string): string {
+    switch (format) {
+      case 'parentheses':
+        return `(${value})`;
+      case 'brackets':
+        return `[${value}]`;
+      case 'braces':
+        return `{${value}}`;
+      case '-prefix':
+      default:
+        return `-${value}`;
+    }
   }
 
   get differenceClass(): string {

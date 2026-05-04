@@ -4,11 +4,11 @@
   @if (!loading && difference) {
   <div class="compact-income">
     <span class="label">Income</span>
-    <span class="amount positive">+{{ formatCurrency(difference.income) }}</span>
+    <span class="amount positive">{{ formatCurrency(difference.income) }}</span>
   </div>
   <div class="compact-expenses">
     <span class="label">Expenses</span>
-    <span class="amount negative">-{{ formatCurrency(difference.expenses) }}</span>
+    <span class="amount negative" [style.color]="activeUser ? activeUser.negative_color : 'inherit'">{{ formatCurrency(-difference.expenses) }}</span>
   </div>
   }
 </div>
@@ -58,11 +58,11 @@
       </div>
       <div class="net-row">
         <span class="net-label">Expenses</span>
-        <span class="net-amount negative">{{ formatCurrency(difference.expenses) }}</span>
+        <span class="net-amount negative" [style.color]="activeUser ? activeUser.negative_color : 'inherit'">{{ formatCurrency(-difference.expenses) }}</span>
       </div>
       <div class="net-row net-total">
         <span class="net-label">Net For {{ monthNames[month - 1] }} {{ year }}</span>
-        <span class="net-amount" [class]="difference.difference >= 0 ? 'positive' : 'negative'">
+        <span class="net-amount" [class]="difference.difference >= 0 ? 'positive' : 'negative'" [style.color]="difference.difference < 0 && activeUser ? activeUser.negative_color : '#1dd1a1'">
           {{ formatCurrency(difference.difference) }}
         </span>
       </div>

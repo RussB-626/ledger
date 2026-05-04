@@ -32,6 +32,20 @@ interface DescriptionModalData {
   is_common: boolean;
 }
 
+interface ParsedTransaction {
+  date: string;
+  account: string;
+  category: string;
+  categoryType: 'expense' | 'income' | 'transfer';
+  description: string;
+  notes: string;
+  amount: number;
+  type: 'D' | 'W' | 'TD' | 'TW';
+  pending: boolean;
+  originalDate: string;
+  parseError?: string;
+}
+
 @Component({
   selector: 'app-admin',
   templateUrl: './admin.component.html',
@@ -41,12 +55,41 @@ interface DescriptionModalData {
 })
 export class AdminComponent implements OnInit, OnDestroy {
   activeUser: User | null = null;
-  activeTab: 'accounts' | 'categories' | 'descriptions' = 'accounts';
+  activeTab: 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups' = 'accounts';
 
   // Data arrays
   accounts: Account[] = [];
   categories: Category[] = [];
   descriptions: Description[] = [];
+
+  // Pagination
+  itemsPerPage = 10;
+  accountsPage = 1;
+  categoriesPage = 1;
+  descriptionsPage = 1;
+
+  // Search filters
+  searchAccounts = '';
+  searchCategories = '';
+  searchDescriptions = '';
+
+  // Money format preferences
+  currencySymbol = '$';
+  decimalPlaces = 2;
+  thousandSeparator = ',';
+  currencyPosition: 'before' | 'after' = 'before';
+  negativeFormat = '-prefix';
+  negativeColor = '#ff6b6b';
+  currencySymbolOptions = ['$', '€', '£', '¥', '₹', 'USD', 'EUR'];
+  decimalPlacesOptions = [2, 3];
+  thousandSeparatorOptions = [',', '.', ' '];
+  currencyPositionOptions: Array<'before' | 'after'> = ['before', 'after'];
+  negativeFormatOptions: Array<{ value: string; label: string }> = [
+    { value: '-prefix', label: '-$1.00' },
+    { value: 'parentheses', label: '($1.00)' },
+    { value: 'brackets', label: '[$1.00]' },
+    { value: 'braces', label: '{$1.00}' }
+  ];
 
   // User deletion modal state
   showUserDeletionModal = false;
@@ -89,6 +132,17 @@ export class AdminComponent implements OnInit, OnDestroy {
   bulkDescriptionError = '';
   bulkDescriptionLoading = false;
 
+  // Bulk upload transactions modal state
+  bulkUploadModal = { isOpen: false };
+  bulkUploadParsedData: ParsedTransaction[] = [];
+  bulkUploadParsedDataWithErrors: ParsedTransaction[] = [];
+  bulkUploadValidCount = 0;
+  bulkUploadError = '';
+  bulkUploadLoading = false;
+  bulkUploadFileLoading = false;
+  bulkUploadDateFormat = '';
+  bulkUploadStatus = '';
+
   deleteConfirmation: {
     isOpen: boolean;
     type: 'user' | 'account' | 'category' | 'description' | null;
@@ -115,6 +169,7 @@ export class AdminComponent implements OnInit, OnDestroy {
       .subscribe(user => {
         this.activeUser = user;
         if (user) {
+          this.loadMoneyFormatPreferences();
           this.loadAllData();
         }
       });
@@ -498,10 +553,320 @@ export class AdminComponent implements OnInit, OnDestroy {
     }
   }
 
+  // ====== BULK UPLOAD TRANSACTIONS ======
+
+  openBulkUploadModal(): void {
+    this.bulkUploadModal = { isOpen: true };
+    this.bulkUploadParsedData = [];
+    this.bulkUploadParsedDataWithErrors = [];
+    this.bulkUploadValidCount = 0;
+    this.bulkUploadError = '';
+    this.bulkUploadLoading = false;
+    this.bulkUploadDateFormat = '';
+    this.bulkUploadStatus = '';
+    (this as any).bulkUploadAllParsedData = [];
+  }
+
+  closeBulkUploadModal(): void {
+    this.bulkUploadModal = { isOpen: false };
+    this.bulkUploadParsedData = [];
+    this.bulkUploadParsedDataWithErrors = [];
+    this.bulkUploadValidCount = 0;
+    this.bulkUploadError = '';
+    this.bulkUploadLoading = false;
+    this.bulkUploadDateFormat = '';
+    this.bulkUploadStatus = '';
+    (this as any).bulkUploadAllParsedData = [];
+  }
+
+  onBulkUploadFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.bulkUploadFileLoading = true;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const text = e.target?.result as string;
+        this.bulkUploadError = '';
+        this.bulkUploadStatus = '';
+
+        this.bulkUploadParsedData = this.parseTsvFile(text);
+
+        // Pre-compute filtered values for template
+        this.bulkUploadParsedDataWithErrors = this.bulkUploadParsedData.filter(t => t.parseError);
+        this.bulkUploadValidCount = this.bulkUploadParsedData.length - this.bulkUploadParsedDataWithErrors.length;
+
+        // Keep only preview (first 10) + errors for display; keep all for upload
+        const previewData = this.bulkUploadParsedData.slice(0, 10);
+        const allData = this.bulkUploadParsedData;
+        this.bulkUploadParsedData = previewData;
+        // Store full data separately for upload
+        (this as any).bulkUploadAllParsedData = allData;
+
+        if (this.bulkUploadParsedData.length === 0) {
+          this.bulkUploadError = 'No valid transactions found in file';
+        }
+      } catch (error) {
+        this.bulkUploadError = `Failed to parse file: ${(error as Error).message}`;
+        this.bulkUploadParsedData = [];
+      } finally {
+        this.bulkUploadFileLoading = false;
+        this.cdr.markForCheck();
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  parseTsvFile(fileText: string): ParsedTransaction[] {
+    const lines = fileText.split('\n').filter(line => line.trim());
+    if (lines.length === 0) return [];
+
+    const parsed: ParsedTransaction[] = [];
+
+    // Extract all unique dates to detect format
+    const dateStrings = lines.map(line => {
+      const parts = line.split('\t');
+      return parts[0]?.trim() || '';
+    }).filter(d => d);
+
+    const detectedFormat = this.detectDateFormat(dateStrings);
+
+    for (const line of lines) {
+      const parts = line.split('\t');
+      if (parts.length < 8) continue;
+
+      const [dateStr, account, category, description, notes, amountStr, type, pendingStr] = parts.map(p => p.trim());
+
+      // Parse date
+      const dateResult = this.parseDate(dateStr, detectedFormat);
+      if (!dateResult.success || !dateResult.date) {
+        parsed.push({
+          date: '',
+          account,
+          category,
+          categoryType: this.inferCategoryType(type as 'D' | 'W' | 'TD' | 'TW'),
+          description,
+          notes,
+          amount: 0,
+          type: type as 'D' | 'W' | 'TD' | 'TW',
+          pending: false,
+          originalDate: dateStr,
+          parseError: `Invalid date: ${dateStr}`
+        });
+        continue;
+      }
+
+      // Parse amount
+      const amount = parseFloat(amountStr);
+      if (isNaN(amount)) {
+        parsed.push({
+          date: dateResult.date,
+          account,
+          category,
+          categoryType: this.inferCategoryType(type as 'D' | 'W' | 'TD' | 'TW'),
+          description,
+          notes,
+          amount: 0,
+          type: type as 'D' | 'W' | 'TD' | 'TW',
+          pending: false,
+          originalDate: dateStr,
+          parseError: `Invalid amount: ${amountStr}`
+        });
+        continue;
+      }
+
+      // Parse pending flag
+      const pending = pendingStr.toUpperCase() === 'TRUE';
+
+      parsed.push({
+        date: dateResult.date,
+        account,
+        category,
+        categoryType: this.inferCategoryType(type as 'D' | 'W' | 'TD' | 'TW'),
+        description,
+        notes,
+        amount,
+        type: type as 'D' | 'W' | 'TD' | 'TW',
+        pending,
+        originalDate: dateStr
+      });
+    }
+
+    this.bulkUploadDateFormat = detectedFormat;
+    return parsed;
+  }
+
+  detectDateFormat(dateStrings: string[]): string {
+    if (dateStrings.length === 0) return 'yyyy-mm-dd';
+
+    // Infer from first date only for performance
+    const firstDate = dateStrings[0];
+
+    // Check yyyy-mm-dd pattern
+    if (/^\d{4}[-/]\d{1,2}[-/]\d{1,2}$/.test(firstDate)) {
+      return 'yyyy-mm-dd';
+    }
+
+    // Check dd-mm-yyyy or mm-dd-yyyy pattern
+    if (/^\d{1,2}[-/]\d{1,2}[-/]\d{4}$/.test(firstDate)) {
+      const parts = firstDate.split(/[-/]/);
+      const first = parseInt(parts[0], 10);
+      const second = parseInt(parts[1], 10);
+
+      if (first > 12) {
+        return 'dd-mm-yyyy';
+      } else if (second > 12) {
+        return 'mm-dd-yyyy';
+      } else {
+        // Ambiguous - prefer dd-mm-yyyy as more common globally
+        return 'dd-mm-yyyy';
+      }
+    }
+
+    return 'yyyy-mm-dd';
+  }
+
+  parseDate(dateStr: string, format: string): { success: boolean; date?: string; error?: string } {
+    const parts = dateStr.split(/[-/]/);
+    if (parts.length !== 3) {
+      return { success: false, error: 'Invalid date format' };
+    }
+
+    let year: number, month: number, day: number;
+
+    if (format === 'yyyy-mm-dd') {
+      year = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10);
+      day = parseInt(parts[2], 10);
+    } else if (format === 'dd-mm-yyyy') {
+      day = parseInt(parts[0], 10);
+      month = parseInt(parts[1], 10);
+      year = parseInt(parts[2], 10);
+    } else {
+      // mm-dd-yyyy
+      month = parseInt(parts[0], 10);
+      day = parseInt(parts[1], 10);
+      year = parseInt(parts[2], 10);
+    }
+
+    // Validate month and day ranges (no expensive Date object creation)
+    if (month < 1 || month > 12 || day < 1 || day > 31) {
+      return { success: false, error: 'Invalid month or day' };
+    }
+
+    // Return as yyyy-mm-dd format
+    const isoMonth = String(month).padStart(2, '0');
+    const isoDay = String(day).padStart(2, '0');
+    const isoDate = `${year}-${isoMonth}-${isoDay}`;
+
+    return { success: true, date: isoDate };
+  }
+
+  private inferCategoryType(type: 'D' | 'W' | 'TD' | 'TW'): 'expense' | 'income' | 'transfer' {
+    if (type === 'W' || type === 'TW') {
+      return type === 'TW' ? 'transfer' : 'expense';
+    } else if (type === 'D') {
+      return 'income';
+    } else {
+      // TD
+      return 'transfer';
+    }
+  }
+
+  saveBulkUpload(): void {
+    if (!this.activeUser) return;
+
+    // Use the full data, not just the preview
+    const allData = (this as any).bulkUploadAllParsedData as ParsedTransaction[] || this.bulkUploadParsedData;
+    const transactionsToUpload = allData.filter((t: ParsedTransaction) => !t.parseError);
+
+    if (transactionsToUpload.length === 0) {
+      this.bulkUploadError = 'No valid transactions to upload. Please fix parsing errors.';
+      return;
+    }
+
+    this.bulkUploadLoading = true;
+    this.bulkUploadError = '';
+    this.bulkUploadStatus = 'Uploading transactions...';
+
+    this.apiService.bulkUploadTransactions(this.activeUser.id, transactionsToUpload)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.bulkUploadLoading = false;
+          this.bulkUploadStatus = 'Upload successful!';
+          setTimeout(() => {
+            this.closeBulkUploadModal();
+            this.loadAllData();
+            this.refreshPageDataInDashboard();
+          }, 1500);
+        },
+        error: (error: unknown) => {
+          this.bulkUploadLoading = false;
+          const err = error as { error?: { error?: string } };
+          const errorMsg = err?.error?.error || 'Failed to upload transactions';
+          this.bulkUploadError = errorMsg;
+          this.bulkUploadStatus = '';
+        }
+      });
+  }
+
   // ====== NAVIGATION ======
 
-  selectTab(tab: 'accounts' | 'categories' | 'descriptions'): void {
+  selectTab(tab: 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups'): void {
     this.activeTab = tab;
+  }
+
+  // Filter helpers
+  getFilteredAccounts(): Account[] {
+    if (!this.searchAccounts.trim()) return this.accounts;
+    const search = this.searchAccounts.toLowerCase();
+    return this.accounts.filter(a => a.name.toLowerCase().includes(search));
+  }
+
+  getFilteredCategories(): Category[] {
+    if (!this.searchCategories.trim()) return this.categories;
+    const search = this.searchCategories.toLowerCase();
+    return this.categories.filter(c => c.name.toLowerCase().includes(search));
+  }
+
+  getFilteredDescriptions(): Description[] {
+    if (!this.searchDescriptions.trim()) return this.descriptions;
+    const search = this.searchDescriptions.toLowerCase();
+    return this.descriptions.filter(d => d.description.toLowerCase().includes(search));
+  }
+
+  // Pagination helpers
+  getPaginatedAccounts(): Account[] {
+    const filtered = this.getFilteredAccounts();
+    const start = (this.accountsPage - 1) * this.itemsPerPage;
+    return filtered.slice(start, start + this.itemsPerPage);
+  }
+
+  getTotalAccountsPages(): number {
+    return Math.ceil(this.getFilteredAccounts().length / this.itemsPerPage);
+  }
+
+  getPaginatedCategories(): Category[] {
+    const filtered = this.getFilteredCategories();
+    const start = (this.categoriesPage - 1) * this.itemsPerPage;
+    return filtered.slice(start, start + this.itemsPerPage);
+  }
+
+  getTotalCategoriesPages(): number {
+    return Math.ceil(this.getFilteredCategories().length / this.itemsPerPage);
+  }
+
+  getPaginatedDescriptions(): Description[] {
+    const filtered = this.getFilteredDescriptions();
+    const start = (this.descriptionsPage - 1) * this.itemsPerPage;
+    return filtered.slice(start, start + this.itemsPerPage);
+  }
+
+  getTotalDescriptionsPages(): number {
+    return Math.ceil(this.getFilteredDescriptions().length / this.itemsPerPage);
   }
 
   deleteCurrentUser(): void {
@@ -575,5 +940,38 @@ export class AdminComponent implements OnInit, OnDestroy {
 
   backToDashboard(): void {
     this.router.navigate(['/dashboard']);
+  }
+
+  loadMoneyFormatPreferences(): void {
+    if (this.activeUser) {
+      this.currencySymbol = this.activeUser.currency_symbol ?? '$';
+      this.decimalPlaces = this.activeUser.decimal_places ?? 2;
+      this.thousandSeparator = this.activeUser.thousand_separator ?? ',';
+      this.currencyPosition = this.activeUser.currency_position ?? 'before';
+      this.negativeFormat = this.activeUser.negative_format ?? '-prefix';
+      this.negativeColor = this.activeUser.negative_color ?? '#ff6b6b';
+    }
+  }
+
+  saveMoneyFormatPreferences(): void {
+    if (!this.activeUser) return;
+
+    this.apiService.updateUserPreferences(this.activeUser.id, {
+      currency_symbol: this.currencySymbol,
+      decimal_places: this.decimalPlaces,
+      thousand_separator: this.thousandSeparator,
+      currency_position: this.currencyPosition,
+      negative_format: this.negativeFormat,
+      negative_color: this.negativeColor
+    }).subscribe({
+      next: (updatedUser) => {
+        this.activeUser = updatedUser;
+        this.userService.setActiveUser(updatedUser);
+      },
+      error: (error) => {
+        console.error('Failed to save money format preferences:', error);
+        alert('Failed to save preferences');
+      }
+    });
   }
 }

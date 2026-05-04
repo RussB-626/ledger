@@ -4,9 +4,15 @@
 
 -- Users table: User profiles (no auth, no passwords)
 CREATE TABLE users (
-  id         INT AUTO_INCREMENT PRIMARY KEY,
-  name       VARCHAR(100) NOT NULL UNIQUE,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  id                  INT AUTO_INCREMENT PRIMARY KEY,
+  name                VARCHAR(100) NOT NULL UNIQUE,
+  currency_symbol     VARCHAR(10) NOT NULL DEFAULT '$',
+  decimal_places      TINYINT NOT NULL DEFAULT 2,
+  thousand_separator  VARCHAR(1) NOT NULL DEFAULT ',',
+  currency_position   VARCHAR(10) NOT NULL DEFAULT 'before',
+  negative_format     VARCHAR(20) NOT NULL DEFAULT '-prefix',
+  negative_color      VARCHAR(7) NOT NULL DEFAULT '#ff6b6b',
+  created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Accounts table: Bank/savings account names per user

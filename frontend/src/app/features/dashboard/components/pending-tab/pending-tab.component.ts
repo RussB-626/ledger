@@ -4,20 +4,22 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
-import { PageData, Transaction } from '../../../../core/models/index';
+import { PageData, Transaction, User } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
   selector: 'app-pending-tab',
   templateUrl: './pending-tab.component.html',
   styleUrls: ['./pending-tab.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmationModalComponent]
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent, FormatCurrencyPipe]
 })
 export class PendingTabComponent implements OnChanges {
   @Input() pageData!: PageData;
   @Output() editTransaction = new EventEmitter<Transaction>();
 
+  activeUser: User | null = null;
   searchTerm: string = '';
   selectedAccount: string = 'All';
 
@@ -37,7 +39,9 @@ export class PendingTabComponent implements OnChanges {
     private userService: UserService,
     private pageDataService: PageDataService,
     private cdr: ChangeDetectorRef
-  ) {}
+  ) {
+    this.activeUser = this.userService.getActiveUser();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['pageData'] && this.pageData) {
@@ -156,7 +160,30 @@ export class PendingTabComponent implements OnChanges {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(amount);
+    const user = this.userService.getActiveUser();
+    if (!user) {
+      return `$${amount.toFixed(2)}`;
+    }
+
+    const symbol = user.currency_symbol;
+    const decimalPlaces = user.decimal_places;
+    const thousandSep = user.thousand_separator;
+    const currencyPos = user.currency_position;
+
+    const absAmount = Math.abs(amount);
+    const isNegative = amount < 0;
+
+    const parts = absAmount.toFixed(decimalPlaces).split('.');
+    const intPart = parts[0];
+    const decPart = parts[1];
+
+    const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
+    const formatted = decPart !== undefined ? `${withThousands}.${decPart}` : withThousands;
+    const withCurrency = currencyPos === 'before'
+      ? `${symbol}${formatted}`
+      : `${formatted}${symbol}`;
+
+    return isNegative ? `-${withCurrency}` : withCurrency;
   }
 
   formatDate(dateString: string): string {
@@ -233,7 +260,12 @@ export class PendingTabComponent implements OnChanges {
   getFilteredTotal(): number {
     return this.filteredPendingTransactions.reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
-      return sum + (isNaN(amount) ? 0 : amount);
+      const signedAmount = (txn.type === 'W' || txn.type === 'TW') ? -amount : amount;
+      return sum + (isNaN(signedAmount) ? 0 : signedAmount);
     }, 0);
+  }
+
+  isFilteredTotalNegative(): boolean {
+    return this.getFilteredTotal() < 0;
   }
 }

@@ -16,9 +16,11 @@
   </div>
 
   <div class="navbar-right">
-    <button class="btn-new-transaction" (click)="openCreateTransactionModal()">
-      + New Transaction
-    </button>
+    @if (!isOnAdminPage()) {
+      <button class="btn-new-transaction" (click)="openCreateTransactionModal()">
+        + New Transaction
+      </button>
+    }
 
     <div class="user-switcher" clickOutside (clickOutside)="closeUserDropdown()">
       <button class="user-button" (click)="toggleUserDropdown()">

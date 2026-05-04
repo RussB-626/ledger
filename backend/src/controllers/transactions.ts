@@ -202,10 +202,21 @@ export async function createTransactionsBatch(
           ]
         );
 
-        const transaction = await getTransactionById(userId, result.insertId);
-        if (!transaction) {
-          throw new Error('Failed to retrieve created transaction');
-        }
+        // Build transaction object directly (don't call getTransactionById - separate connection can't see uncommitted data)
+        const transaction: Transaction = {
+          id: result.insertId,
+          user_id: userId,
+          date: txnReq.date,
+          account: txnReq.account,
+          category: txnReq.category,
+          description_id: descriptionId,
+          description: txnReq.description,
+          note: txnReq.note || null,
+          amount: txnReq.amount,
+          type: txnReq.type as 'D' | 'W' | 'TD' | 'TW',
+          pending: txnReq.pending ?? false,
+          created_at: new Date().toISOString()
+        };
 
         createdTransactions.push(transaction);
       }
@@ -499,6 +510,204 @@ export async function getMonthlyDifference(
       expenses,
       difference: income - expenses
     };
+  } finally {
+    connection.release();
+  }
+}
+
+// ====== BULK UPLOAD ======
+
+// Bulk upload transactions with auto-creation of missing references
+export async function bulkUploadTransactions(
+  userId: number,
+  transactionsData: any[]
+): Promise<{
+  accountsCreated: any[];
+  categoriesCreated: any[];
+  descriptionsCreated: any[];
+  transactionsCreated: Transaction[];
+  summary: {
+    totalImported: number;
+    accountsAdded: number;
+    categoriesAdded: number;
+    descriptionsAdded: number;
+  };
+}> {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const accountsCreated: any[] = [];
+    const categoriesCreated: any[] = [];
+    const descriptionsCreated: any[] = [];
+    const transactionsCreated: Transaction[] = [];
+
+    try {
+      // Extract unique accounts, categories, descriptions
+      const uniqueAccounts = [...new Set(transactionsData.map(t => t.account))];
+      const uniqueCategories = new Map<string, 'expense' | 'income' | 'transfer'>();
+      const uniqueDescriptions = [...new Set(transactionsData.map(t => t.description))];
+
+      transactionsData.forEach(t => {
+        if (!uniqueCategories.has(t.category)) {
+          uniqueCategories.set(t.category, t.categoryType);
+        }
+      });
+
+      // Create missing accounts - fetch all at once, batch insert
+      const [existingAccounts] = await connection.query<RowDataPacket[]>(
+        'SELECT id, name FROM accounts WHERE user_id = ?',
+        [userId]
+      );
+
+      const accountSet = new Set((existingAccounts as any[]).map(a => a.name));
+      const accountsToCreate = [...uniqueAccounts].filter(name => !accountSet.has(name));
+
+      for (const accountName of accountsToCreate) {
+        const [result] = await connection.query<ResultSetHeader>(
+          'INSERT INTO accounts (user_id, name) VALUES (?, ?)',
+          [userId, accountName]
+        );
+        accountsCreated.push({ id: result.insertId, name: accountName });
+      }
+
+      // Create/update missing categories - fetch all at once, batch updates
+      const [existingCategories] = await connection.query<RowDataPacket[]>(
+        'SELECT id, name, is_expense, is_income, is_transfer FROM categories WHERE user_id = ?',
+        [userId]
+      );
+
+      const categoryMap = new Map((existingCategories as any[]).map(c => [c.name, c]));
+
+      for (const [categoryName, categoryType] of uniqueCategories.entries()) {
+        const existing = categoryMap.get(categoryName);
+        const typeKey = `is_${categoryType}` as 'is_expense' | 'is_income' | 'is_transfer';
+
+        if (!existing) {
+          // Create new category
+          const [result] = await connection.query<ResultSetHeader>(
+            `INSERT INTO categories (user_id, name, is_expense, is_income, is_transfer, is_ignored)
+             VALUES (?, ?, ?, ?, ?, 0)`,
+            [
+              userId,
+              categoryName,
+              categoryType === 'expense' ? 1 : 0,
+              categoryType === 'income' ? 1 : 0,
+              categoryType === 'transfer' ? 1 : 0
+            ]
+          );
+          categoriesCreated.push({
+            id: result.insertId,
+            name: categoryName,
+            is_expense: categoryType === 'expense',
+            is_income: categoryType === 'income',
+            is_transfer: categoryType === 'transfer'
+          });
+        } else if (!existing[typeKey]) {
+          // Update existing category to add type
+          await connection.query(
+            `UPDATE categories SET ${typeKey} = 1 WHERE id = ?`,
+            [existing.id]
+          );
+          categoriesCreated.push({
+            id: existing.id,
+            name: categoryName,
+            is_expense: categoryType === 'expense' || existing.is_expense,
+            is_income: categoryType === 'income' || existing.is_income,
+            is_transfer: categoryType === 'transfer' || existing.is_transfer
+          });
+        }
+      }
+
+      // Create missing descriptions and build map before transaction
+      const [existingDescriptions] = await connection.query<RowDataPacket[]>(
+        'SELECT id, description FROM descriptions WHERE user_id = ?',
+        [userId]
+      );
+
+      const descriptionMap = new Map<string, number>();
+      const existingDescSet = new Set<string>();
+
+      // Map existing descriptions
+      for (const row of existingDescriptions as any[]) {
+        descriptionMap.set(row.description, row.id);
+        existingDescSet.add(row.description);
+      }
+
+      // Create missing descriptions
+      for (const descriptionText of uniqueDescriptions) {
+        if (!existingDescSet.has(descriptionText)) {
+          const [result] = await connection.query<ResultSetHeader>(
+            'INSERT INTO descriptions (user_id, description, is_common) VALUES (?, ?, 0)',
+            [userId, descriptionText]
+          );
+          const newId = (result as any).insertId;
+          descriptionMap.set(descriptionText, newId);
+          descriptionsCreated.push({ id: newId, description: descriptionText });
+        }
+      }
+
+      // Create all transactions
+      for (const txnData of transactionsData) {
+        // Look up description ID from pre-built map (no database call in transaction)
+        const descriptionId = descriptionMap.get(txnData.description);
+        if (!descriptionId) {
+          throw new Error(`Description "${txnData.description}" not found in mapping`);
+        }
+
+        const [result] = await connection.query<ResultSetHeader>(
+          `INSERT INTO transactions (user_id, date, account, category, description_id, note, amount, type, pending)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            userId,
+            txnData.date,
+            txnData.account,
+            txnData.category,
+            descriptionId,
+            txnData.notes || null,
+            txnData.amount,
+            txnData.type,
+            txnData.pending ? 1 : 0
+          ]
+        );
+
+        // Build transaction object from data (don't call getTransactionById - separate connection can't see uncommitted data)
+        const transaction: Transaction = {
+          id: result.insertId,
+          user_id: userId,
+          date: txnData.date,
+          account: txnData.account,
+          category: txnData.category,
+          description_id: descriptionId,
+          description: txnData.description,
+          note: txnData.notes || null,
+          amount: txnData.amount,
+          type: txnData.type as 'D' | 'W' | 'TD' | 'TW',
+          pending: txnData.pending,
+          created_at: new Date().toISOString()
+        };
+
+        transactionsCreated.push(transaction);
+      }
+
+      await connection.commit();
+
+      return {
+        accountsCreated,
+        categoriesCreated,
+        descriptionsCreated,
+        transactionsCreated,
+        summary: {
+          totalImported: transactionsCreated.length,
+          accountsAdded: accountsCreated.length,
+          categoriesAdded: categoriesCreated.length,
+          descriptionsAdded: descriptionsCreated.length
+        }
+      };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    }
   } finally {
     connection.release();
   }

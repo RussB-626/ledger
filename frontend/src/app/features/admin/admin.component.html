@@ -2,12 +2,14 @@
   <div class="admin-header">
     <button class="back-btn" (click)="backToDashboard()">← Back to Dashboard</button>
     <h1>Admin Management</h1>
-    <div class="active-user" *ngIf="activeUser">
-      User: <span class="user-name">{{ activeUser.name }}</span>
-      <button class="delete-user-btn" (click)="deleteCurrentUser()" title="Delete this user and all their data">
-        Delete User
-      </button>
-    </div>
+    @if (activeUser) {
+      <div class="active-user">
+        User: <span class="user-name">{{ activeUser.name }}</span>
+        <button class="delete-user-btn" (click)="deleteCurrentUser()" title="Delete this user and all their data">
+          Delete User
+        </button>
+      </div>
+    }
   </div>
 
   <div class="tabs">
@@ -32,460 +34,902 @@
     >
       Descriptions ({{ descriptions.length }})
     </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'transactions'"
+      (click)="selectTab('transactions')"
+    >
+      Transactions
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'other'"
+      (click)="selectTab('other')"
+    >
+      Other
+    </button>
+    <button
+      class="tab-btn"
+      [class.active]="activeTab === 'backups'"
+      (click)="selectTab('backups')"
+    >
+      Backups
+    </button>
   </div>
 
   <!-- ACCOUNTS TAB -->
-  <div class="tab-content" *ngIf="activeTab === 'accounts'">
-    <div class="tab-header">
-      <h2>Accounts Management</h2>
-      <div class="button-group">
-        <button class="add-btn" (click)="openAccountModal('create')">+ Add Account</button>
-        <button class="bulk-add-btn" (click)="openBulkAddModal()">Bulk Add</button>
+  @if (activeTab === 'accounts') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <h2>Accounts Management</h2>
+        <div class="button-group">
+          <button class="add-btn" (click)="openAccountModal('create')">+ Add Account</button>
+          <button class="bulk-add-btn" (click)="openBulkAddModal()">Bulk Add</button>
+        </div>
       </div>
-    </div>
 
-    <table class="admin-table" *ngIf="accounts.length > 0; else noAccounts">
-      <thead>
-        <tr>
-          <th>Account Name</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let account of accounts">
-          <td>{{ account.name }}</td>
-          <td class="actions">
-            <button
-              class="action-btn edit-btn"
-              (click)="openAccountModal('edit', account)"
-              title="Edit"
-            >
-              ✎
-            </button>
-            <button
-              class="action-btn delete-btn"
-              (click)="openDeleteConfirmation('account', account.id, account.name)"
-              title="Delete"
-            >
-              ✕
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <ng-template #noAccounts>
-      <div class="empty-state">No accounts yet. Create one to get started!</div>
-    </ng-template>
-  </div>
-
-  <!-- CATEGORIES TAB -->
-  <div class="tab-content" *ngIf="activeTab === 'categories'">
-    <div class="tab-header">
-      <h2>Categories Management</h2>
-      <div class="button-group">
-        <button class="add-btn" (click)="openCategoryModal('create')">+ Add Category</button>
-        <button class="bulk-add-btn" (click)="openBulkCategoryModal()">Bulk Add</button>
+      <div class="search-bar">
+        <input
+          type="text"
+          placeholder="Search accounts..."
+          [(ngModel)]="searchAccounts"
+          class="search-input"
+        />
       </div>
-    </div>
 
-    <table class="admin-table" *ngIf="categories.length > 0; else noCategories">
-      <thead>
-        <tr>
-          <th>Category Name</th>
-          <th>Expense</th>
-          <th>Income</th>
-          <th>Transfer</th>
-          <th>Ignore</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let category of categories">
-          <td>{{ category.name }}</td>
-          <td class="checkbox-col">{{ category.is_expense ? '✓' : '' }}</td>
-          <td class="checkbox-col">{{ category.is_income ? '✓' : '' }}</td>
-          <td class="checkbox-col">{{ category.is_transfer ? '✓' : '' }}</td>
-          <td class="checkbox-col">{{ category.is_ignored ? '✓' : '' }}</td>
-          <td class="actions">
-            <button
-              class="action-btn edit-btn"
-              (click)="openCategoryModal('edit', category)"
-              title="Edit"
-            >
-              ✎
-            </button>
-            <button
-              class="action-btn delete-btn"
-              (click)="openDeleteConfirmation('category', category.id, category.name)"
-              title="Delete"
-            >
-              ✕
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+      @if (accounts.length > 0) {
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Account Name</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (account of getPaginatedAccounts(); track account.id) {
+              <tr>
+                <td>{{ account.name }}</td>
+                <td class="actions">
+                  <button
+                    class="action-btn edit-btn"
+                    (click)="openAccountModal('edit', account)"
+                    title="Edit"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    class="action-btn delete-btn"
+                    (click)="openDeleteConfirmation('account', account.id, account.name)"
+                    title="Delete"
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
 
-    <ng-template #noCategories>
-      <div class="empty-state">No categories yet. Create one to get started!</div>
-    </ng-template>
-  </div>
-
-  <!-- DESCRIPTIONS TAB -->
-  <div class="tab-content" *ngIf="activeTab === 'descriptions'">
-    <div class="tab-header">
-      <h2>Descriptions Management</h2>
-      <div class="button-group">
-        <button class="add-btn" (click)="openDescriptionModal('create')">+ Add Description</button>
-        <button class="bulk-add-btn" (click)="openBulkDescriptionModal()">Bulk Add</button>
-      </div>
-    </div>
-
-    <table class="admin-table" *ngIf="descriptions.length > 0; else noDescriptions">
-      <thead>
-        <tr>
-          <th>Description Text</th>
-          <th>Is Common</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let desc of descriptions">
-          <td>{{ desc.description }}</td>
-          <td class="checkbox-col">{{ desc.is_common ? '✓' : '' }}</td>
-          <td class="actions">
-            <button
-              class="action-btn edit-btn"
-              (click)="openDescriptionModal('edit', desc)"
-              title="Edit"
-            >
-              ✎
-            </button>
-            <button
-              class="action-btn delete-btn"
-              (click)="openDeleteConfirmation('description', desc.id, desc.description)"
-              title="Delete"
-            >
-              ✕
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-
-    <ng-template #noDescriptions>
-      <div class="empty-state">No descriptions yet. Create one to get started!</div>
-    </ng-template>
-  </div>
-
-  <!-- USER DELETION MODAL (required - no cancel) -->
-  <div class="modal-overlay" *ngIf="showUserDeletionModal" (click)="$event.stopPropagation()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ availableUsers.length > 0 ? 'Select a User' : 'Create New User' }}</h3>
-      </div>
-      <div class="modal-body">
-        <p *ngIf="availableUsers.length > 0">The current user has been deleted. Please select another user:</p>
-        <p *ngIf="availableUsers.length === 0">No users exist. Please create a new user:</p>
-
-        <!-- User list (if users exist) -->
-        <div *ngIf="availableUsers.length > 0" class="user-list">
+        <!-- Pagination -->
+        <div class="pagination">
           <button
-            *ngFor="let user of availableUsers"
-            class="user-option-btn"
-            (click)="selectUserAndContinue(user)"
+            class="pagination-btn"
+            [disabled]="accountsPage === 1"
+            (click)="accountsPage = accountsPage - 1"
           >
-            {{ user.name }}
+            ← Previous
+          </button>
+          <span class="pagination-info">
+            Page {{ accountsPage }} of {{ getTotalAccountsPages() }}
+          </span>
+          <button
+            class="pagination-btn"
+            [disabled]="accountsPage === getTotalAccountsPages()"
+            (click)="accountsPage = accountsPage + 1"
+          >
+            Next →
           </button>
         </div>
+      } @else {
+        <div class="empty-state">No accounts yet. Create one to get started!</div>
+      }
+    </div>
+  }
 
-        <!-- Create new user form (if no users) -->
-        <div *ngIf="availableUsers.length === 0" class="form-group">
-          <label>User Name</label>
-          <input
-            type="text"
-            [(ngModel)]="newUserName"
-            placeholder="Enter new user name"
-            class="form-input"
-          />
+  <!-- CATEGORIES TAB -->
+  @if (activeTab === 'categories') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <h2>Categories Management</h2>
+        <div class="button-group">
+          <button class="add-btn" (click)="openCategoryModal('create')">+ Add Category</button>
+          <button class="bulk-add-btn" (click)="openBulkCategoryModal()">Bulk Add</button>
         </div>
       </div>
-      <div class="modal-footer">
-        <button *ngIf="availableUsers.length === 0" class="btn-save" (click)="createUserAndContinue()">
-          Create User
-        </button>
+
+      <div class="search-bar">
+        <input
+          type="text"
+          placeholder="Search categories..."
+          [(ngModel)]="searchCategories"
+          class="search-input"
+        />
+      </div>
+
+      @if (categories.length > 0) {
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Category Name</th>
+              <th>Expense</th>
+              <th>Income</th>
+              <th>Transfer</th>
+              <th>Ignore</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (category of getPaginatedCategories(); track category.id) {
+              <tr>
+                <td>{{ category.name }}</td>
+                <td class="checkbox-col">{{ category.is_expense ? '✓' : '' }}</td>
+                <td class="checkbox-col">{{ category.is_income ? '✓' : '' }}</td>
+                <td class="checkbox-col">{{ category.is_transfer ? '✓' : '' }}</td>
+                <td class="checkbox-col">{{ category.is_ignored ? '✓' : '' }}</td>
+                <td class="actions">
+                  <button
+                    class="action-btn edit-btn"
+                    (click)="openCategoryModal('edit', category)"
+                    title="Edit"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    class="action-btn delete-btn"
+                    (click)="openDeleteConfirmation('category', category.id, category.name)"
+                    title="Delete"
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <button
+            class="pagination-btn"
+            [disabled]="categoriesPage === 1"
+            (click)="categoriesPage = categoriesPage - 1"
+          >
+            ← Previous
+          </button>
+          <span class="pagination-info">
+            Page {{ categoriesPage }} of {{ getTotalCategoriesPages() }}
+          </span>
+          <button
+            class="pagination-btn"
+            [disabled]="categoriesPage === getTotalCategoriesPages()"
+            (click)="categoriesPage = categoriesPage + 1"
+          >
+            Next →
+          </button>
+        </div>
+      } @else {
+        <div class="empty-state">No categories yet. Create one to get started!</div>
+      }
+    </div>
+  }
+
+  <!-- DESCRIPTIONS TAB -->
+  @if (activeTab === 'descriptions') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <h2>Descriptions Management</h2>
+        <div class="button-group">
+          <button class="add-btn" (click)="openDescriptionModal('create')">+ Add Description</button>
+          <button class="bulk-add-btn" (click)="openBulkDescriptionModal()">Bulk Add</button>
+        </div>
+      </div>
+
+      <div class="search-bar">
+        <input
+          type="text"
+          placeholder="Search descriptions..."
+          [(ngModel)]="searchDescriptions"
+          class="search-input"
+        />
+      </div>
+
+      @if (descriptions.length > 0) {
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Description Text</th>
+              <th>Is Common</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (desc of getPaginatedDescriptions(); track desc.id) {
+              <tr>
+                <td>{{ desc.description }}</td>
+                <td class="checkbox-col">{{ desc.is_common ? '✓' : '' }}</td>
+                <td class="actions">
+                  <button
+                    class="action-btn edit-btn"
+                    (click)="openDescriptionModal('edit', desc)"
+                    title="Edit"
+                  >
+                    ✎
+                  </button>
+                  <button
+                    class="action-btn delete-btn"
+                    (click)="openDeleteConfirmation('description', desc.id, desc.description)"
+                    title="Delete"
+                  >
+                    ✕
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="pagination">
+          <button
+            class="pagination-btn"
+            [disabled]="descriptionsPage === 1"
+            (click)="descriptionsPage = descriptionsPage - 1"
+          >
+            ← Previous
+          </button>
+          <span class="pagination-info">
+            Page {{ descriptionsPage }} of {{ getTotalDescriptionsPages() }}
+          </span>
+          <button
+            class="pagination-btn"
+            [disabled]="descriptionsPage === getTotalDescriptionsPages()"
+            (click)="descriptionsPage = descriptionsPage + 1"
+          >
+            Next →
+          </button>
+        </div>
+      } @else {
+        <div class="empty-state">No descriptions yet. Create one to get started!</div>
+      }
+    </div>
+  }
+
+  <!-- TRANSACTIONS TAB -->
+  @if (activeTab === 'transactions') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <h2>Bulk Upload Transactions</h2>
+        <div class="button-group">
+          <button class="add-btn" (click)="openBulkUploadModal()">📤 Bulk Upload Transactions</button>
+        </div>
+      </div>
+      <div class="extras-content">
+        <p class="info-text" style="margin: 0;">Import transactions from a TSV file. Accounts, categories, and descriptions will be created automatically if they don't exist.</p>
       </div>
     </div>
-  </div>
+  }
+
+  <!-- OTHER TAB -->
+  @if (activeTab === 'other') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <h2>Other Settings</h2>
+      </div>
+      <div class="settings-section">
+        <h3>Money Format Preferences</h3>
+        <p class="section-description">Customize how money values are displayed throughout the app</p>
+
+        <div class="settings-grid">
+          <!-- Currency Symbol -->
+          <div class="setting-item">
+            <label for="currency-symbol">Currency Symbol</label>
+            <select
+              id="currency-symbol"
+              [(ngModel)]="currencySymbol"
+              (change)="saveMoneyFormatPreferences()"
+              class="select-input"
+            >
+              @for (symbol of currencySymbolOptions; track symbol) {
+                <option [value]="symbol">{{ symbol }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Decimal Places -->
+          <div class="setting-item">
+            <label for="decimal-places">Decimal Places</label>
+            <select
+              id="decimal-places"
+              [(ngModel)]="decimalPlaces"
+              (change)="saveMoneyFormatPreferences()"
+              class="select-input"
+            >
+              @for (places of decimalPlacesOptions; track places) {
+                <option [value]="places">{{ places }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Thousand Separator -->
+          <div class="setting-item">
+            <label for="thousand-separator">Thousand Separator</label>
+            <select
+              id="thousand-separator"
+              [(ngModel)]="thousandSeparator"
+              (change)="saveMoneyFormatPreferences()"
+              class="select-input"
+            >
+              @for (sep of thousandSeparatorOptions; track sep) {
+                <option [value]="sep">
+                  {{ sep === ',' ? 'Comma (,)' : sep === '.' ? 'Period (.)' : 'Space ( )' }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- Currency Position -->
+          <div class="setting-item">
+            <label for="currency-position">Currency Position</label>
+            <select
+              id="currency-position"
+              [(ngModel)]="currencyPosition"
+              (change)="saveMoneyFormatPreferences()"
+              class="select-input"
+            >
+              <option value="before">Before amount ({{ currencySymbol }}100.00)</option>
+              <option value="after">After amount (100.00{{ currencySymbol }})</option>
+            </select>
+          </div>
+
+          <!-- Negative Format -->
+          <div class="setting-item">
+            <label for="negative-format">Negative Format</label>
+            <select
+              id="negative-format"
+              [(ngModel)]="negativeFormat"
+              (change)="saveMoneyFormatPreferences()"
+              class="select-input"
+            >
+              @for (format of negativeFormatOptions; track format.value) {
+                <option [value]="format.value">{{ format.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Negative Color -->
+          <div class="setting-item">
+            <label for="negative-color">Negative Amount Color</label>
+            <div class="color-input-wrapper">
+              <input
+                id="negative-color"
+                type="color"
+                [(ngModel)]="negativeColor"
+                (change)="saveMoneyFormatPreferences()"
+                class="color-input"
+              />
+              <span class="color-value">{{ negativeColor }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div class="preview-box">
+          <p><strong>Preview (Positive):</strong></p>
+          <p class="preview-amount">
+            @if (currencyPosition === 'before') {
+              {{ currencySymbol }}1,234.50
+            }@else {
+              1,234.50{{ currencySymbol }}
+            }
+          </p>
+          <p><strong>Preview (Negative):</strong></p>
+          <p class="preview-amount-negative" [style.color]="negativeColor">
+            @if (negativeFormat === '-prefix') {
+              @if (currencyPosition === 'before') {
+                -{{ currencySymbol }}1,234.50
+              }@else {
+                -1,234.50{{ currencySymbol }}
+              }
+            }@else if (negativeFormat === 'parentheses') {
+              @if (currencyPosition === 'before') {
+                ({{ currencySymbol }}1,234.50)
+              }@else {
+                (1,234.50{{ currencySymbol }})
+              }
+            }@else if (negativeFormat === 'brackets') {
+              @if (currencyPosition === 'before') {
+                [{{ currencySymbol }}1,234.50]
+              }@else {
+                [1,234.50{{ currencySymbol }}]
+              }
+            }@else {
+              @if (currencyPosition === 'before') {
+                <span>&#123;</span>{{ currencySymbol }}1,234.50<span>&#125;</span>
+              }@else {
+                <span>&#123;</span>1,234.50{{ currencySymbol }}<span>&#125;</span>
+              }
+            }
+          </p>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- BACKUPS TAB -->
+  @if (activeTab === 'backups') {
+    <div class="tab-content">
+      <div class="tab-header">
+        <h2>Backups</h2>
+      </div>
+      <div class="empty-state" style="padding: 40px; text-align: center;">
+        <p>Backup features coming soon...</p>
+      </div>
+    </div>
+  }
+
+  <!-- USER DELETION MODAL (required - no cancel) -->
+  @if (showUserDeletionModal) {
+    <div class="modal-overlay" (click)="$event.stopPropagation()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ availableUsers.length > 0 ? 'Select a User' : 'Create New User' }}</h3>
+        </div>
+        <div class="modal-body">
+          @if (availableUsers.length > 0) {
+            <p>The current user has been deleted. Please select another user:</p>
+          } @else {
+            <p>No users exist. Please create a new user:</p>
+          }
+
+          <!-- User list (if users exist) -->
+          @if (availableUsers.length > 0) {
+            <div class="user-list">
+              @for (user of availableUsers; track user.id) {
+                <button
+                  class="user-option-btn"
+                  (click)="selectUserAndContinue(user)"
+                >
+                  {{ user.name }}
+                </button>
+              }
+            </div>
+          }
+
+          <!-- Create new user form (if no users) -->
+          @if (availableUsers.length === 0) {
+            <div class="form-group">
+              <label>User Name</label>
+              <input
+                type="text"
+                [(ngModel)]="newUserName"
+                placeholder="Enter new user name"
+                class="form-input"
+              />
+            </div>
+          }
+        </div>
+        <div class="modal-footer">
+          @if (availableUsers.length === 0) {
+            <button class="btn-save" (click)="createUserAndContinue()">
+              Create User
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- ACCOUNT MODAL -->
-  <div class="modal-overlay" *ngIf="accountModal.isOpen" (click)="closeAccountModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ accountModal.mode === 'create' ? 'Add Account' : 'Edit Account' }}</h3>
-        <button class="close-btn" (click)="closeAccountModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Account Name</label>
-          <input
-            type="text"
-            [(ngModel)]="accountFormData.name"
-            placeholder="Enter account name"
-            class="form-input"
-          />
+  @if (accountModal.isOpen) {
+    <div class="modal-overlay" (click)="closeAccountModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ accountModal.mode === 'create' ? 'Add Account' : 'Edit Account' }}</h3>
+          <button class="close-btn" (click)="closeAccountModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Account Name</label>
+            <input
+              type="text"
+              [(ngModel)]="accountFormData.name"
+              placeholder="Enter account name"
+              class="form-input"
+            />
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeAccountModal()">Cancel</button>
+          <button class="btn-save" (click)="saveAccount()">Save</button>
         </div>
       </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeAccountModal()">Cancel</button>
-        <button class="btn-save" (click)="saveAccount()">Save</button>
-      </div>
     </div>
-  </div>
+  }
 
   <!-- CATEGORY MODAL -->
-  <div class="modal-overlay" *ngIf="categoryModal.isOpen" (click)="closeCategoryModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ categoryModal.mode === 'create' ? 'Add Category' : 'Edit Category' }}</h3>
-        <button class="close-btn" (click)="closeCategoryModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Category Name</label>
-          <input
-            type="text"
-            [(ngModel)]="categoryFormData.name"
-            placeholder="Enter category name"
-            class="form-input"
-          />
+  @if (categoryModal.isOpen) {
+    <div class="modal-overlay" (click)="closeCategoryModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ categoryModal.mode === 'create' ? 'Add Category' : 'Edit Category' }}</h3>
+          <button class="close-btn" (click)="closeCategoryModal()">×</button>
         </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Category Name</label>
+            <input
+              type="text"
+              [(ngModel)]="categoryFormData.name"
+              placeholder="Enter category name"
+              class="form-input"
+            />
+          </div>
 
-        <div class="checkbox-group">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="categoryFormData.is_expense"
-              class="checkbox-input"
-            />
-            Is Expense
-          </label>
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="categoryFormData.is_income"
-              class="checkbox-input"
-            />
-            Is Income
-          </label>
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="categoryFormData.is_transfer"
-              class="checkbox-input"
-            />
-            Is Transfer
-          </label>
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="categoryFormData.is_ignored"
-              class="checkbox-input"
-            />
-            Ignore (excludes from analytics)
-          </label>
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="categoryFormData.is_expense"
+                class="checkbox-input"
+              />
+              Is Expense
+            </label>
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="categoryFormData.is_income"
+                class="checkbox-input"
+              />
+              Is Income
+            </label>
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="categoryFormData.is_transfer"
+                class="checkbox-input"
+              />
+              Is Transfer
+            </label>
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="categoryFormData.is_ignored"
+                class="checkbox-input"
+              />
+              Ignore (excludes from analytics)
+            </label>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeCategoryModal()">Cancel</button>
-        <button class="btn-save" (click)="saveCategory()">Save</button>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeCategoryModal()">Cancel</button>
+          <button class="btn-save" (click)="saveCategory()">Save</button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- DESCRIPTION MODAL -->
-  <div class="modal-overlay" *ngIf="descriptionModal.isOpen" (click)="closeDescriptionModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>{{ descriptionModal.mode === 'create' ? 'Add Description' : 'Edit Description' }}</h3>
-        <button class="close-btn" (click)="closeDescriptionModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>Description Text</label>
-          <input
-            type="text"
-            [(ngModel)]="descriptionFormData.description"
-            placeholder="Enter description"
-            class="form-input"
-          />
+  @if (descriptionModal.isOpen) {
+    <div class="modal-overlay" (click)="closeDescriptionModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>{{ descriptionModal.mode === 'create' ? 'Add Description' : 'Edit Description' }}</h3>
+          <button class="close-btn" (click)="closeDescriptionModal()">×</button>
         </div>
-
-        <div class="checkbox-group">
-          <label class="checkbox-label">
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Description Text</label>
             <input
-              type="checkbox"
-              [(ngModel)]="descriptionFormData.is_common"
-              class="checkbox-input"
+              type="text"
+              [(ngModel)]="descriptionFormData.description"
+              placeholder="Enter description"
+              class="form-input"
             />
-            Is Common (shows in recurring withdrawals)
-          </label>
+          </div>
+
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="descriptionFormData.is_common"
+                class="checkbox-input"
+              />
+              Is Common (shows in recurring withdrawals)
+            </label>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeDescriptionModal()">Cancel</button>
-        <button class="btn-save" (click)="saveDescription()">Save</button>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeDescriptionModal()">Cancel</button>
+          <button class="btn-save" (click)="saveDescription()">Save</button>
+        </div>
       </div>
     </div>
-  </div>
+  }
+
+  <!-- BULK UPLOAD TRANSACTIONS MODAL -->
+  @if (bulkUploadModal.isOpen) {
+    <div class="modal-overlay" (click)="closeBulkUploadModal()">
+      <div class="modal large-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Bulk Upload Transactions</h3>
+          <button class="close-btn" (click)="closeBulkUploadModal()">×</button>
+        </div>
+        <div class="modal-body">
+          @if (bulkUploadParsedData.length === 0) {
+            <!-- File upload section -->
+            <div class="upload-section">
+              @if (bulkUploadFileLoading) {
+                <div class="file-loading-spinner">
+                  <div class="spinner"></div>
+                  <p>Processing file...</p>
+                </div>
+              } @else {
+                <label for="tsv-file" class="file-input-label">Choose TSV File</label>
+                <input
+                  id="tsv-file"
+                  type="file"
+                  accept=".tsv,.csv,text/tab-separated-values,text/csv"
+                  (change)="onBulkUploadFileSelected($event)"
+                  class="file-input"
+                  [disabled]="bulkUploadFileLoading"
+                />
+                <p class="help-text">
+                  Upload a TSV file with columns: Date | Account | Category | Description | Notes | Amount | Type | Pending<br/>
+                  Supported date formats: yyyy-mm-dd, dd-mm-yyyy, mm-dd-yyyy<br/>
+                  Types: D (Deposit), W (Withdrawal), TD (Transfer Deposit), TW (Transfer Withdrawal)<br/>
+                  Pending: TRUE or FALSE
+                </p>
+              }
+            </div>
+          } @else {
+            <!-- Preview section -->
+            <div class="preview-section">
+              <div class="preview-info">
+                <p><strong>Date Format Detected:</strong> {{ bulkUploadDateFormat }}</p>
+                <p><strong>Transactions to Import:</strong> {{ bulkUploadValidCount }} of {{ bulkUploadParsedData.length }}</p>
+              </div>
+
+              @if (bulkUploadParsedDataWithErrors.length > 0) {
+                <div class="error-summary">
+                  <p><strong>⚠️ Warning:</strong> {{ bulkUploadParsedDataWithErrors.length }} row(s) have errors and will be skipped:</p>
+                  <ul>
+                    @for (row of bulkUploadParsedDataWithErrors; track $index) {
+                      <li>Row {{ $index + 1 }}: {{ row.parseError }}</li>
+                    }
+                  </ul>
+                </div>
+              }
+
+              <div class="preview-table-container">
+                <table class="preview-table">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Account</th>
+                      <th>Category</th>
+                      <th>Description</th>
+                      <th>Amount</th>
+                      <th>Type</th>
+                      <th>Pending</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    @for (row of bulkUploadParsedData.slice(0, 10); track $index) {
+                      <tr [class.error-row]="row.parseError">
+                        <td title="{{ row.originalDate }}">{{ row.originalDate }} <span class="arrow">→</span> {{ row.date }}</td>
+                        <td>{{ row.account }}</td>
+                        <td>{{ row.category }} <span class="type-badge">{{ row.categoryType }}</span></td>
+                        <td>{{ row.description }}</td>
+                        <td class="amount">{{ row.amount | number: '1.2-2' }}</td>
+                        <td class="type">{{ row.type }}</td>
+                        <td>{{ row.pending ? 'Yes' : 'No' }}</td>
+                      </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              @if (bulkUploadParsedData.length > 10) {
+                <p class="preview-note">... and {{ bulkUploadParsedData.length - 10 }} more rows</p>
+              }
+            </div>
+          }
+
+          @if (bulkUploadError) {
+            <div class="error-message">{{ bulkUploadError }}</div>
+          }
+
+          @if (bulkUploadStatus) {
+            <div class="status-message">{{ bulkUploadStatus }}</div>
+          }
+        </div>
+        <div class="modal-footer">
+          @if (bulkUploadParsedData.length === 0) {
+            <button class="btn-cancel" (click)="closeBulkUploadModal()" [disabled]="bulkUploadLoading">Cancel</button>
+          } @else {
+            <button class="btn-cancel" (click)="closeBulkUploadModal()" [disabled]="bulkUploadLoading">Back</button>
+            <button class="btn-save" (click)="saveBulkUpload()" [disabled]="bulkUploadLoading">
+              {{ bulkUploadLoading ? 'Uploading...' : 'Confirm Upload' }}
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+  }
 
   <!-- DELETE CONFIRMATION MODAL -->
-  <div class="modal-overlay" *ngIf="deleteConfirmation.isOpen" (click)="closeDeleteConfirmation()">
-    <div class="modal confirm-modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Confirm Delete</h3>
-        <button class="close-btn" (click)="closeDeleteConfirmation()">×</button>
-      </div>
-      <div class="modal-body">
-        <p>Are you sure you want to delete "{{ deleteConfirmation.itemName }}"?</p>
-        <p class="warning" *ngIf="deleteConfirmation.type === 'user'">
-          ⚠️ Deleting this user will permanently remove all their accounts, categories, descriptions, and transactions. This cannot be undone.
-        </p>
-        <p class="warning" *ngIf="deleteConfirmation.type !== 'user'">
-          This action cannot be undone.
-        </p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeDeleteConfirmation()">Cancel</button>
-        <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+  @if (deleteConfirmation.isOpen) {
+    <div class="modal-overlay" (click)="closeDeleteConfirmation()">
+      <div class="modal confirm-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Confirm Delete</h3>
+          <button class="close-btn" (click)="closeDeleteConfirmation()">×</button>
+        </div>
+        <div class="modal-body">
+          <p>Are you sure you want to delete "{{ deleteConfirmation.itemName }}"?</p>
+          @if (deleteConfirmation.type === 'user') {
+            <p class="warning">
+              ⚠️ Deleting this user will permanently remove all their accounts, categories, descriptions, and transactions. This cannot be undone.
+            </p>
+          } @else {
+            <p class="warning">
+              This action cannot be undone.
+            </p>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeDeleteConfirmation()">Cancel</button>
+          <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- BULK ADD ACCOUNTS MODAL -->
-  <div class="modal-overlay" *ngIf="bulkAddModal.isOpen" (click)="closeBulkAddModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Bulk Add Accounts</h3>
-        <button class="close-btn" (click)="closeBulkAddModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <p class="help-text">Paste a comma-separated list of account names:</p>
-        <textarea
-          [(ngModel)]="bulkAccountsText"
-          placeholder="e.g., Checking, Savings, Credit Card, Paypal"
-          class="bulk-textarea"
-          rows="6"
-        ></textarea>
-        <div *ngIf="bulkAddError" class="error-message">{{ bulkAddError }}</div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeBulkAddModal()" [disabled]="bulkAddLoading">Cancel</button>
-        <button class="btn-save" (click)="saveBulkAccounts()" [disabled]="bulkAddLoading">
-          {{ bulkAddLoading ? 'Adding...' : 'Add Accounts' }}
-        </button>
+  @if (bulkAddModal.isOpen) {
+    <div class="modal-overlay" (click)="closeBulkAddModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Bulk Add Accounts</h3>
+          <button class="close-btn" (click)="closeBulkAddModal()">×</button>
+        </div>
+        <div class="modal-body">
+          <p class="help-text">Paste a comma-separated list of account names:</p>
+          <textarea
+            [(ngModel)]="bulkAccountsText"
+            placeholder="e.g., Checking, Savings, Credit Card, Paypal"
+            class="bulk-textarea"
+            rows="6"
+          ></textarea>
+          @if (bulkAddError) {
+            <div class="error-message">{{ bulkAddError }}</div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeBulkAddModal()" [disabled]="bulkAddLoading">Cancel</button>
+          <button class="btn-save" (click)="saveBulkAccounts()" [disabled]="bulkAddLoading">
+            {{ bulkAddLoading ? 'Adding...' : 'Add Accounts' }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- BULK ADD CATEGORIES MODAL -->
-  <div class="modal-overlay" *ngIf="bulkCategoryModal.isOpen" (click)="closeBulkCategoryModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Bulk Add Categories</h3>
-        <button class="close-btn" (click)="closeBulkCategoryModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <p class="help-text">Paste a comma-separated list of category names:</p>
-        <textarea
-          [(ngModel)]="bulkCategoriesText"
-          placeholder="e.g., Groceries, Gas, Entertainment, Salary"
-          class="bulk-textarea"
-          rows="6"
-        ></textarea>
-
-        <div class="radio-group">
-          <p class="radio-label">Category Type:</p>
-          <label class="radio-option">
-            <input
-              type="radio"
-              name="categoryType"
-              value="expense"
-              [(ngModel)]="bulkCategoryType"
-              class="radio-input"
-            />
-            Expense
-          </label>
-          <label class="radio-option">
-            <input
-              type="radio"
-              name="categoryType"
-              value="income"
-              [(ngModel)]="bulkCategoryType"
-              class="radio-input"
-            />
-            Income
-          </label>
-          <label class="radio-option">
-            <input
-              type="radio"
-              name="categoryType"
-              value="transfer"
-              [(ngModel)]="bulkCategoryType"
-              class="radio-input"
-            />
-            Transfer
-          </label>
+  @if (bulkCategoryModal.isOpen) {
+    <div class="modal-overlay" (click)="closeBulkCategoryModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Bulk Add Categories</h3>
+          <button class="close-btn" (click)="closeBulkCategoryModal()">×</button>
         </div>
+        <div class="modal-body">
+          <p class="help-text">Paste a comma-separated list of category names:</p>
+          <textarea
+            [(ngModel)]="bulkCategoriesText"
+            placeholder="e.g., Groceries, Gas, Entertainment, Salary"
+            class="bulk-textarea"
+            rows="6"
+          ></textarea>
 
-        <div *ngIf="bulkCategoryError" class="error-message">{{ bulkCategoryError }}</div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeBulkCategoryModal()" [disabled]="bulkCategoryLoading">Cancel</button>
-        <button class="btn-save" (click)="saveBulkCategories()" [disabled]="bulkCategoryLoading">
-          {{ bulkCategoryLoading ? 'Adding...' : 'Add Categories' }}
-        </button>
+          <div class="radio-group">
+            <p class="radio-label">Category Type:</p>
+            <label class="radio-option">
+              <input
+                type="radio"
+                name="categoryType"
+                value="expense"
+                [(ngModel)]="bulkCategoryType"
+                class="radio-input"
+              />
+              Expense
+            </label>
+            <label class="radio-option">
+              <input
+                type="radio"
+                name="categoryType"
+                value="income"
+                [(ngModel)]="bulkCategoryType"
+                class="radio-input"
+              />
+              Income
+            </label>
+            <label class="radio-option">
+              <input
+                type="radio"
+                name="categoryType"
+                value="transfer"
+                [(ngModel)]="bulkCategoryType"
+                class="radio-input"
+              />
+              Transfer
+            </label>
+          </div>
+
+          @if (bulkCategoryError) {
+            <div class="error-message">{{ bulkCategoryError }}</div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeBulkCategoryModal()" [disabled]="bulkCategoryLoading">Cancel</button>
+          <button class="btn-save" (click)="saveBulkCategories()" [disabled]="bulkCategoryLoading">
+            {{ bulkCategoryLoading ? 'Adding...' : 'Add Categories' }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
   <!-- BULK ADD DESCRIPTIONS MODAL -->
-  <div class="modal-overlay" *ngIf="bulkDescriptionModal.isOpen" (click)="closeBulkDescriptionModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Bulk Add Descriptions</h3>
-        <button class="close-btn" (click)="closeBulkDescriptionModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <p class="help-text">Paste a comma-separated list of descriptions:</p>
-        <textarea
-          [(ngModel)]="bulkDescriptionsText"
-          placeholder="e.g., Grocery Store, Gas Station, Restaurant, Transfer"
-          class="bulk-textarea"
-          rows="6"
-        ></textarea>
-
-        <div class="checkbox-group">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="bulkDescriptionIsCommon"
-              class="checkbox-input"
-            />
-            Mark as Common (for recurring withdrawals)
-          </label>
+  @if (bulkDescriptionModal.isOpen) {
+    <div class="modal-overlay" (click)="closeBulkDescriptionModal()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h3>Bulk Add Descriptions</h3>
+          <button class="close-btn" (click)="closeBulkDescriptionModal()">×</button>
         </div>
+        <div class="modal-body">
+          <p class="help-text">Paste a comma-separated list of descriptions:</p>
+          <textarea
+            [(ngModel)]="bulkDescriptionsText"
+            placeholder="e.g., Grocery Store, Gas Station, Restaurant, Transfer"
+            class="bulk-textarea"
+            rows="6"
+          ></textarea>
 
-        <div *ngIf="bulkDescriptionError" class="error-message">{{ bulkDescriptionError }}</div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeBulkDescriptionModal()" [disabled]="bulkDescriptionLoading">Cancel</button>
-        <button class="btn-save" (click)="saveBulkDescriptions()" [disabled]="bulkDescriptionLoading">
-          {{ bulkDescriptionLoading ? 'Adding...' : 'Add Descriptions' }}
-        </button>
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="bulkDescriptionIsCommon"
+                class="checkbox-input"
+              />
+              Mark as Common (for recurring withdrawals)
+            </label>
+          </div>
+
+          @if (bulkDescriptionError) {
+            <div class="error-message">{{ bulkDescriptionError }}</div>
+          }
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" (click)="closeBulkDescriptionModal()" [disabled]="bulkDescriptionLoading">Cancel</button>
+          <button class="btn-save" (click)="saveBulkDescriptions()" [disabled]="bulkDescriptionLoading">
+            {{ bulkDescriptionLoading ? 'Adding...' : 'Add Descriptions' }}
+          </button>
+        </div>
       </div>
     </div>
-  </div>
+  }
 
 </div>

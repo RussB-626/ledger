@@ -3,7 +3,9 @@
 
 import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PageData } from '../../../../core/models/index';
+import { PageData, User } from '../../../../core/models/index';
+import { UserService } from '../../../../core/services/user.service';
+import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 interface BalanceRow {
   accountName: string;
@@ -16,10 +18,15 @@ interface BalanceRow {
   templateUrl: './balances-tab.component.html',
   styleUrls: ['./balances-tab.component.scss'],
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule, FormatCurrencyPipe]
 })
 export class BalancesTabComponent {
   @Input() pageData!: PageData;
+  activeUser: User | null = null;
+
+  constructor(private userService: UserService) {
+    this.activeUser = this.userService.getActiveUser();
+  }
 
   get balanceRows(): BalanceRow[] {
     const rows: BalanceRow[] = [];
@@ -42,12 +49,5 @@ export class BalancesTabComponent {
     });
 
     return rows;
-  }
-
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
   }
 }

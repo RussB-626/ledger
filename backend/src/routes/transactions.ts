@@ -175,6 +175,32 @@ router.delete(
   })
 );
 
+// POST /api/users/:userId/transactions/bulk-upload - Bulk upload transactions with auto-creation of references
+router.post(
+  '/:userId/transactions/bulk-upload',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = parseInt(req.params.userId, 10);
+    const { transactions: txnsToUpload } = req.body as { transactions?: any[] };
+
+    if (isNaN(userId)) {
+      const response: ApiResponse<never> = { error: 'Invalid user ID' };
+      res.status(400).json(response);
+      return;
+    }
+
+    if (!Array.isArray(txnsToUpload) || txnsToUpload.length === 0) {
+      const response: ApiResponse<never> = { error: 'transactions array is required and must not be empty' };
+      res.status(400).json(response);
+      return;
+    }
+
+    // Call the bulk upload controller
+    const result = await transactionsController.bulkUploadTransactions(userId, txnsToUpload);
+    const response: ApiResponse<any> = { data: result };
+    res.status(201).json(response);
+  })
+);
+
 // GET /api/users/:userId/monthly-difference - Get monthly (Income - Expenses)
 router.get(
   '/:userId/monthly-difference',

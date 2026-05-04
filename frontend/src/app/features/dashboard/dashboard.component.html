@@ -5,7 +5,7 @@
     <div class="net-worth-header">
       <div class="net-worth-title">
         <span class="label">Net worth</span>
-        <span class="amount">{{ calculateNetWorth(pageData.balances) | currency }}</span>
+        <span class="amount" [style.color]="calculateNetWorth(pageData.balances) < 0 && activeUser ? activeUser.negative_color : '#1dd1a1'">{{ formatNetWorth(pageData.balances) }}</span>
       </div>
       <app-differences-card [pageData]="pageData" [compact]="true"></app-differences-card>
     </div>

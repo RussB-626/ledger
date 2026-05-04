@@ -9,7 +9,7 @@ import { takeUntil } from 'rxjs/operators';
 import { PageDataService } from '../../core/services/page-data.service';
 import { UserService } from '../../core/services/user.service';
 import { ApiService } from '../../core/services/api.service';
-import { PageData, Transaction } from '../../core/models/index';
+import { PageData, Transaction, User } from '../../core/models/index';
 import { BalancesTabComponent } from './components/balances-tab/balances-tab.component';
 import { TransactionsTabComponent } from './components/transactions-tab/transactions-tab.component';
 import { PendingTabComponent } from './components/pending-tab/pending-tab.component';
@@ -41,6 +41,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   showCreateTransactionModal = false;
   showEditTransactionModal = false;
   editingTransaction: Transaction | null = null;
+  activeUser: User | null = null;
 
   selectedCategoryYear: number;
   selectedCategoryMonth: number;
@@ -54,6 +55,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     private apiService: ApiService
   ) {
     this.pageData$ = this.pageDataService.pageData$;
+    this.activeUser = this.userService.getActiveUser();
     const now = new Date();
     this.selectedCategoryYear = now.getFullYear();
     this.selectedCategoryMonth = now.getMonth() + 1;
@@ -73,6 +75,57 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   calculateNetWorth(balances: Record<string, number>): number {
     return Object.values(balances).reduce((sum, balance) => sum + balance, 0);
+  }
+
+  formatNetWorth(balances: Record<string, number>): string {
+    const netWorth = this.calculateNetWorth(balances);
+    const user = this.activeUser;
+    if (!user) {
+      return `$${netWorth.toFixed(2)}`;
+    }
+
+    const symbol = user.currency_symbol;
+    const decimalPlaces = user.decimal_places;
+    const thousandSep = user.thousand_separator;
+    const currencyPos = user.currency_position;
+    const negativeFormat = user.negative_format;
+
+    const absAmount = Math.abs(netWorth);
+    const isNegative = netWorth < 0;
+
+    const formatted = this.formatNumber(absAmount, decimalPlaces, thousandSep);
+    const withCurrency = currencyPos === 'before'
+      ? `${symbol}${formatted}`
+      : `${formatted}${symbol}`;
+
+    if (!isNegative) {
+      return withCurrency;
+    }
+
+    return this.applyNegativeFormat(withCurrency, negativeFormat);
+  }
+
+  private formatNumber(num: number, decimalPlaces: number, thousandSep: string): string {
+    const parts = num.toFixed(decimalPlaces).split('.');
+    const intPart = parts[0];
+    const decPart = parts[1];
+
+    const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
+    return decPart !== undefined ? `${withThousands}.${decPart}` : withThousands;
+  }
+
+  private applyNegativeFormat(value: string, format: string): string {
+    switch (format) {
+      case 'parentheses':
+        return `(${value})`;
+      case 'brackets':
+        return `[${value}]`;
+      case 'braces':
+        return `{${value}}`;
+      case '-prefix':
+      default:
+        return `-${value}`;
+    }
   }
 
   onEditTransaction(transaction: Transaction): void {

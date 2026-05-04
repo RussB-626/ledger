@@ -36,6 +36,24 @@ router.post(
   })
 );
 
+// PUT /api/users/:id/preferences - Update user preferences
+router.put(
+  '/:id/preferences',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = parseInt(req.params.id, 10);
+
+    if (isNaN(userId)) {
+      const response: ApiResponse<never> = { error: 'Invalid user ID' };
+      res.status(400).json(response);
+      return;
+    }
+
+    const user = await usersController.updateUserPreferences(userId, req.body);
+    const response: ApiResponse<User> = { data: user };
+    res.json(response);
+  })
+);
+
 // DELETE /api/users/:id - Delete a user
 router.delete(
   '/:id',

@@ -46,6 +46,11 @@ export class ApiService {
       .pipe(map(response => response.data || { success: false }));
   }
 
+  updateUserPreferences(userId: number, preferences: any): Observable<User> {
+    return this.http.put<ApiResponse<User>>(`${this.baseUrl}/users/${userId}/preferences`, preferences)
+      .pipe(map(response => response.data!));
+  }
+
   // ====== TRANSACTIONS ======
 
   getPageData(userId: number): Observable<PageData> {
@@ -243,6 +248,15 @@ export class ApiService {
     return this.http.get<ApiResponse<MonthlyDifference>>(
       `${this.baseUrl}/users/${userId}/monthly-difference`,
       { params }
+    ).pipe(map(response => response.data!));
+  }
+
+  // ====== BULK UPLOAD ======
+
+  bulkUploadTransactions(userId: number, transactions: any[]): Observable<any> {
+    return this.http.post<ApiResponse<any>>(
+      `${this.baseUrl}/users/${userId}/transactions/bulk-upload`,
+      { transactions }
     ).pipe(map(response => response.data!));
   }
 }

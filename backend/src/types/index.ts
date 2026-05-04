@@ -5,6 +5,12 @@
 export interface User {
   id: number;
   name: string;
+  currency_symbol: string;
+  decimal_places: number;
+  thousand_separator: string;
+  currency_position: 'before' | 'after';
+  negative_format: string;
+  negative_color: string;
   created_at: string;
 }
 

@@ -7,20 +7,22 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
-import { PageData, Transaction } from '../../../../core/models/index';
+import { PageData, Transaction, User } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
+import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
   selector: 'app-transactions-tab',
   templateUrl: './transactions-tab.component.html',
   styleUrls: ['./transactions-tab.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmationModalComponent]
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent, FormatCurrencyPipe]
 })
 export class TransactionsTabComponent implements OnInit, OnChanges {
   @Input() pageData!: PageData;
   @Output() editTransaction = new EventEmitter<Transaction>();
 
+  activeUser: User | null = null;
   transactions: Transaction[] = [];
   selectedYear: number;
   selectedMonth: string = 'All';
@@ -48,6 +50,7 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
     private cdr: ChangeDetectorRef
   ) {
     this.selectedYear = new Date().getFullYear();
+    this.activeUser = this.userService.getActiveUser();
   }
 
   ngOnInit(): void {
@@ -144,10 +147,30 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    const user = this.userService.getActiveUser();
+    if (!user) {
+      return `$${amount.toFixed(2)}`;
+    }
+
+    const symbol = user.currency_symbol;
+    const decimalPlaces = user.decimal_places;
+    const thousandSep = user.thousand_separator;
+    const currencyPos = user.currency_position;
+
+    const absAmount = Math.abs(amount);
+    const isNegative = amount < 0;
+
+    const parts = absAmount.toFixed(decimalPlaces).split('.');
+    const intPart = parts[0];
+    const decPart = parts[1];
+
+    const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
+    const formatted = decPart !== undefined ? `${withThousands}.${decPart}` : withThousands;
+    const withCurrency = currencyPos === 'before'
+      ? `${symbol}${formatted}`
+      : `${formatted}${symbol}`;
+
+    return isNegative ? `-${withCurrency}` : withCurrency;
   }
 
   formatDate(dateString: string): string {

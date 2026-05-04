@@ -4,13 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
 import { PageData, CategoryTotals } from '../../../../core/models/index';
+import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
   selector: 'app-categories-section',
   templateUrl: './categories-section.component.html',
   styleUrls: ['./categories-section.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule]
+  imports: [CommonModule, FormsModule, FormatCurrencyPipe]
 })
 export class CategoriesSectionComponent implements OnInit, OnChanges {
   @Input() pageData!: PageData;
@@ -108,9 +109,29 @@ export class CategoriesSectionComponent implements OnInit, OnChanges {
   }
 
   formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
+    const user = this.userService.getActiveUser();
+    if (!user) {
+      return `$${amount.toFixed(2)}`;
+    }
+
+    const symbol = user.currency_symbol;
+    const decimalPlaces = user.decimal_places;
+    const thousandSep = user.thousand_separator;
+    const currencyPos = user.currency_position;
+
+    const absAmount = Math.abs(amount);
+    const isNegative = amount < 0;
+
+    const parts = absAmount.toFixed(decimalPlaces).split('.');
+    const intPart = parts[0];
+    const decPart = parts[1];
+
+    const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
+    const formatted = decPart !== undefined ? `${withThousands}.${decPart}` : withThousands;
+    const withCurrency = currencyPos === 'before'
+      ? `${symbol}${formatted}`
+      : `${formatted}${symbol}`;
+
+    return isNegative ? `-${withCurrency}` : withCurrency;
   }
 }

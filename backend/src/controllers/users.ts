@@ -10,7 +10,7 @@ export async function getAllUsers(): Promise<User[]> {
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, name, created_at FROM users ORDER BY name ASC'
+      'SELECT id, name, currency_symbol, decimal_places, thousand_separator, currency_position, negative_format, negative_color, created_at FROM users ORDER BY name ASC'
     );
     return rows as User[];
   } finally {
@@ -23,7 +23,7 @@ export async function getUserById(userId: number): Promise<User | null> {
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, name, created_at FROM users WHERE id = ?',
+      'SELECT id, name, currency_symbol, decimal_places, thousand_separator, currency_position, negative_format, negative_color, created_at FROM users WHERE id = ?',
       [userId]
     );
     if (rows.length === 0) {
@@ -49,6 +49,35 @@ export async function createUser(req: CreateUserRequest): Promise<User> {
 
     if (!user) {
       throw new Error('Failed to retrieve created user');
+    }
+
+    return user;
+  } finally {
+    connection.release();
+  }
+}
+
+// Update user preferences
+export async function updateUserPreferences(userId: number, preferences: any): Promise<User> {
+  const connection = await pool.getConnection();
+  try {
+    await connection.query(
+      'UPDATE users SET currency_symbol = ?, decimal_places = ?, thousand_separator = ?, currency_position = ?, negative_format = ?, negative_color = ? WHERE id = ?',
+      [
+        preferences.currency_symbol,
+        preferences.decimal_places,
+        preferences.thousand_separator,
+        preferences.currency_position,
+        preferences.negative_format,
+        preferences.negative_color,
+        userId
+      ]
+    );
+
+    const user = await getUserById(userId);
+
+    if (!user) {
+      throw new Error('Failed to retrieve updated user');
     }
 
     return user;

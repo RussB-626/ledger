@@ -37,6 +37,13 @@ export class UserService {
   }
 
   /**
+   * Get current active user synchronously (alias for getActiveUserSync)
+   */
+  getActiveUser(): User | null {
+    return this.activeUserSubject.value;
+  }
+
+  /**
    * Set all available users
    */
   setAllUsers(users: User[]): void {
