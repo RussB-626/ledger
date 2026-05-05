@@ -47,6 +47,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedCategoryMonth: number;
   monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   showDifferencesOnMobile: boolean = true;
+  mobileSection: 'accounts-transactions' | 'categories' | 'common-withdrawals' = 'accounts-transactions';
 
   private destroy$ = new Subject<void>();
 
