@@ -48,9 +48,9 @@
         @for (desc of commonDescriptions; track desc.id) {
           <tr>
             <td>{{ desc.description }}</td>
-            <td class="text-right">{{ getPriorMonthTotal(desc.description) | formatCurrency }}</td>
-            <td class="text-right">{{ getCurrentMonthTotal(desc.description) | formatCurrency }}</td>
-            <td class="text-right">{{ getYearTotal(desc.description) | formatCurrency }}</td>
+            <td class="text-right">{{ getPriorMonthTotal(desc.id) | formatCurrency }}</td>
+            <td class="text-right">{{ getCurrentMonthTotal(desc.id) | formatCurrency }}</td>
+            <td class="text-right">{{ getYearTotal(desc.id) | formatCurrency }}</td>
           </tr>
         }
       </tbody>

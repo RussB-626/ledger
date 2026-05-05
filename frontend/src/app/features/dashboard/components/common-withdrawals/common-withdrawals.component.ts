@@ -35,18 +35,18 @@ export class CommonWithdrawalsComponent implements OnChanges {
     return this.pageData?.txnDescriptions.filter(d => d.is_common) || [];
   }
 
-  private getTransactionsForMonth(year: number, month: number, descriptionText: string): Transaction[] {
+  private getTransactionsForMonth(year: number, month: number, descriptionId: number): Transaction[] {
     if (!this.pageData?.transactions) return [];
 
     return this.pageData.transactions.filter(txn => {
       const txnDate = new Date(txn.date);
-      return txn.description === descriptionText &&
+      return txn.description_id === descriptionId &&
              txnDate.getFullYear() === year &&
              txnDate.getMonth() + 1 === month;
     });
   }
 
-  getPriorMonthTotal(descriptionText: string): number {
+  getPriorMonthTotal(descriptionId: number): number {
     let priorMonth = this.selectedMonth - 1;
     let priorYear = this.selectedYear;
 
@@ -55,27 +55,27 @@ export class CommonWithdrawalsComponent implements OnChanges {
       priorYear--;
     }
 
-    const txns = this.getTransactionsForMonth(priorYear, priorMonth, descriptionText);
+    const txns = this.getTransactionsForMonth(priorYear, priorMonth, descriptionId);
     return txns.reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
   }
 
-  getCurrentMonthTotal(descriptionText: string): number {
-    const txns = this.getTransactionsForMonth(this.selectedYear, this.selectedMonth, descriptionText);
+  getCurrentMonthTotal(descriptionId: number): number {
+    const txns = this.getTransactionsForMonth(this.selectedYear, this.selectedMonth, descriptionId);
     return txns.reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
   }
 
-  getYearTotal(descriptionText: string): number {
+  getYearTotal(descriptionId: number): number {
     if (!this.pageData?.transactions) return 0;
 
     return this.pageData.transactions.filter(txn => {
       const txnDate = new Date(txn.date);
-      return txn.description === descriptionText &&
+      return txn.description_id === descriptionId &&
              txnDate.getFullYear() === this.selectedYear;
     }).reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
