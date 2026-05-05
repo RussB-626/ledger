@@ -10,7 +10,36 @@
 - **Deployment:** Docker containers (Express + Angular) + separate MySQL container
 - **Users:** Multi-user without authentication (dropdown switcher for user isolation)
 
-**Status:** Implementation phase — follow the plan file **to the letter**.
+**Status:** Active development — core features implemented, ongoing refinement.
+
+---
+
+## Current Implementation Status
+
+### ✅ Fully Implemented
+- Database schema with auto-initialization
+- User management (multi-user dropdown, no authentication)
+- Transaction CRUD (W/D/TW/TD types)
+- Account, category, description management
+- Dashboard with balances, transactions, and pending tabs
+- Pending transaction flag and quick removal
+- Admin panel with reference management
+- Theme system with dark mode support
+- Backup scheduling and restore functionality
+- Docker containerization
+- Mobile-responsive UI
+
+### 📋 NOT Currently Implemented
+- **Charts/Analytics:** Pie charts, category analytics, and monthly differences dashboard not built
+  - References like `is_common`, `ignore` flags are database-ready but not used in UI
+  - These are reserved for future analytics features
+- **Analytics API endpoints:** Category totals and monthly difference routes not needed
+
+### 🎯 Development Priorities
+1. **Bug Fixes & UX Refinement:** Recent commits show focus on mobile UI, date formatting, styling
+2. **Feature Stability:** Ensure all transaction types and user isolation work correctly
+3. **Performance:** Optimize queries for large transaction sets
+4. **Testing:** Add comprehensive testing coverage
 
 ---
 
@@ -87,10 +116,6 @@
 - `GET/POST/PUT/DELETE /api/users/:userId/txn-descriptions` — manage descriptions
 - `GET /api/users/:userId/txn-descriptions?common=true` — common descriptions only
 
-**Analytics routes:**
-- `GET /api/users/:userId/categories?year=YYYY&month=MM` — category totals (exclude ignored)
-- `GET /api/users/:userId/monthly-difference?year=YYYY&month=MM` — (Income - Expenses) excluding ignored
-
 ### 6. UI Components (Must Implement Exactly)
 
 **Navbar:**
@@ -111,16 +136,6 @@
    - Deposit: date, account, category (income), description, notes, amount, pending
    - Transfer: date, from-account, to-account, category (transfer), description, notes, amount, pending
 
-3. **Categories Section** (with year/month selectors)
-   - Expenses pie chart (by category, exclude ignored)
-   - Incomes pie chart (by category, exclude ignored)
-
-4. **Net Total / Differences Card** (with own year/month selectors)
-   - Displays (Income - Expenses) as prominent number, excludes ignored categories
-
-5. **Common Withdrawals Section**
-   - Recurring withdrawal analysis (descriptions where `is_common=true`)
-
 **Admin Pages:**
 - Back to Dashboard link
 - Three tabs: Accounts (count), Categories (count), Descriptions (count)
@@ -136,7 +151,7 @@
 - **Transfer Handling:** Create 2 rows (TW, TD) with identical date/description/amount/category
 - **Pending Flag:** Boolean, persisted, filterable
 - **Description Normalization:** Use FK to `descriptions.id`, not inline text
-- **Category Ignore:** Affects analytics only (pie charts, Differences card)
+- **Category Ignore:** Reserved for future analytics features
 - **Date Format:** `YYYY-MM-DD` (DATE in MySQL, string in JSON)
 - **Amount Format:** `DECIMAL(12,2)` in DB, number in JSON (not string)
 
@@ -151,27 +166,25 @@
 - **Database Enforcement:** All cascade operations are enforced at MySQL level, not application level
 - **No Application-Level Checks:** Backend delete functions are simple and rely on database constraints
 
-### 8. Verification Before Mark-Complete
+### 8. Verification Checklist
 - [ ] MySQL user has CREATE TABLE permissions on the database
   - If error `CREATE command denied`, run: `GRANT CREATE ON database_name.* TO 'user'@'host'; FLUSH PRIVILEGES;`
 - [ ] Backend runs: `npm run dev` (TypeScript) or `npm run build && node dist/index.js` (compiled)
   - Logs: `[Database] Starting initialization...` → `✓ Database schema initialized successfully`
   - Or: `✓ Database tables already exist` (if already initialized)
-- [ ] All endpoints return `{ data, error }` format
+- [ ] All API endpoints return `{ data, error }` format
 - [ ] All endpoints tested with Postman/Thunder Client
 - [ ] Frontend runs: `ng serve` with dev proxy to backend
 - [ ] Page loads without console errors or TypeScript warnings
 - [ ] User switcher works and isolates data per user
-- [ ] Create W/D/T transactions → appear in tables, balances update
+- [ ] Create W/D/TW/TD transactions → appear in tables, balances update correctly
 - [ ] Edit transaction → table and balances update
 - [ ] Delete transaction → row removed, balances update
 - [ ] Year selector in Transactions tab filters correctly
-- [ ] Categories section: year/month selectors work, pie charts render, exclude ignored
-- [ ] Differences card: displays correct (Income - Expenses), excludes ignored
-- [ ] Common Withdrawals: shows recurring descriptions
 - [ ] Pending tab: shows only pending=true, "Remove Pending" unchecks pending flag
 - [ ] Admin pages: all CRUD operations work (accounts, categories, descriptions)
-- [ ] No TypeScript type errors
+- [ ] Cascade deletes work: deleting account/category/description removes related transactions
+- [ ] No TypeScript type errors (strict mode)
 - [ ] Docker build succeeds
 
 ---
@@ -275,9 +288,68 @@ If you encounter unclear specifications in the plan, ask for clarification rathe
 
 ---
 
+---
+
+## Development Workflow
+
+### Before Making Changes
+1. **Review CLAUDE.md** — This file is your source of truth for requirements
+2. **Check git status** — Ensure you're on a feature branch, not main
+3. **Read recent commits** — Understand what was just changed and why
+4. **Verify tests** — If tests exist, run them before starting work
+
+### When Adding Features
+1. **Update CLAUDE.md first** if requirements change
+2. **Follow TypeScript strict mode** — No `any` types, explicit interfaces everywhere
+3. **Use BehaviorSubject in services** — State management, no NgRx
+4. **Maintain `{ data, error }` response format** — Consistency across all endpoints
+5. **Filter by `user_id`** — Every query must scope to the active user
+6. **Test in browser** — Frontend changes require visual verification
+
+### When Fixing Bugs
+1. **Identify root cause** — Don't apply band-aids
+2. **Check for side effects** — Will this break related features?
+3. **Test data isolation** — Switch users and verify data doesn't leak
+4. **Verify balances recalculate** — After transaction changes
+
+### Common Patterns
+
+**Backend Route:**
+```typescript
+router.get('/users/:userId/transactions', async (req, res) => {
+  const userId = parseInt(req.params.userId);
+  const transactions = await getTransactions(userId); // filtered by userId
+  res.json({ data: transactions }); // { data, error } format
+});
+```
+
+**Frontend Service:**
+```typescript
+export class TransactionService {
+  private transactionsSubject = new BehaviorSubject<Transaction[]>([]);
+  transactions$ = this.transactionsSubject.asObservable();
+}
+```
+
+**Component Usage:**
+```typescript
+this.transactions$.pipe(takeUntil(this.destroy$)).subscribe(txns => {
+  this.displayTransactions = txns;
+});
+```
+
+### What NOT to Do
+- ❌ Don't use `any` types — be explicit
+- ❌ Don't bypass cascade deletes — let MySQL handle FK constraints
+- ❌ Don't fetch data without user_id filter — security issue
+- ❌ Don't break existing tests — run tests before committing
+- ❌ Don't add features beyond scope — stick to the spec
+- ❌ Don't hardcode URLs/ports — use environment variables
+
+---
+
 ## Reference Documents
 - **Plan:** `/plans/plan_file.md` — Full specification
 - **Design:** `/plans/ui_imgs/` — Visual reference (26 images showing all screens)
+- **README:** `/README.md` — User-facing documentation
 - **This file:** `/CLAUDE.md` — Implementation guardrails
-
-**Start implementation from Phase 1 (Database) and follow the Implementation Order exactly.**

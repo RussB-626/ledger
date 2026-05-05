@@ -1,6 +1,6 @@
 # Ledger
 
-A self-hosted full-stack financial ledger application built with Express.js, Angular, and MySQL. Features multi-user support without authentication, dark theme with customizable colors, and comprehensive transaction tracking with categories, accounts, and detailed analytics.
+A self-hosted full-stack financial ledger application built with Express.js, Angular, and MySQL. Features multi-user support without authentication, dark theme with customizable colors, and comprehensive transaction tracking with categories, accounts, and pending transactions.
 
 ## Features
 
@@ -8,8 +8,7 @@ A self-hosted full-stack financial ledger application built with Express.js, Ang
 - **Transaction management** — Deposits, withdrawals, transfers with categories and descriptions
 - **Pending transactions** — Flag transactions as pending for review before finalizing
 - **Account balances** — Real-time balance calculations per account
-- **Category analytics** — Pie charts for expenses and incomes by category
-- **Customizable theme** — 6 built-in themes (default, light, high-contrast, colorblind variants)
+- **Customizable theme** — Built-in themes with dark mode support
 - **Customizable formatting** — Currency symbols, decimal separators, negative amount formatting
 - **Backup system** — Automatic and manual backups with scheduled jobs
 - **Responsive design** — Dark theme with teal/cyan accents
@@ -183,8 +182,6 @@ Open the app in your browser and:
    - View account balances
    - See pending transactions
    - Browse transaction history with year/month filtering
-   - View category analytics
-   - Check net worth and monthly differences
 3. **Admin tab:**
    - Manage accounts, categories, descriptions
    - Configure user settings (theme, currency formatting, negative format)
@@ -416,14 +413,16 @@ Visit http://localhost:3000 (or http://localhost:4200 for dev mode)
 ## Implementation Status
 
 - ✅ Database schema and auto-initialization
-- ✅ User management
-- ✅ Transaction CRUD operations
+- ✅ User management (multi-user without authentication)
+- ✅ Transaction CRUD operations (W/D/TW/TD types)
 - ✅ Account, category, description management
-- ✅ Dashboard with analytics
-- ✅ Theme system with 6 themes
+- ✅ Dashboard with transaction tables and balances
+- ✅ Pending transactions support
+- ✅ Theme system with dark mode support
 - ✅ Backup scheduling and restore
-- ✅ Admin panel with settings
+- ✅ Admin panel with settings and reference management
 - ✅ Docker containerization
+- ✅ Mobile-responsive UI
 
 ## Documentation
 
