@@ -1,4 +1,4 @@
-# Docker Compose configuration for Checkbook Register
+# Docker Compose configuration for Ledger
 # App container with Express + Angular frontend
 # Note: MySQL database must be running separately (external or local instance)
 
@@ -6,7 +6,7 @@ services:
   # Express + Angular app container
   app:
     build: .
-    container_name: checkbook-app
+    container_name: ledger-app
     restart: unless-stopped
     ports:
       - "3000:3000"

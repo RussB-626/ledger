@@ -1,4 +1,4 @@
--- Checkbook Register Database Schema
+-- Ledger Database Schema
 -- Created according to CLAUDE.md specifications
 -- Strict data isolation: ALL tables scoped by user_id
 

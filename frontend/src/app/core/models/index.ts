@@ -1,4 +1,4 @@
-// Core models and interfaces for the Checkbook Register app
+// Core models and interfaces for the Ledger app
 // All types are explicitly defined per CLAUDE.md
 
 export type TransactionType = 'W' | 'D' | 'TW' | 'TD';

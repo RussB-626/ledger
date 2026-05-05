@@ -9,7 +9,7 @@ import { User } from '../models/index';
   providedIn: 'root'
 })
 export class UserService {
-  private readonly STORAGE_KEY = 'checkbook_active_user_id';
+  private readonly STORAGE_KEY = 'ledger_active_user_id';
 
   private activeUserSubject = new BehaviorSubject<User | null>(null);
   activeUser$: Observable<User | null> = this.activeUserSubject.asObservable();

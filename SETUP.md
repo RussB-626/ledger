@@ -1,6 +1,6 @@
-# Checkbook Register - Setup Instructions
+# Ledger - Setup Instructions
 
-This document provides instructions for setting up and running the Checkbook Register application locally or with Docker.
+This document provides instructions for setting up and running the Ledger application locally or with Docker.
 
 ## Prerequisites
 
@@ -26,8 +26,8 @@ Create MySQL database and tables:
 mysql -u root -p
 
 # Create database and import schema
-CREATE DATABASE checkbook_register;
-USE checkbook_register;
+CREATE DATABASE ledger;
+USE ledger;
 SOURCE database/schema.sql;
 SOURCE database/seed.sql;
 ```
@@ -216,7 +216,7 @@ Updates propagate through the database automatically without requiring manual tr
 ## File Structure
 
 ```
-checkbook-register/
+ledger/
 ├── backend/                    # Express + TypeScript backend
 │   ├── src/
 │   │   ├── types/             # TypeScript interfaces
@@ -319,7 +319,7 @@ checkbook-register/
 ```
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=checkbook_register
+DB_NAME=ledger
 DB_USER=root
 DB_PASSWORD=password
 NODE_ENV=development

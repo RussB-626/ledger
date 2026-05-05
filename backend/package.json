@@ -1,7 +1,7 @@
 {
-  "name": "checkbook-register-backend",
+  "name": "ledger-backend",
   "version": "1.0.0",
-  "description": "Express backend for Checkbook Register app",
+  "description": "Express backend for Ledger app",
   "main": "dist/index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",

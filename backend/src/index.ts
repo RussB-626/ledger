@@ -25,7 +25,7 @@ app.use((req, _res, next) => {
 });
 
 // Serve Angular frontend static files
-const frontendPath = path.join(__dirname, '../../frontend/dist/checkbook-register-frontend');
+const frontendPath = path.join(__dirname, '../../frontend/dist/ledger-frontend');
 app.use(express.static(frontendPath));
 
 // Routes

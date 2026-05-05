@@ -1,4 +1,4 @@
-# Multi-stage build for Checkbook Register app
+# Multi-stage build for Ledger app
 # Per CLAUDE.md: Compiles backend, builds Angular frontend, serves both from Express
 
 FROM node:20-alpine as builder

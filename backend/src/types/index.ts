@@ -1,4 +1,4 @@
-// Shared TypeScript types for Checkbook Register API
+// Shared TypeScript types for Ledger API
 // All API payloads must be strictly typed per CLAUDE.md
 
 // User entity

@@ -1,8 +1,8 @@
-# Checkbook Register: Implementation Guidelines
+# Ledger: Implementation Guidelines
 
 ## Project Context
 
-**Goal:** Convert Google Apps Script Checkbook Register to a self-hosted full-stack app:
+**Goal:** Ledger — a self-hosted full-stack financial ledger application:
 - **Backend:** Express.js + TypeScript
 - **Frontend:** Angular
 - **Database:** MySQL

@@ -1,4 +1,4 @@
-# Checkbook Register
+# Ledger
 
 A self-hosted full-stack financial ledger application built with Express.js, Angular, and MySQL. Features multi-user support without authentication, dark theme with customizable colors, and comprehensive transaction tracking with categories, accounts, and detailed analytics.
 
@@ -36,10 +36,10 @@ mysql -u root -p
 ```
 
 ```sql
-CREATE DATABASE checkbook_register;
-CREATE USER 'checkbook_user'@'%' IDENTIFIED BY 'checkbook_password';
-GRANT ALL PRIVILEGES ON checkbook_register.* TO 'checkbook_user'@'%';
-GRANT CREATE ON checkbook_register.* TO 'checkbook_user'@'%';
+CREATE DATABASE ledger;
+CREATE USER 'ledger_user'@'%' IDENTIFIED BY 'ledger_password';
+GRANT ALL PRIVILEGES ON ledger.* TO 'ledger_user'@'%';
+GRANT CREATE ON ledger.* TO 'ledger_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
@@ -58,18 +58,18 @@ cp .env.example .env  # Or create manually
 ```
 DB_HOST=192.168.1.100        # Your MySQL server IP/hostname
 DB_PORT=3306
-DB_NAME=checkbook_register
-DB_USER=checkbook_user
-DB_PASSWORD=checkbook_password
+DB_NAME=ledger
+DB_USER=ledger_user
+DB_PASSWORD=ledger_password
 ```
 
 Or use `localhost` if MySQL is running on your machine:
 ```
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=checkbook_register
-DB_USER=checkbook_user
-DB_PASSWORD=checkbook_password
+DB_NAME=ledger
+DB_USER=ledger_user
+DB_PASSWORD=ledger_password
 ```
 
 ### 3. Build and Run with Docker
@@ -118,10 +118,10 @@ mysql -u root -p
 ```
 
 ```sql
-CREATE DATABASE checkbook_register;
-CREATE USER 'checkbook_user'@'localhost' IDENTIFIED BY 'your_password';
-GRANT ALL PRIVILEGES ON checkbook_register.* TO 'checkbook_user'@'localhost';
-GRANT CREATE ON checkbook_register.* TO 'checkbook_user'@'localhost';
+CREATE DATABASE ledger;
+CREATE USER 'ledger_user'@'localhost' IDENTIFIED BY 'your_password';
+GRANT ALL PRIVILEGES ON ledger.* TO 'ledger_user'@'localhost';
+GRANT CREATE ON ledger.* TO 'ledger_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
 
@@ -137,8 +137,8 @@ npm install
 cat > .env << EOF
 DB_HOST=localhost
 DB_PORT=3306
-DB_NAME=checkbook_register
-DB_USER=checkbook_user
+DB_NAME=ledger
+DB_USER=ledger_user
 DB_PASSWORD=your_password
 PORT=3000
 NODE_ENV=development
@@ -217,7 +217,7 @@ DB_HOST=192.168.1.100  # Use the server's IP address
 
 **Test connection:**
 ```bash
-mysql -h <DB_HOST> -u checkbook_user -p
+mysql -h <DB_HOST> -u ledger_user -p
 ```
 
 ### Docker: "address already in use" for port 3000
@@ -237,7 +237,7 @@ docker-compose down
 The MySQL user doesn't have CREATE permissions. Fix with:
 
 ```sql
-GRANT CREATE ON checkbook_register.* TO 'checkbook_user'@'%';
+GRANT CREATE ON ledger.* TO 'ledger_user'@'%';
 FLUSH PRIVILEGES;
 ```
 
@@ -269,7 +269,7 @@ Common issues:
 ## Project Structure
 
 ```
-checkbook-register/
+ledger/
 ├── docker-compose.yml          # Docker Compose configuration
 ├── Dockerfile                  # Multi-stage build for app container
 ├── .env.example                # Environment variables template
@@ -316,15 +316,15 @@ Result: A single container running both backend (Express) and frontend (served b
 
 ```bash
 # Build manually
-docker build -t checkbook-register .
+docker build -t ledger .
 
 # Run manually
 docker run -p 3000:3000 \
   -e DB_HOST=localhost \
-  -e DB_USER=checkbook_user \
-  -e DB_PASSWORD=checkbook_password \
+  -e DB_USER=ledger_user \
+  -e DB_PASSWORD=ledger_password \
   -v ./backups:/app/backups \
-  checkbook-register
+  ledger
 ```
 
 Or use Docker Compose (recommended): `docker-compose up`
@@ -435,4 +435,4 @@ Visit http://localhost:3000 (or http://localhost:4200 for dev mode)
 
 ## License
 
-Internal project — Checkbook Register
+Internal project — Ledger

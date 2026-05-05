@@ -22,7 +22,7 @@ import { User } from './core/models/index';
   imports: [CommonModule, RouterOutlet, SharedModule, FormsModule]
 })
 export class AppComponent implements OnInit, OnDestroy {
-  title = 'Checkbook Register';
+  title = 'Ledger';
   loading = true;
   showUserSelectionModal = false;
   hasExistingUsers = false;
@@ -57,7 +57,7 @@ export class AppComponent implements OnInit, OnDestroy {
           this.userService.setAllUsers(users);
 
           // Try to restore active user from localStorage
-          const storedUserId = localStorage.getItem('checkbook_active_user_id');
+          const storedUserId = localStorage.getItem('ledger_active_user_id');
           if (storedUserId) {
             const userId = parseInt(storedUserId, 10);
             const user = users.find(u => u.id === userId);
