@@ -14,7 +14,7 @@ import { BalancesTabComponent } from './components/balances-tab/balances-tab.com
 import { TransactionsTabComponent } from './components/transactions-tab/transactions-tab.component';
 import { PendingTabComponent } from './components/pending-tab/pending-tab.component';
 import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
-import { DifferencesCardComponent } from './components/differences-card/differences-card.component';
+import { BalancesCardComponent } from './components/balances-card/balances-card.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
 import { EditTransactionModalComponent } from '../../shared/components/edit-transaction-modal/edit-transaction-modal.component';
 
@@ -30,7 +30,7 @@ import { EditTransactionModalComponent } from '../../shared/components/edit-tran
     TransactionsTabComponent,
     PendingTabComponent,
     CategoriesSectionComponent,
-    DifferencesCardComponent,
+    BalancesCardComponent,
     CommonWithdrawalsComponent,
     EditTransactionModalComponent
   ]
@@ -46,6 +46,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedCategoryYear: number;
   selectedCategoryMonth: number;
   monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  showDifferencesOnMobile: boolean = true;
 
   private destroy$ = new Subject<void>();
 
@@ -159,6 +160,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onCategoryYearMonthChange(): void {
     // This method is called when year/month changes in the dashboard header
     // The bindings will automatically update the differences card and categories section
+  }
+
+  toggleMobileView(): void {
+    this.showDifferencesOnMobile = !this.showDifferencesOnMobile;
   }
 
   ngOnDestroy(): void {

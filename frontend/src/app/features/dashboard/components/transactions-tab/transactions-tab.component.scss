@@ -5,6 +5,10 @@
 .transactions-tab-container {
   width: 100%;
   padding: 20px;
+
+  @media (max-width: 767px) {
+    padding: 12px;
+  }
 }
 
 .transactions-header {
@@ -13,12 +17,24 @@
   justify-content: space-between;
   align-items: center;
   gap: 20px;
+
+  @media (max-width: 767px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
 }
 
 .selectors-group {
   display: flex;
   align-items: center;
   gap: 0;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    gap: 8px;
+    flex-direction: column;
+  }
 }
 
 .year-selector {
@@ -26,12 +42,21 @@
   align-items: center;
   gap: 8px;
 
+  @media (max-width: 767px) {
+    width: 100%;
+  }
+
   label {
     font-size: 13px;
     font-weight: 500;
     color: var(--color-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+
+    @media (max-width: 767px) {
+      font-size: 11px;
+      white-space: nowrap;
+    }
   }
 
   select {
@@ -42,6 +67,12 @@
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
+
+    @media (max-width: 767px) {
+      width: 100%;
+      font-size: 13px;
+      padding: 6px 8px;
+    }
 
     &:focus {
       outline: none;
@@ -57,12 +88,22 @@
   gap: 8px;
   padding-left: 10px;
 
+  @media (max-width: 767px) {
+    width: 100%;
+    padding-left: 0;
+  }
+
   label {
     font-size: 13px;
     font-weight: 500;
     color: var(--color-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+
+    @media (max-width: 767px) {
+      font-size: 11px;
+      white-space: nowrap;
+    }
   }
 
   select {
@@ -73,6 +114,12 @@
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
+
+    @media (max-width: 767px) {
+      width: 100%;
+      font-size: 13px;
+      padding: 6px 8px;
+    }
 
     &:focus {
       outline: none;
@@ -85,6 +132,11 @@
 .search-box {
   flex: 1;
   max-width: 300px;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    max-width: 100%;
+  }
 }
 
 .search-input {
@@ -128,6 +180,31 @@
   overflow-x: auto;
   border: 1px solid var(--color-border);
   border-radius: 4px;
+
+  @media (max-width: 767px) {
+    border-radius: 0;
+    border-left: none;
+    border-right: none;
+    margin: 0 -12px;
+    width: calc(100% + 24px);
+  }
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+
+    &:hover {
+      background: rgba(0, 217, 255, 0.3);
+    }
+  }
 }
 
 .transactions-table {
@@ -148,6 +225,17 @@
       font-size: 12px;
       letter-spacing: 0.5px;
       white-space: nowrap;
+
+      @media (max-width: 767px) {
+        padding: 10px 8px;
+        font-size: 11px;
+
+        &:nth-child(2),
+        &:nth-child(4),
+        &:nth-child(5) {
+          display: none;
+        }
+      }
 
       &.text-right {
         text-align: right;
@@ -179,6 +267,18 @@
         max-width: 200px;
         overflow: hidden;
         text-overflow: ellipsis;
+
+        @media (max-width: 767px) {
+          padding: 10px 8px;
+          font-size: 12px;
+          max-width: none;
+
+          &:nth-child(2),
+          &:nth-child(4),
+          &:nth-child(5) {
+            display: none;
+          }
+        }
 
         &.text-right {
           text-align: right;

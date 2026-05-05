@@ -47,7 +47,8 @@
     </div>
     }
 
-    @if (!loading && filteredTransactions.length > 0) {
+    <!-- Mobile Card View -->
+    @if (!loading && !isMobileView && filteredTransactions.length > 0) {
     <div class="table-wrapper">
       <table class="transactions-table">
         <thead>
@@ -95,7 +96,7 @@
       </table>
     </div>
 
-    <!-- Pagination Controls -->
+    <!-- Desktop Pagination Controls -->
     <div class="pagination-controls">
       <div class="page-size-selector">
         <label for="page-size">Items per page:</label>
@@ -154,6 +155,20 @@
         </button>
       </div>
     </div>
+    }
+
+    <!-- Mobile Card View -->
+    @if (!loading && isMobileView && filteredTransactions.length > 0) {
+      <app-transactions-card-view
+        [transactions]="paginatedTransactions"
+        [selectedYear]="selectedYear"
+        [currentPage]="currentPage"
+        [pageSize]="pageSize"
+        [totalPages]="totalPages"
+        (editTransaction)="onEditTransaction($event)"
+        (removePending)="removePending($event)"
+        (pageChanged)="goToPage($event)"
+      ></app-transactions-card-view>
     }
 
     @if (!loading && transactions.length === 0) {

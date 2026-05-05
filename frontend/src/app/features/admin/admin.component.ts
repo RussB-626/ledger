@@ -50,7 +50,6 @@ interface ParsedTransaction {
 interface Theme {
   id: string;
   name: string;
-  description: string;
 }
 
 @Component({
@@ -183,33 +182,27 @@ export class AdminComponent implements OnInit, OnDestroy {
   themes: Theme[] = [
     {
       id: 'default',
-      name: 'Default',
-      description: 'Dark theme with teal/cyan accents (current)'
+      name: 'Default'
     },
     {
       id: 'light',
-      name: 'Light',
-      description: 'Light background with dark text'
+      name: 'Light'
     },
     {
       id: 'high-contrast',
-      name: 'High Contrast',
-      description: 'High contrast colors for better visibility'
+      name: 'High Contrast'
     },
     {
       id: 'colorblind-deuteranopia',
-      name: 'Color Blind (Red-Green)',
-      description: 'Optimized for deuteranopia (red-green color blindness)'
+      name: 'Color Blind (Red-Green)'
     },
     {
       id: 'colorblind-protanopia',
-      name: 'Color Blind (Red-Green Alt)',
-      description: 'Alternative optimized for protanopia'
+      name: 'Color Blind (Red-Green Alt)'
     },
     {
       id: 'colorblind-tritanopia',
-      name: 'Color Blind (Blue-Yellow)',
-      description: 'Optimized for tritanopia (blue-yellow color blindness)'
+      name: 'Color Blind (Blue-Yellow)'
     }
   ];
 

@@ -1,6 +1,5 @@
 <div class="admin-container">
   <div class="admin-header">
-    <button class="back-btn" (click)="backToDashboard()">← Back to Dashboard</button>
     <h1>Admin Management</h1>
     @if (activeUser) {
       <div class="active-user">
@@ -12,7 +11,8 @@
     }
   </div>
 
-  <div class="tabs">
+  <!-- Desktop Tabs -->
+  <div class="tabs hide-mobile">
     <button
       class="tab-btn"
       [class.active]="activeTab === 'accounts'"
@@ -62,6 +62,19 @@
     >
       Backups
     </button>
+  </div>
+
+  <!-- Mobile Tabs Dropdown -->
+  <div class="mobile-tabs-dropdown show-mobile">
+    <select [(ngModel)]="activeTab" (change)="selectTab(activeTab)" class="tabs-select">
+      <option value="accounts">Accounts ({{ accounts.length }})</option>
+      <option value="categories">Categories ({{ categories.length }})</option>
+      <option value="descriptions">Descriptions ({{ descriptions.length }})</option>
+      <option value="transactions">Transactions</option>
+      <option value="other">Money</option>
+      <option value="themes">Themes</option>
+      <option value="backups">Backups</option>
+    </select>
   </div>
 
   <!-- ACCOUNTS TAB -->
@@ -180,7 +193,7 @@
       </div>
 
       @if (categories.length > 0) {
-        <table class="admin-table">
+        <table class="admin-table categories-table">
           <thead>
             <tr>
               <th>Category Name</th>
@@ -283,7 +296,7 @@
       </div>
 
       @if (descriptions.length > 0) {
-        <table class="admin-table">
+        <table class="admin-table descriptions-table">
           <thead>
             <tr>
               <th>Description Text</th>
@@ -565,7 +578,6 @@
         </div>
 
         <div class="setting-row">
-          <label for="theme-select">Theme</label>
           <select
             id="theme-select"
             [(ngModel)]="selectedTheme"
@@ -574,7 +586,7 @@
             [disabled]="savingTheme"
           >
             @for (theme of themes; track theme.id) {
-              <option [value]="theme.id">{{ theme.name }} - {{ theme.description }}</option>
+              <option [value]="theme.id">{{ theme.name }}</option>
             }
           </select>
         </div>
@@ -686,7 +698,7 @@
 
           <div class="info-box">
             <p><strong>💾 Access Your Backups</strong></p>
-            <p>Backup files are stored on the server at: <code>/backups/user-{{ activeUser?.name }}/</code></p>
+            <p>Backup files are stored on the server at: <br><code>/backups/user-{{ activeUser?.name }}/</code></p>
             <p>You can access this directory to view, download, or manage your backup files directly.</p>
           </div>
         </div>

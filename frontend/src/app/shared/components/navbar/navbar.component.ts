@@ -26,6 +26,7 @@ export class NavbarComponent implements OnInit {
   showUserDropdown = false;
   showCreateTransactionModal = false;
   showCreateUserModal = false;
+  mobileMenuOpen = false;
   newUserName = '';
 
   constructor(
@@ -39,6 +40,14 @@ export class NavbarComponent implements OnInit {
   }
 
   ngOnInit(): void {}
+
+  toggleMobileMenu(): void {
+    this.mobileMenuOpen = !this.mobileMenuOpen;
+  }
+
+  closeMobileMenu(): void {
+    this.mobileMenuOpen = false;
+  }
 
   toggleUserDropdown(): void {
     this.showUserDropdown = !this.showUserDropdown;
@@ -131,10 +140,12 @@ export class NavbarComponent implements OnInit {
   }
 
   navigateToDashboard(): void {
+    this.closeMobileMenu();
     this.router.navigate(['/dashboard']);
   }
 
   navigateToAdmin(): void {
+    this.closeMobileMenu();
     this.router.navigate(['/admin']);
   }
 

@@ -1,0 +1,79 @@
+@if (compact) {
+<!-- Compact view for header -->
+<div class="balances-card-compact">
+  @if (!loading && difference) {
+  <div class="compact-income">
+    <span class="label">Income</span>
+    <span class="amount positive" [style.color]="difference.income === 0 ? 'var(--color-zero)' : (activeUser ? activeUser.positive_color : 'inherit')">{{ formatCurrency(difference.income) }}</span>
+  </div>
+  <div class="compact-expenses">
+    <span class="label">Expenses</span>
+    <span class="amount negative" [style.color]="difference.expenses === 0 ? 'var(--color-zero)' : (activeUser ? activeUser.negative_color : 'inherit')">{{ formatCurrency(-difference.expenses) }}</span>
+  </div>
+  }
+</div>
+} @else {
+<!-- Full view for card -->
+<div class="balances-card-container">
+  <!-- Only show selectors if not controlled by parent (selectedYear/selectedMonth inputs not provided) -->
+  @if (selectedYear === undefined && selectedMonth === undefined) {
+    <div class="card-selectors">
+      <div class="selector-group">
+        <label for="bal-year">Year:</label>
+        <select
+          id="bal-year"
+          [(ngModel)]="year"
+          (change)="onYearOrMonthChange()"
+        >
+          @for (year of pageData.years; track year) {
+            <option [value]="year">
+              {{ year }}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="selector-group">
+        <label for="bal-month">Month:</label>
+        <select
+          id="bal-month"
+          [(ngModel)]="month"
+          (change)="onYearOrMonthChange()"
+        >
+          @for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) {
+            <option [value]="month">
+              {{ monthNames[month - 1] }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+  }
+
+  @if (!loading && difference) {
+  <div class="card-body">
+    <div class="net-total-display">
+      <div class="net-row">
+        <span class="net-label">Income</span>
+        <span class="net-amount positive" [style.color]="difference.income === 0 ? 'var(--color-zero)' : (activeUser ? activeUser.positive_color : 'inherit')">{{ formatCurrency(difference.income) }}</span>
+      </div>
+      <div class="net-row">
+        <span class="net-label">Expenses</span>
+        <span class="net-amount negative" [style.color]="difference.expenses === 0 ? 'var(--color-zero)' : (activeUser ? activeUser.negative_color : 'inherit')">{{ formatCurrency(-difference.expenses) }}</span>
+      </div>
+      <div class="net-row net-total">
+        <span class="net-label">Net For {{ monthNames[month - 1] }} {{ year }}</span>
+        <span class="net-amount" [class]="difference.difference >= 0 ? 'positive' : 'negative'" [style.color]="difference.difference === 0 ? 'var(--color-zero)' : (difference.difference < 0 && activeUser ? activeUser.negative_color : (activeUser ? activeUser.positive_color : '#1dd1a1'))">
+          {{ formatCurrency(difference.difference) }}
+        </span>
+      </div>
+    </div>
+  </div>
+  }
+
+  @if (loading) {
+  <div class="loading-state">
+    Loading...
+  </div>
+  }
+</div>
+}

@@ -75,8 +75,6 @@ export class EditTransactionModalComponent implements OnInit, OnChanges {
       return;
     }
 
-    console.log('Populating form with transaction:', this.transaction);
-
     // Convert ISO date format to YYYY-MM-DD format for date input
     let dateStr = '';
     if (this.transaction.date) {
@@ -98,7 +96,6 @@ export class EditTransactionModalComponent implements OnInit, OnChanges {
     this.note = this.transaction.note || '';
     this.pending = this.transaction.pending || false;
 
-    console.log('Form populated. Date value:', this.date, 'Amount value:', this.amount);
     this.cdr.markForCheck();
   }
 

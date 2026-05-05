@@ -1,5 +1,5 @@
 // Dashboard module with main page features
-// Per CLAUDE.md: Balances, Transactions, Pending tabs; Categories section; Differences card
+// Per CLAUDE.md: Balances, Transactions, Pending tabs; Categories section; Balances card
 
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -13,7 +13,7 @@ import { BalancesTabComponent } from './components/balances-tab/balances-tab.com
 import { TransactionsTabComponent } from './components/transactions-tab/transactions-tab.component';
 import { PendingTabComponent } from './components/pending-tab/pending-tab.component';
 import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
-import { DifferencesCardComponent } from './components/differences-card/differences-card.component';
+import { BalancesCardComponent } from './components/balances-card/balances-card.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -31,7 +31,7 @@ import { SharedModule } from '../../shared/shared.module';
     TransactionsTabComponent,
     PendingTabComponent,
     CategoriesSectionComponent,
-    DifferencesCardComponent,
+    BalancesCardComponent,
     CommonWithdrawalsComponent
   ]
 })

@@ -5,7 +5,8 @@
       <span class="logo-text">Ledger</span>
     </div>
 
-    <div class="nav-links">
+    <!-- Desktop nav links (hidden on mobile) -->
+    <div class="nav-links hide-mobile">
       <button class="nav-link" (click)="navigateToDashboard()">
         Dashboard
       </button>
@@ -13,6 +14,25 @@
         Admin
       </button>
     </div>
+
+    <!-- Mobile nav links (shown when menu is open) -->
+    @if (mobileMenuOpen) {
+      <div class="mobile-nav-menu">
+        <button class="nav-link" (click)="navigateToDashboard()">
+          Dashboard
+        </button>
+        <button class="nav-link" (click)="navigateToAdmin()">
+          Admin
+        </button>
+      </div>
+    }
+
+    <!-- Mobile hamburger button -->
+    <button class="hamburger-btn show-mobile" (click)="toggleMobileMenu()">
+      <span class="hamburger-line" [class.active]="mobileMenuOpen"></span>
+      <span class="hamburger-line" [class.active]="mobileMenuOpen"></span>
+      <span class="hamburger-line" [class.active]="mobileMenuOpen"></span>
+    </button>
   </div>
 
   <div class="navbar-right">

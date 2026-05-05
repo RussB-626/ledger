@@ -25,7 +25,8 @@
     </div>
   </div>
 
-  @if (filteredPendingTransactions.length > 0) {
+  <!-- Desktop Table View -->
+  @if (!isMobileView && filteredPendingTransactions.length > 0) {
   <div class="table-wrapper">
     <table class="pending-table">
       <thead>
@@ -79,7 +80,7 @@
     </table>
   </div>
 
-  <!-- Pagination Controls -->
+  <!-- Desktop Pagination Controls -->
   <div class="pagination-controls">
     <div class="page-size-selector">
       <label for="page-size">Items per page:</label>
@@ -138,6 +139,21 @@
       </button>
     </div>
   </div>
+  }
+
+  <!-- Mobile Card View -->
+  @if (isMobileView && filteredPendingTransactions.length > 0) {
+    <app-pending-card-view
+      [transactions]="paginatedPendingTransactions"
+      [currentPage]="currentPage"
+      [pageSize]="pageSize"
+      [totalPages]="totalPages"
+      [totalsAmount]="getFilteredTotal()"
+      [totalsAmountColor]="getFilteredTotal() === 0 ? 'var(--color-zero)' : (isFilteredTotalNegative() ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))"
+      (editTransaction)="onEditTransaction($event)"
+      (removePending)="removePending($event)"
+      (pageChanged)="goToPage($event)"
+    ></app-pending-card-view>
   }
 
   @if (filteredPendingTransactions.length === 0) {

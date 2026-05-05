@@ -61,6 +61,10 @@
 
 .modal-body {
   padding: 20px;
+
+  @media (max-width: 767px) {
+    padding: 16px;
+  }
 }
 
 .error-message {
@@ -83,6 +87,11 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
+
+  @media (max-width: 767px) {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
 }
 
 .form-group {
@@ -140,6 +149,11 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
+
+  @media (max-width: 767px) {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
 }
 
 .type-btn {
@@ -154,6 +168,18 @@
   transition: all 0.2s ease;
   text-transform: capitalize;
   line-height: 1.3;
+  white-space: normal;
+  word-break: break-word;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  @media (max-width: 767px) {
+    font-size: 11px;
+    padding: 8px 10px;
+  }
 
   &:hover {
     border-color: var(--color-primary);
@@ -196,6 +222,13 @@
   padding: 20px;
   border-top: 1px solid var(--color-border);
   background-color: rgba(0, 0, 0, 0.2);
+  flex-wrap: wrap;
+
+  @media (max-width: 767px) {
+    flex-direction: column-reverse;
+    padding: 16px;
+    gap: 8px;
+  }
 }
 
 .btn-secondary,
@@ -206,7 +239,17 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
-  border: none;
+  border: 1px solid var(--color-border);
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  @media (max-width: 767px) {
+    width: 100%;
+    font-size: 13px;
+    padding: 10px 12px;
+  }
 
   &:disabled {
     opacity: 0.5;
@@ -220,8 +263,8 @@
   border: 1px solid var(--color-border);
 
   &:hover:not(:disabled) {
-    border-color: var(--color-text);
-    color: var(--color-text);
+    border-color: var(--color-primary);
+    color: var(--color-primary);
   }
 }
 

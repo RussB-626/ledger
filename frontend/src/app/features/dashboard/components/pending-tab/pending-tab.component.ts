@@ -1,21 +1,25 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, OnDestroy, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
 import { PageData, Transaction, User } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
+import { PendingCardViewComponent } from './pending-card-view.component';
 
 @Component({
   selector: 'app-pending-tab',
   templateUrl: './pending-tab.component.html',
   styleUrls: ['./pending-tab.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmationModalComponent, FormatCurrencyPipe]
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent, FormatCurrencyPipe, PendingCardViewComponent]
 })
-export class PendingTabComponent implements OnChanges {
+export class PendingTabComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pageData!: PageData;
   @Output() editTransaction = new EventEmitter<Transaction>();
 
@@ -34,13 +38,28 @@ export class PendingTabComponent implements OnChanges {
   confirmationType: 'delete' | 'removePending' | null = null;
   transactionToConfirm: Transaction | null = null;
 
+  // Mobile view
+  isMobileView = false;
+  private destroy$ = new Subject<void>();
+
   constructor(
     private apiService: ApiService,
     private userService: UserService,
     private pageDataService: PageDataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private breakpointObserver: BreakpointObserver
   ) {
     this.activeUser = this.userService.getActiveUser();
+  }
+
+  ngOnInit(): void {
+    this.breakpointObserver
+      .observe(['(max-width: 767px)'])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        this.isMobileView = result.matches;
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -48,6 +67,11 @@ export class PendingTabComponent implements OnChanges {
       this.currentPage = 1;
       this.cdr.markForCheck();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get pendingTransactions(): Transaction[] {

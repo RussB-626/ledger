@@ -1,0 +1,122 @@
+<!-- Hybrid Table: Cards on mobile, Table on desktop -->
+
+<!-- Empty state -->
+@if (data.length === 0) {
+  <div class="empty-state">
+    {{ emptyMessage }}
+  </div>
+}
+
+<!-- Mobile view: Expandable cards -->
+<div class="hybrid-cards show-mobile">
+  @for (row of data; track $index) {
+    <div class="card" [class.expanded]="isExpanded($index)">
+      <!-- Card header with key info -->
+      <div class="card-header" (click)="toggleExpand($index)">
+        <div class="card-header-content">
+          @for (col of getCardHeaderColumns(); track col.key) {
+            <div class="header-item">
+              <span class="header-label">{{ col.label }}</span>
+              <span class="header-value">{{ getColumnValue(row, col) }}</span>
+            </div>
+          }
+        </div>
+        <button class="card-expand-btn" (click)="toggleExpand($index)">
+          <span class="chevron" [class.open]="isExpanded($index)">›</span>
+        </button>
+      </div>
+
+      <!-- Card body (expandable) -->
+      @if (isExpanded($index)) {
+        <div class="card-body">
+          <!-- Show all details -->
+          <div class="details">
+            @for (col of columns; track col.key) {
+              @if (!col.hidden) {
+                <div class="detail-row">
+                  <span class="detail-label">{{ col.label }}</span>
+                  <span class="detail-value">{{ getColumnValue(row, col) }}</span>
+                </div>
+              }
+            }
+          </div>
+
+          <!-- Custom expanded content (template) -->
+          @if (expandedContentTemplate) {
+            <div class="custom-content">
+              <ng-container *ngTemplateOutlet="expandedContentTemplate; context: { row: row, $index: $index }"></ng-container>
+            </div>
+          }
+
+          <!-- Actions -->
+          @if (actions.length > 0) {
+            <div class="card-actions">
+              @for (action of actions; track action.label) {
+                <button
+                  class="action-btn"
+                  [class]="action.class || ''"
+                  (click)="executeAction(action, row)"
+                >
+                  @if (action.icon) {
+                    <span class="action-icon">{{ action.icon }}</span>
+                  }
+                  {{ action.label }}
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Desktop view: Traditional table -->
+<div class="hybrid-table hide-mobile">
+  @if (data.length > 0) {
+    <table>
+      <thead>
+        <tr>
+          @for (col of columns; track col.key) {
+            @if (!col.hidden) {
+              <th>{{ col.label }}</th>
+            }
+          }
+          @if (actions.length > 0) {
+            <th class="actions-header">Actions</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (row of data; track $index) {
+          <tr>
+            @for (col of columns; track col.key) {
+              @if (!col.hidden) {
+                <td>{{ getColumnValue(row, col) }}</td>
+              }
+            }
+            @if (actions.length > 0) {
+              <td class="actions-cell">
+                @for (action of actions; track action.label) {
+                  <button
+                    class="action-btn"
+                    [class]="action.class || ''"
+                    [title]="action.label"
+                    (click)="executeAction(action, row)"
+                  >
+                    @if (action.icon) {
+                      <span class="action-icon">{{ action.icon }}</span>
+                    }
+                    @if (!action.icon) {
+                      {{ action.label }}
+                    }
+                  </button>
+                }
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</div>

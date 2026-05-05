@@ -1,0 +1,246 @@
+.pending-card-view {
+  width: 100%;
+  padding: 12px 0;
+}
+
+.cards-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction-card {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 16px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: var(--color-primary);
+    background-color: var(--color-surface-alt);
+  }
+
+  &.pending {
+    opacity: 0.85;
+  }
+}
+
+.card-top {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.card-bottom {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.card-bottom-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.card-bottom-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: flex-end;
+  flex: 1;
+  min-width: 0;
+}
+
+.card-field {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  .badge {
+    width: fit-content;
+    display: inline-block;
+  }
+}
+
+.card-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-value {
+  font-size: 14px;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.amount {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.card-badge {
+  margin-top: 4px;
+}
+
+.type-badge {
+  margin-top: 4px;
+}
+
+.badge {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+
+  &.badge-w {
+    background-color: rgba(255, 71, 87, 0.2);
+    color: #ff4757;
+  }
+
+  &.badge-d {
+    background-color: rgba(46, 213, 115, 0.2);
+    color: #2ed573;
+  }
+
+  &.badge-tw {
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+  }
+
+  &.badge-td {
+    background-color: var(--color-surface);
+    color: var(--color-primary);
+  }
+
+  &.badge-pending {
+    background-color: rgba(255, 165, 2, 0.2);
+    color: #ffa502;
+  }
+}
+
+.action-row {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.remove-pending-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  width: 24px;
+  height: 24px;
+  min-width: 24px;
+  min-height: 24px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  padding: 0;
+
+  &:hover {
+    border-color: var(--color-primary);
+    color: #2ed573;
+  }
+}
+
+.totals-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  margin-top: 12px;
+  background-color: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-weight: 600;
+
+  .totals-label {
+    font-size: 12px;
+    color: var(--color-text);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .totals-amount {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: 'Courier New', monospace;
+  }
+}
+
+.pagination-controls {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--color-border);
+  margin-top: 12px;
+}
+
+.pagination-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-btn {
+  background: none;
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  padding: 6px 12px;
+  border-radius: 3px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+
+  &:hover:not(:disabled) {
+    border-color: var(--color-primary);
+    color: var(--color-primary);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.page-info {
+  font-size: 12px;
+  color: var(--color-text);
+  white-space: nowrap;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+}

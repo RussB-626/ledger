@@ -1,24 +1,27 @@
 // Transactions Tab component
 // Per CLAUDE.md: Year selector, sortable/filterable table with Edit/Delete, pagination
 
-import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { BreakpointObserver, Breakpoints } from '@angular/cdk/layout';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
 import { PageData, Transaction, User } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
-import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
+import { TransactionsCardViewComponent } from './transactions-card-view.component';
 
 @Component({
   selector: 'app-transactions-tab',
   templateUrl: './transactions-tab.component.html',
   styleUrls: ['./transactions-tab.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmationModalComponent, FormatCurrencyPipe]
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent, TransactionsCardViewComponent]
 })
-export class TransactionsTabComponent implements OnInit, OnChanges {
+export class TransactionsTabComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pageData!: PageData;
   @Output() editTransaction = new EventEmitter<Transaction>();
 
@@ -43,17 +46,30 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
   transactionToDelete: Transaction | null = null;
   transactionToRemovePending: Transaction | null = null;
 
+  // Mobile view
+  isMobileView = false;
+  private destroy$ = new Subject<void>();
+
   constructor(
     private apiService: ApiService,
     private userService: UserService,
     private pageDataService: PageDataService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private breakpointObserver: BreakpointObserver
   ) {
     this.selectedYear = new Date().getFullYear();
     this.activeUser = this.userService.getActiveUser();
   }
 
   ngOnInit(): void {
+    this.breakpointObserver
+      .observe(['(max-width: 767px)'])
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((result) => {
+        this.isMobileView = result.matches;
+        this.cdr.markForCheck();
+      });
+
     if (this.pageData) {
       this.updateTransactionsFromPageData();
     }
@@ -63,6 +79,11 @@ export class TransactionsTabComponent implements OnInit, OnChanges {
     if (changes['pageData'] && this.pageData) {
       this.updateTransactionsFromPageData();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private updateTransactionsFromPageData(): void {

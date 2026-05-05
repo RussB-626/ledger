@@ -1,0 +1,110 @@
+<div class="pending-card-view">
+  @if (transactions.length === 0) {
+    <div class="empty-state">
+      <p>No pending transactions</p>
+    </div>
+  }
+
+  @if (transactions.length > 0) {
+    <div class="cards-container" #cardsContainer>
+      @for (transaction of transactions; track transaction.id) {
+        <div class="transaction-card pending" (click)="onTransactionClick(transaction)">
+          <!-- Card Top -->
+          <div class="card-top">
+            <div class="card-field">
+              <span class="card-value">{{ transaction.account }}</span>
+            </div>
+            <div class="card-field">
+              <span class="card-value">{{ transaction.category }}</span>
+            </div>
+            <div class="card-field">
+              <span class="card-value">{{ transaction.description }}</span>
+            </div>
+            <div class="card-field">
+              <span class="card-value">{{ truncateText(transaction.note) }}</span>
+            </div>
+          </div>
+
+          <!-- Card Bottom -->
+          <div class="card-bottom">
+            <div class="card-bottom-left">
+              <div class="card-field">
+                <span class="card-value">{{ formatDate(transaction.date) }}</span>
+              </div>
+              <div class="card-field">
+                <span [class]="'badge ' + getTypeClass(transaction.type)">
+                  {{ getTransactionTypeLabel(transaction.type) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="card-bottom-right">
+              <div class="amount" [style.color]="getAmountColor(transaction.amount)">
+                {{ transaction.amount < 0 ? '-' : '+' }}${{ formatAmount(transaction.amount) }}
+              </div>
+              <div class="action-row">
+                <span class="badge badge-pending">Pending</span>
+                <button class="remove-pending-btn" (click)="onRemovePending($event, transaction)" title="Remove pending status">
+                  ✓
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- Totals Card (above pagination) -->
+    <div class="totals-card">
+      <span class="totals-label">Total Pending:</span>
+      <span class="totals-amount" [style.color]="totalsAmountColor">
+        {{ totalsAmount | formatCurrency }}
+      </span>
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-controls">
+      <div class="pagination-buttons">
+        <button
+          class="page-btn"
+          [disabled]="currentPage === 1"
+          (click)="firstPage()"
+          title="First page"
+        >
+          ⌂ Home
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === 1"
+          (click)="previousPage()"
+          title="Previous page"
+        >
+          ← Previous
+        </button>
+
+        <div class="page-info">
+          Page {{ currentPage }} of {{ totalPages }}
+        </div>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="nextPage()"
+          title="Next page"
+        >
+          Next →
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="lastPage()"
+          title="Last page"
+        >
+          End ⌂
+        </button>
+      </div>
+    </div>
+  }
+</div>
