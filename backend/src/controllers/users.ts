@@ -10,7 +10,7 @@ export async function getAllUsers(): Promise<User[]> {
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, name, currency_symbol, decimal_places, thousand_separator, decimal_separator, currency_position, negative_format, negative_color, positive_color, theme, created_at FROM users ORDER BY name ASC'
+      'SELECT id, name, currency_symbol, decimal_places, thousand_separator, decimal_separator, currency_position, negative_format, negative_color, positive_color, theme, backup_enabled, backup_frequency, backup_time, backup_day_of_week, backup_day_of_month, backup_count, last_backup_date, created_at FROM users ORDER BY name ASC'
     );
     return rows as User[];
   } finally {
