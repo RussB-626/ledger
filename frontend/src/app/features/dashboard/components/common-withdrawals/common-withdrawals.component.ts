@@ -27,11 +27,7 @@ export class CommonWithdrawalsComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['pageData'] && this.pageData) {
-      console.log('[Common Withdrawals] pageData updated');
-      console.log('[Common Withdrawals] Total transactions:', this.pageData.transactions?.length);
-      console.log('[Common Withdrawals] txnDescriptions:', this.pageData.txnDescriptions);
-      console.log('[Common Withdrawals] commonDescriptions:', this.commonDescriptions);
-      console.log('[Common Withdrawals] Sample transactions:', this.pageData.transactions?.slice(0, 3));
+      // Page data updated, filtering will happen through getter
     }
   }
 
@@ -41,34 +37,15 @@ export class CommonWithdrawalsComponent implements OnChanges {
 
   private getTransactionsForMonth(year: number, month: number, descriptionId: number): Transaction[] {
     if (!this.pageData?.transactions) {
-      console.log(`[getTransactionsForMonth] No transactions found for year=${year}, month=${month}, descId=${descriptionId}`);
       return [];
     }
 
-    const filtered = this.pageData.transactions.filter(txn => {
+    return this.pageData.transactions.filter(txn => {
       const txnDate = new Date(txn.date);
-      const matches = txn.description_id === descriptionId &&
-                      txnDate.getFullYear() === year &&
-                      txnDate.getMonth() + 1 === month;
-
-      if (txn.description_id === descriptionId) {
-        console.log(`[getTransactionsForMonth] Checking txn:`, {
-          date: txn.date,
-          description_id: txn.description_id,
-          description: txn.description,
-          txnYear: txnDate.getFullYear(),
-          txnMonth: txnDate.getMonth() + 1,
-          year,
-          month,
-          matches
-        });
-      }
-
-      return matches;
+      return txn.description_id === descriptionId &&
+             txnDate.getUTCFullYear() === year &&
+             txnDate.getUTCMonth() + 1 === month;
     });
-
-    console.log(`[getTransactionsForMonth] Found ${filtered.length} txns for year=${year}, month=${month}, descId=${descriptionId}`);
-    return filtered;
   }
 
   getPriorMonthTotal(descriptionId: number): number {
@@ -88,16 +65,11 @@ export class CommonWithdrawalsComponent implements OnChanges {
   }
 
   getCurrentMonthTotal(descriptionId: number): number {
-    console.log(`[getCurrentMonthTotal] Called with descriptionId=${descriptionId}, year=${this.selectedYear}, month=${this.selectedMonth}`);
     const txns = this.getTransactionsForMonth(this.selectedYear, this.selectedMonth, descriptionId);
-    const total = txns.reduce((sum, txn) => {
+    return txns.reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
-      const addAmount = isNaN(amount) ? 0 : amount;
-      console.log(`[getCurrentMonthTotal] Adding amount=${addAmount} from txn:`, txn);
-      return sum + addAmount;
+      return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
-    console.log(`[getCurrentMonthTotal] Final total=${total}`);
-    return total;
   }
 
   getYearTotal(descriptionId: number): number {
@@ -106,7 +78,7 @@ export class CommonWithdrawalsComponent implements OnChanges {
     return this.pageData.transactions.filter(txn => {
       const txnDate = new Date(txn.date);
       return txn.description_id === descriptionId &&
-             txnDate.getFullYear() === this.selectedYear;
+             txnDate.getUTCFullYear() === this.selectedYear;
     }).reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
       return sum + (isNaN(amount) ? 0 : amount);

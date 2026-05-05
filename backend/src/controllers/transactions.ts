@@ -23,7 +23,7 @@ export async function getTransactionsByYear(userId: number, year?: number): Prom
     const targetYear = year || new Date().getFullYear();
 
     const [rows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, date, account, category, description_id, note, amount, type, pending, created_at
+      `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
        FROM transactions
        WHERE user_id = ? AND YEAR(date) = ?
        ORDER BY date DESC`,
@@ -41,7 +41,7 @@ export async function getPendingTransactions(userId: number): Promise<Transactio
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, date, account, category, description_id, note, amount, type, pending, created_at
+      `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
        FROM transactions
        WHERE user_id = ? AND pending = 1
        ORDER BY date DESC`,
@@ -59,7 +59,7 @@ export async function getTransactionById(userId: number, transactionId: number):
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, date, account, category, description_id, note, amount, type, pending, created_at
+      `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
        FROM transactions
        WHERE id = ? AND user_id = ?`,
       [transactionId, userId]
@@ -328,7 +328,7 @@ export async function getPageData(userId: number): Promise<PageData> {
 
     // Get transactions for current year
     const [txnRows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, date, account, category, description_id, note, amount, type, pending, created_at
+      `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
        FROM transactions
        WHERE user_id = ? AND YEAR(date) = ?
        ORDER BY date DESC`,
@@ -339,7 +339,7 @@ export async function getPageData(userId: number): Promise<PageData> {
 
     // Get all pending transactions
     const [pendingRows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, date, account, category, description_id, note, amount, type, pending, created_at
+      `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
        FROM transactions
        WHERE user_id = ? AND pending = 1
        ORDER BY date DESC`,
