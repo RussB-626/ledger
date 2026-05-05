@@ -103,6 +103,7 @@ input, textarea, select {
   font-family: inherit;
   transition: all 0.2s ease;
   min-height: 44px;
+  color-scheme: var(--color-scheme, dark);
 
   @media (max-width: 767px) {
     font-size: 16px;

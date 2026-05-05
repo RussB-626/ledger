@@ -478,6 +478,48 @@
   gap: 10px;
   padding: 20px;
   border-top: 1px solid var(--color-border);
+
+  .btn-cancel,
+  .btn-save,
+  .btn-delete {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .btn-cancel {
+    background: var(--color-background);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+
+    &:hover {
+      border-color: var(--color-text);
+    }
+  }
+
+  .btn-save {
+    background: var(--color-primary);
+    color: var(--color-background);
+
+    &:hover {
+      opacity: 0.9;
+      box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
+    }
+  }
+
+  .btn-delete {
+    background: var(--color-error);
+    color: white;
+
+    &:hover {
+      opacity: 0.9;
+      box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
+    }
+  }
 }
 
 // FORM
@@ -572,48 +614,7 @@
   }
 }
 
-// BUTTONS
-.btn-cancel,
-.btn-save,
-.btn-delete {
-  padding: 10px 16px;
-  border: none;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.btn-cancel {
-  background: var(--color-background);
-  color: var(--color-text);
-  border: 1px solid var(--color-border);
-
-  &:hover {
-    border-color: var(--color-text);
-  }
-}
-
-.btn-save {
-  background: var(--color-primary);
-  color: var(--color-background);
-
-  &:hover {
-    opacity: 0.9;
-    box-shadow: 0 0 10px rgba(0, 217, 255, 0.3);
-  }
-}
-
-.btn-delete {
-  background: var(--color-error);
-  color: white;
-
-  &:hover {
-    opacity: 0.9;
-    box-shadow: 0 0 10px rgba(255, 71, 87, 0.3);
-  }
-}
+// BUTTONS - Styles moved to .modal-footer for proper specificity
 
 // CONFIRMATION MODAL WARNING
 .modal-body {
@@ -1269,6 +1270,7 @@ button[disabled] {
     border-radius: 4px;
     color: var(--color-text);
     font-size: 14px;
+    color-scheme: var(--color-scheme, dark);
 
     &:focus {
       outline: none;
@@ -1570,4 +1572,8 @@ button[disabled] {
     border-radius: 4px;
     font-size: 13px;
   }
+}
+
+input[type="time"] {
+    color-scheme: light;
 }

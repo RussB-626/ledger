@@ -18,6 +18,7 @@ export interface ThemeColors {
 
 export interface ThemeDefinition {
   name: string;
+  colorScheme: 'light' | 'dark';
   colors: ThemeColors;
 }
 
@@ -28,6 +29,7 @@ export class ThemeService {
   private themes: Record<string, ThemeDefinition> = {
     default: {
       name: 'Default',
+      colorScheme: 'dark',
       colors: {
         primary: '#00d9ff',
         secondary: '#1dd1a1',
@@ -46,6 +48,7 @@ export class ThemeService {
     },
     light: {
       name: 'Light',
+      colorScheme: 'light',
       colors: {
         primary: '#0066cc',
         secondary: '#00aa66',
@@ -64,6 +67,7 @@ export class ThemeService {
     },
     'high-contrast': {
       name: 'High Contrast',
+      colorScheme: 'dark',
       colors: {
         primary: '#ffff00',
         secondary: '#00ff00',
@@ -82,6 +86,7 @@ export class ThemeService {
     },
     'colorblind-deuteranopia': {
       name: 'Color Blind (Red-Green)',
+      colorScheme: 'dark',
       colors: {
         primary: '#0173b2',
         secondary: '#de8f05',
@@ -100,6 +105,7 @@ export class ThemeService {
     },
     'colorblind-protanopia': {
       name: 'Color Blind (Red-Green Alt)',
+      colorScheme: 'dark',
       colors: {
         primary: '#0173b2',
         secondary: '#eca307',
@@ -118,6 +124,7 @@ export class ThemeService {
     },
     'colorblind-tritanopia': {
       name: 'Color Blind (Blue-Yellow)',
+      colorScheme: 'dark',
       colors: {
         primary: '#ee7733',
         secondary: '#0077bb',
@@ -148,6 +155,7 @@ export class ThemeService {
     const root = document.documentElement;
 
     // Set CSS custom properties
+    root.style.setProperty('--color-scheme', theme.colorScheme);
     root.style.setProperty('--color-primary', colors.primary);
     root.style.setProperty('--color-secondary', colors.secondary);
     root.style.setProperty('--color-accent', colors.accent);
