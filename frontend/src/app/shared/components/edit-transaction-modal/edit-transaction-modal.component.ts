@@ -75,14 +75,10 @@ export class EditTransactionModalComponent implements OnInit, OnChanges {
       return;
     }
 
-    // Convert ISO date format to YYYY-MM-DD format for date input
+    // Date is already in YYYY-MM-DD format from backend
     let dateStr = '';
     if (this.transaction.date) {
-      const dateObj = new Date(this.transaction.date);
-      const year = dateObj.getFullYear();
-      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
-      const day = String(dateObj.getDate()).padStart(2, '0');
-      dateStr = `${year}-${month}-${day}`;
+      dateStr = this.transaction.date;
     }
 
     this.date = dateStr;

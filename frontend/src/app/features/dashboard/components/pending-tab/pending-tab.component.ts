@@ -103,8 +103,8 @@ export class PendingTabComponent implements OnInit, OnChanges, OnDestroy {
       );
     }
 
-    // Sort by date in ascending order
-    filtered.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+    // Sort by date in ascending order (YYYY-MM-DD format sorts correctly as strings)
+    filtered.sort((a, b) => a.date.localeCompare(b.date));
 
     return filtered;
   }
@@ -234,7 +234,8 @@ export class PendingTabComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US');
+    const [year, month, day] = dateString.split('-');
+    return `${month}/${day}/${year}`;
   }
 
   truncateText(text: string | undefined | null, maxLength: number = 20): string {

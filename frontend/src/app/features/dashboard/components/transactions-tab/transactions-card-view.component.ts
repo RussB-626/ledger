@@ -52,7 +52,8 @@ export class TransactionsCardViewComponent {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US');
+    const [year, month, day] = dateString.split('-');
+    return `${month}/${day}/${year}`;
   }
 
   truncateText(text: string | undefined | null, maxLength: number = 20): string {

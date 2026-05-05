@@ -215,7 +215,8 @@ export class TransactionsTabComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   formatDate(dateString: string): string {
-    return new Date(dateString).toLocaleDateString('en-US');
+    const [year, month, day] = dateString.split('-');
+    return `${month}/${day}/${year}`;
   }
 
   truncateText(text: string | undefined | null, maxLength: number = 20): string {
@@ -226,8 +227,8 @@ export class TransactionsTabComponent implements OnInit, OnChanges, OnDestroy {
   get uniqueMonths(): number[] {
     const months = new Set<number>();
     this.transactions.forEach(txn => {
-      const date = new Date(txn.date);
-      months.add(date.getMonth() + 1);
+      const [, month] = txn.date.split('-');
+      months.add(parseInt(month));
     });
     return Array.from(months).sort((a, b) => a - b);
   }
@@ -239,8 +240,8 @@ export class TransactionsTabComponent implements OnInit, OnChanges, OnDestroy {
     if (this.selectedMonth !== 'All') {
       const monthNum = parseInt(this.selectedMonth);
       filtered = filtered.filter(txn => {
-        const date = new Date(txn.date);
-        return date.getMonth() + 1 === monthNum;
+        const [, month] = txn.date.split('-');
+        return parseInt(month) === monthNum;
       });
     }
 
