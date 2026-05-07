@@ -40,17 +40,20 @@ export class CommonWithdrawalsComponent implements OnChanges {
       return [];
     }
 
+    const monthNum = Number(month);
+    const yearNum = Number(year);
+
     return this.pageData.transactions.filter(txn => {
-      const txnDate = new Date(txn.date);
+      const [txnYear, txnMonth] = txn.date.split('-').map(Number);
       return txn.description_id === descriptionId &&
-             txnDate.getUTCFullYear() === year &&
-             txnDate.getUTCMonth() + 1 === month;
+             txnYear === yearNum &&
+             txnMonth === monthNum;
     });
   }
 
   getPriorMonthTotal(descriptionId: number): number {
-    let priorMonth = this.selectedMonth - 1;
-    let priorYear = this.selectedYear;
+    let priorMonth = Number(this.selectedMonth) - 1;
+    let priorYear = Number(this.selectedYear);
 
     if (priorMonth < 1) {
       priorMonth = 12;
@@ -65,7 +68,7 @@ export class CommonWithdrawalsComponent implements OnChanges {
   }
 
   getCurrentMonthTotal(descriptionId: number): number {
-    const txns = this.getTransactionsForMonth(this.selectedYear, this.selectedMonth, descriptionId);
+    const txns = this.getTransactionsForMonth(Number(this.selectedYear), Number(this.selectedMonth), descriptionId);
     return txns.reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
       return sum + (isNaN(amount) ? 0 : amount);
@@ -75,10 +78,10 @@ export class CommonWithdrawalsComponent implements OnChanges {
   getYearTotal(descriptionId: number): number {
     if (!this.pageData?.transactions) return 0;
 
+    const yearNum = Number(this.selectedYear);
     return this.pageData.transactions.filter(txn => {
-      const txnDate = new Date(txn.date);
-      return txn.description_id === descriptionId &&
-             txnDate.getUTCFullYear() === this.selectedYear;
+      const [txnYear] = txn.date.split('-').map(Number);
+      return txn.description_id === descriptionId && txnYear === yearNum;
     }).reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
       return sum + (isNaN(amount) ? 0 : amount);
