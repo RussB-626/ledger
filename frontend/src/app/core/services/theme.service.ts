@@ -14,6 +14,8 @@ export interface ThemeColors {
   border: string;
   buttonHover: string;
   zero: string;
+  iconFilter?: string;
+  buttonIconFilter?: string;
 }
 
 export interface ThemeDefinition {
@@ -43,7 +45,9 @@ export class ThemeService {
         error: '#ff6b6b',
         border: '#2a3447',
         buttonHover: '#005fa3',
-        zero: '#ffffff'
+        zero: '#ffffff',
+        iconFilter: 'invert(0.9) brightness(1.1)',
+        buttonIconFilter: 'brightness(0.2) contrast(1.1)'
       }
     },
     light: {
@@ -62,7 +66,9 @@ export class ThemeService {
         error: '#cc0000',
         border: '#cccccc',
         buttonHover: '#0052a3',
-        zero: '#999999'
+        zero: '#999999',
+        iconFilter: 'brightness(0.3) contrast(1.2)',
+        buttonIconFilter: 'invert(1) brightness(0.9)'
       }
     },
     'high-contrast': {
@@ -81,7 +87,9 @@ export class ThemeService {
         error: '#ff0000',
         border: '#ffffff',
         buttonHover: '#cccc00',
-        zero: '#cccccc'
+        zero: '#cccccc',
+        iconFilter: 'invert(1) brightness(1.2)',
+        buttonIconFilter: 'brightness(0.1) contrast(1.2)'
       }
     },
     'colorblind-deuteranopia': {
@@ -100,7 +108,9 @@ export class ThemeService {
         error: '#cc78bc',
         border: '#2a3447',
         buttonHover: '#005fa3',
-        zero: '#ffffff'
+        zero: '#ffffff',
+        iconFilter: 'invert(0.9) brightness(1.1)',
+        buttonIconFilter: 'brightness(0.2) contrast(1.1)'
       }
     },
     'colorblind-protanopia': {
@@ -119,7 +129,9 @@ export class ThemeService {
         error: '#d45113',
         border: '#2a3447',
         buttonHover: '#005fa3',
-        zero: '#ffffff'
+        zero: '#ffffff',
+        iconFilter: 'invert(0.9) brightness(1.1)',
+        buttonIconFilter: 'brightness(0.2) contrast(1.1)'
       }
     },
     'colorblind-tritanopia': {
@@ -138,7 +150,9 @@ export class ThemeService {
         error: '#ee7733',
         border: '#2a3447',
         buttonHover: '#005fa3',
-        zero: '#ffffff'
+        zero: '#ffffff',
+        iconFilter: 'invert(0.9) brightness(1.1)',
+        buttonIconFilter: 'brightness(0.2) contrast(1.1)'
       }
     }
   };
@@ -169,6 +183,8 @@ export class ThemeService {
     root.style.setProperty('--color-border', colors.border);
     root.style.setProperty('--color-button-hover', colors.buttonHover);
     root.style.setProperty('--color-zero', colors.zero);
+    root.style.setProperty('--icon-filter', colors.iconFilter || 'none');
+    root.style.setProperty('--button-icon-filter', colors.buttonIconFilter || 'none');
 
     // Store current theme
     localStorage.setItem('selected-theme', themeId);
