@@ -1,0 +1,33 @@
+<div class="tab-content">
+  <div class="tab-header">
+    <h2>Themes</h2>
+  </div>
+
+  <div class="themes-section">
+    <div class="section-header">
+      <h3>Select Theme</h3>
+    </div>
+
+    <div class="setting-row">
+      <select
+        id="theme-select"
+        [(ngModel)]="selectedTheme"
+        (change)="saveTheme()"
+        class="select-input"
+        [disabled]="savingTheme"
+      >
+        @for (theme of themes; track theme.id) {
+          <option [value]="theme.id">{{ theme.name }}</option>
+        }
+      </select>
+    </div>
+
+    @if (themeError) {
+      <div class="error-message">{{ themeError }}</div>
+    }
+
+    @if (savingTheme) {
+      <p class="saving-indicator">Applying theme...</p>
+    }
+  </div>
+</div>

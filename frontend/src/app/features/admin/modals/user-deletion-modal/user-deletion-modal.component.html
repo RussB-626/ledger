@@ -1,0 +1,50 @@
+﻿@if (show) {
+  <div class="modal-overlay" (click)="$event.stopPropagation()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ availableUsers.length > 0 ? 'Select a User' : 'Create New User' }}</h3>
+      </div>
+      <div class="modal-body">
+        @if (availableUsers.length > 0) {
+          <p>The current user has been deleted. Please select another user:</p>
+        } @else {
+          <p>No users exist. Please create a new user:</p>
+        }
+
+        <!-- User list (if users exist) -->
+        @if (availableUsers.length > 0) {
+          <div class="user-list">
+            @for (user of availableUsers; track user.id) {
+              <button
+                class="user-option-btn"
+                (click)="selectUserAndContinue(user)"
+              >
+                {{ user.name }}
+              </button>
+            }
+          </div>
+        }
+
+        <!-- Create new user form (if no users) -->
+        @if (availableUsers.length === 0) {
+          <div class="form-group">
+            <label>User Name</label>
+            <input
+              type="text"
+              [(ngModel)]="newUserName"
+              placeholder="Enter new user name"
+              class="form-input"
+            />
+          </div>
+        }
+      </div>
+      <div class="modal-footer">
+        @if (availableUsers.length === 0) {
+          <button class="btn-save" (click)="createUserAndContinue()">
+            Create User
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

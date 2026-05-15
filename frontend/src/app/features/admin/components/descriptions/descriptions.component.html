@@ -1,0 +1,194 @@
+<div class="tab-content">
+  <div class="tab-header">
+    <h2>Descriptions Management</h2>
+    <div class="button-group">
+      <button class="add-btn" (click)="openDescriptionModal('create')">+ Add Description</button>
+      <button class="bulk-add-btn" (click)="openBulkDescriptionModal()">Bulk Add</button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Search descriptions..."
+      [(ngModel)]="searchDescriptions"
+      class="search-input"
+    />
+  </div>
+
+  @if (descriptions.length > 0) {
+    <table class="admin-table descriptions-table">
+      <thead>
+        <tr>
+          <th>Description Text</th>
+          <th>Is Common</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (desc of getPaginatedDescriptions(); track desc.id) {
+          <tr>
+            <td>{{ desc.description }}</td>
+            <td class="checkbox-col">{{ desc.is_common ? '✓' : '' }}</td>
+            <td class="actions">
+              <button
+                class="action-btn edit-btn"
+                (click)="openDescriptionModal('edit', desc)"
+                title="Edit"
+              >
+                ✎
+              </button>
+              <button
+                class="action-btn delete-btn"
+                (click)="openDeleteConfirmation(desc.id, desc.description)"
+                title="Delete"
+              >
+                ✕
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <button
+        class="pagination-btn"
+        [disabled]="descriptionsPage === 1"
+        (click)="descriptionsPage = 1"
+        title="First page"
+      >
+        ⌂ Home
+      </button>
+      <button
+        class="pagination-btn"
+        [disabled]="descriptionsPage === 1"
+        (click)="descriptionsPage = descriptionsPage - 1"
+      >
+        ← Previous
+      </button>
+      <span class="pagination-info">
+        Page {{ descriptionsPage }} of {{ getTotalPages() }}
+      </span>
+      <button
+        class="pagination-btn"
+        [disabled]="descriptionsPage === getTotalPages()"
+        (click)="descriptionsPage = descriptionsPage + 1"
+      >
+        Next →
+      </button>
+      <button
+        class="pagination-btn"
+        [disabled]="descriptionsPage === getTotalPages()"
+        (click)="descriptionsPage = getTotalPages()"
+        title="Last page"
+      >
+        End ⌂
+      </button>
+    </div>
+  } @else {
+    <div class="empty-state">No descriptions yet. Create one to get started!</div>
+  }
+</div>
+
+<!-- DESCRIPTION MODAL -->
+@if (descriptionModal.isOpen) {
+  <div class="modal-overlay" (click)="closeDescriptionModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ descriptionModal.mode === 'create' ? 'Add Description' : 'Edit Description' }}</h3>
+        <button class="close-btn" (click)="closeDescriptionModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Description Text</label>
+          <input
+            type="text"
+            [(ngModel)]="descriptionFormData.description"
+            placeholder="Enter description"
+            class="form-input"
+          />
+        </div>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="descriptionFormData.is_common"
+              class="checkbox-input"
+            />
+            Is Common (shows in recurring withdrawals)
+          </label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeDescriptionModal()">Cancel</button>
+        <button class="btn-save" (click)="saveDescription()">Save</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- BULK ADD DESCRIPTIONS MODAL -->
+@if (bulkDescriptionModal.isOpen) {
+  <div class="modal-overlay" (click)="closeBulkDescriptionModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Bulk Add Descriptions</h3>
+        <button class="close-btn" (click)="closeBulkDescriptionModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="help-text">Paste a comma-separated list of descriptions:</p>
+        <textarea
+          [(ngModel)]="bulkDescriptionsText"
+          placeholder="e.g., Grocery Store, Gas Station, Restaurant, Transfer"
+          class="bulk-textarea"
+          rows="6"
+        ></textarea>
+
+        <div class="checkbox-group">
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="bulkDescriptionIsCommon"
+              class="checkbox-input"
+            />
+            Mark as Common (for recurring withdrawals)
+          </label>
+        </div>
+
+        @if (bulkDescriptionError) {
+          <div class="error-message">{{ bulkDescriptionError }}</div>
+        }
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeBulkDescriptionModal()" [disabled]="bulkDescriptionLoading">Cancel</button>
+        <button class="btn-save" (click)="saveBulkDescriptions()" [disabled]="bulkDescriptionLoading">
+          {{ bulkDescriptionLoading ? 'Adding...' : 'Add Descriptions' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- DELETE CONFIRMATION MODAL -->
+@if (deleteConfirmation.isOpen) {
+  <div class="modal-overlay" (click)="closeDeleteConfirmation()">
+    <div class="modal confirm-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm Delete</h3>
+        <button class="close-btn" (click)="closeDeleteConfirmation()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete "{{ deleteConfirmation.itemName }}"?</p>
+        <p class="warning">
+          This action cannot be undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeDeleteConfirmation()">Cancel</button>
+        <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+}

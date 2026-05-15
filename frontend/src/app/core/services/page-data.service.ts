@@ -36,6 +36,9 @@ export class PageDataService {
   private monthsSubject = new BehaviorSubject<number[]>([]);
   months$: Observable<number[]> = this.monthsSubject.asObservable();
 
+  private refreshSubject = new BehaviorSubject<void>(undefined);
+  refresh$: Observable<void> = this.refreshSubject.asObservable();
+
   constructor() {}
 
   /**
@@ -186,5 +189,12 @@ export class PageDataService {
     this.balancesSubject.next({});
     this.yearsSubject.next([]);
     this.monthsSubject.next([]);
+  }
+
+  /**
+   * Trigger a refresh event (used after operations like backup restore)
+   */
+  refreshPageData(): void {
+    this.refreshSubject.next(undefined);
   }
 }

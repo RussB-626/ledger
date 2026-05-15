@@ -1,0 +1,122 @@
+<div class="tab-content">
+  <div class="tab-header">
+    <h2>Bulk Upload Transactions</h2>
+    <div class="button-group">
+      <button class="add-btn" (click)="openBulkUploadModal()">📤 Bulk Upload Transactions</button>
+    </div>
+  </div>
+  <div class="extras-content">
+    <p class="info-text" style="margin: 0;">Import transactions from a TSV file. Accounts, categories, and descriptions will be created automatically if they don't exist.</p>
+  </div>
+</div>
+
+<!-- BULK UPLOAD TRANSACTIONS MODAL -->
+@if (bulkUploadModal.isOpen) {
+  <div class="modal-overlay" (click)="closeBulkUploadModal()">
+    <div class="modal large-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Bulk Upload Transactions</h3>
+        <button class="close-btn" (click)="closeBulkUploadModal()">×</button>
+      </div>
+      <div class="modal-body">
+        @if (bulkUploadParsedData.length === 0) {
+          <!-- File upload section -->
+          <div class="upload-section">
+            @if (bulkUploadFileLoading) {
+              <div class="file-loading-spinner">
+                <div class="spinner"></div>
+                <p>Processing file...</p>
+              </div>
+            } @else {
+              <label for="tsv-file" class="file-input-label">Choose TSV File</label>
+              <input
+                id="tsv-file"
+                type="file"
+                accept=".tsv,.csv,text/tab-separated-values,text/csv"
+                (change)="onBulkUploadFileSelected($event)"
+                class="file-input"
+                [disabled]="bulkUploadFileLoading"
+              />
+              <p class="help-text">
+                Upload a TSV file with columns: Date | Account | Category | Description | Notes | Amount | Type | Pending<br/>
+                Supported date formats: yyyy-mm-dd, dd-mm-yyyy, mm-dd-yyyy<br/>
+                Types: D (Deposit), W (Withdrawal), TD (Transfer Deposit), TW (Transfer Withdrawal)<br/>
+                Pending: TRUE or FALSE
+              </p>
+            }
+          </div>
+        } @else {
+          <!-- Preview section -->
+          <div class="preview-section">
+            <div class="preview-info">
+              <p><strong>Date Format Detected:</strong> {{ bulkUploadDateFormat }}</p>
+              <p><strong>Transactions to Import:</strong> {{ bulkUploadValidCount }} of {{ bulkUploadParsedData.length }}</p>
+            </div>
+
+            @if (bulkUploadParsedDataWithErrors.length > 0) {
+              <div class="error-summary">
+                <p><strong>⚠️ Warning:</strong> {{ bulkUploadParsedDataWithErrors.length }} row(s) have errors and will be skipped:</p>
+                <ul>
+                  @for (row of bulkUploadParsedDataWithErrors; track $index) {
+                    <li>Row {{ $index + 1 }}: {{ row.parseError }}</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <div class="preview-table-container">
+              <table class="preview-table">
+                <thead>
+                  <tr>
+                    <th>Date</th>
+                    <th>Account</th>
+                    <th>Category</th>
+                    <th>Description</th>
+                    <th>Amount</th>
+                    <th>Type</th>
+                    <th>Pending</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of bulkUploadParsedData.slice(0, 10); track $index) {
+                    <tr [class.error-row]="row.parseError">
+                      <td title="{{ row.originalDate }}">{{ row.originalDate }} <span class="arrow">→</span> {{ row.date }}</td>
+                      <td>{{ row.account }}</td>
+                      <td>{{ row.category }} <span class="type-badge">{{ row.categoryType }}</span></td>
+                      <td>{{ row.description }}</td>
+                      <td class="amount">{{ row.amount | number: '1.2-2' }}</td>
+                      <td class="type">{{ row.type }}</td>
+                      <td>{{ row.pending ? 'Yes' : 'No' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+
+            @if (bulkUploadParsedData.length > 10) {
+              <p class="preview-note">... and {{ bulkUploadParsedData.length - 10 }} more rows</p>
+            }
+          </div>
+        }
+
+        @if (bulkUploadError) {
+          <div class="error-message">{{ bulkUploadError }}</div>
+        }
+
+        @if (bulkUploadStatus) {
+          <div class="status-message">{{ bulkUploadStatus }}</div>
+        }
+      </div>
+      <div class="modal-footer">
+        @if (bulkUploadParsedData.length === 0) {
+          <button class="btn-cancel" (click)="closeBulkUploadModal()" [disabled]="bulkUploadLoading">Cancel</button>
+        } @else {
+          <button class="btn-cancel" (click)="closeBulkUploadModal()" [disabled]="bulkUploadLoading">Back</button>
+          <button class="btn-save" (click)="saveBulkUpload()" [disabled]="bulkUploadLoading">
+            {{ bulkUploadLoading ? 'Uploading...' : 'Confirm Upload' }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

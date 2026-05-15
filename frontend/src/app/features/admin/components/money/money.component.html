@@ -1,0 +1,174 @@
+<div class="tab-content">
+  <div class="tab-header">
+    <h2>Money Settings</h2>
+  </div>
+  <div class="settings-section">
+    <h3>Money Format Preferences</h3>
+    <p class="section-description">Customize how money values are displayed throughout the app</p>
+
+    <div class="settings-grid">
+      <!-- Currency Symbol -->
+      <div class="setting-item">
+        <label for="currency-symbol">Currency Symbol</label>
+        <select
+          id="currency-symbol"
+          [(ngModel)]="currencySymbol"
+          (change)="saveMoneyFormatPreferences()"
+          class="select-input"
+        >
+          @for (symbol of currencySymbolOptions; track symbol) {
+            <option [value]="symbol">{{ symbol }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Decimal Places -->
+      <div class="setting-item">
+        <label for="decimal-places">Decimal Places</label>
+        <select
+          id="decimal-places"
+          [(ngModel)]="decimalPlaces"
+          (change)="saveMoneyFormatPreferences()"
+          class="select-input"
+        >
+          @for (places of decimalPlacesOptions; track places) {
+            <option [value]="places">{{ places }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Thousand Separator -->
+      <div class="setting-item">
+        <label for="thousand-separator">Thousand Separator</label>
+        <select
+          id="thousand-separator"
+          [(ngModel)]="thousandSeparator"
+          (change)="saveMoneyFormatPreferences()"
+          class="select-input"
+        >
+          @for (sep of thousandSeparatorOptions; track sep) {
+            <option [value]="sep">
+              {{ sep === ',' ? 'Comma (,)' : sep === '.' ? 'Period (.)' : 'Space ( )' }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <!-- Decimal Separator -->
+      <div class="setting-item">
+        <label for="decimal-separator">Decimal Separator</label>
+        <select
+          id="decimal-separator"
+          [(ngModel)]="decimalSeparator"
+          (change)="saveMoneyFormatPreferences()"
+          class="select-input"
+        >
+          @for (sep of decimalSeparatorOptions; track sep) {
+            <option [value]="sep">
+              {{ sep === '.' ? 'Period (.)' : 'Comma (,)' }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <!-- Currency Position -->
+      <div class="setting-item">
+        <label for="currency-position">Currency Position</label>
+        <select
+          id="currency-position"
+          [(ngModel)]="currencyPosition"
+          (change)="saveMoneyFormatPreferences()"
+          class="select-input"
+        >
+          <option value="before">Before amount ({{ currencySymbol }}100.00)</option>
+          <option value="after">After amount (100.00{{ currencySymbol }})</option>
+        </select>
+      </div>
+
+      <!-- Negative Format -->
+      <div class="setting-item">
+        <label for="negative-format">Negative Format</label>
+        <select
+          id="negative-format"
+          [(ngModel)]="negativeFormat"
+          (change)="saveMoneyFormatPreferences()"
+          class="select-input"
+        >
+          @for (format of negativeFormatOptions; track format.value) {
+            <option [value]="format.value">{{ format.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Negative Color -->
+      <div class="setting-item">
+        <label for="negative-color">Negative Amount Color</label>
+        <div class="color-input-wrapper">
+          <input
+            id="negative-color"
+            type="color"
+            [(ngModel)]="negativeColor"
+            (change)="saveMoneyFormatPreferences()"
+            class="color-input"
+          />
+          <span class="color-value">{{ negativeColor }}</span>
+        </div>
+      </div>
+
+      <!-- Positive Color -->
+      <div class="setting-item">
+        <label for="positive-color">Positive Amount Color</label>
+        <div class="color-input-wrapper">
+          <input
+            id="positive-color"
+            type="color"
+            [(ngModel)]="positiveColor"
+            (change)="saveMoneyFormatPreferences()"
+            class="color-input"
+          />
+          <span class="color-value">{{ positiveColor }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preview -->
+    <div class="preview-box">
+      <p><strong>Preview (Positive):</strong></p>
+      <p class="preview-amount" [style.color]="positiveColor">
+        @if (currencyPosition === 'before') {
+          {{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50
+        }@else {
+          1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }}
+        }
+      </p>
+      <p class="preview-label-negative"><strong>Preview (Negative):</strong></p>
+      <p class="preview-amount-negative" [style.color]="negativeColor">
+        @if (negativeFormat === '-prefix') {
+          @if (currencyPosition === 'before') {
+            -{{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50
+          }@else {
+            -1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }}
+          }
+        }@else if (negativeFormat === 'parentheses') {
+          @if (currencyPosition === 'before') {
+            ({{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50)
+          }@else {
+            (1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }})
+          }
+        }@else if (negativeFormat === 'brackets') {
+          @if (currencyPosition === 'before') {
+            [{{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50]
+          }@else {
+            [1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }}]
+          }
+        }@else {
+          @if (currencyPosition === 'before') {
+            <span>&#123;</span>{{ currencySymbol }}1{{ thousandSeparator }}234{{ decimalSeparator }}50<span>&#125;</span>
+          }@else {
+            <span>&#123;</span>1{{ thousandSeparator }}234{{ decimalSeparator }}50{{ currencySymbol }}<span>&#125;</span>
+          }
+        }
+      </p>
+    </div>
+  </div>
+</div>

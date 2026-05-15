@@ -1,0 +1,169 @@
+<div class="tab-content">
+  <div class="tab-header">
+    <h2>Accounts Management</h2>
+    <div class="button-group">
+      <button class="add-btn" (click)="openAccountModal('create')">+ Add Account</button>
+      <button class="bulk-add-btn" (click)="openBulkAddModal()">Bulk Add</button>
+    </div>
+  </div>
+
+  <div class="search-bar">
+    <input
+      type="text"
+      placeholder="Search accounts..."
+      [(ngModel)]="searchAccounts"
+      class="search-input"
+    />
+  </div>
+
+  @if (accounts.length > 0) {
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Account Name</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (account of getPaginatedAccounts(); track account.id) {
+          <tr>
+            <td>{{ account.name }}</td>
+            <td class="actions">
+              <button
+                class="action-btn edit-btn"
+                (click)="openAccountModal('edit', account)"
+                title="Edit"
+              >
+                ✎
+              </button>
+              <button
+                class="action-btn delete-btn"
+                (click)="openDeleteConfirmation(account.id, account.name)"
+                title="Delete"
+              >
+                ✕
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <button
+        class="pagination-btn"
+        [disabled]="accountsPage === 1"
+        (click)="accountsPage = 1"
+        title="First page"
+      >
+        ⌂ Home
+      </button>
+      <button
+        class="pagination-btn"
+        [disabled]="accountsPage === 1"
+        (click)="accountsPage = accountsPage - 1"
+      >
+        ← Previous
+      </button>
+      <span class="pagination-info">
+        Page {{ accountsPage }} of {{ getTotalPages() }}
+      </span>
+      <button
+        class="pagination-btn"
+        [disabled]="accountsPage === getTotalPages()"
+        (click)="accountsPage = accountsPage + 1"
+      >
+        Next →
+      </button>
+      <button
+        class="pagination-btn"
+        [disabled]="accountsPage === getTotalPages()"
+        (click)="accountsPage = getTotalPages()"
+        title="Last page"
+      >
+        End ⌂
+      </button>
+    </div>
+  } @else {
+    <div class="empty-state">No accounts yet. Create one to get started!</div>
+  }
+</div>
+
+<!-- ACCOUNT MODAL -->
+@if (accountModal.isOpen) {
+  <div class="modal-overlay" (click)="closeAccountModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>{{ accountModal.mode === 'create' ? 'Add Account' : 'Edit Account' }}</h3>
+        <button class="close-btn" (click)="closeAccountModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Account Name</label>
+          <input
+            type="text"
+            [(ngModel)]="accountFormData.name"
+            placeholder="Enter account name"
+            class="form-input"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeAccountModal()">Cancel</button>
+        <button class="btn-save" (click)="saveAccount()">Save</button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- BULK ADD ACCOUNTS MODAL -->
+@if (bulkAddModal.isOpen) {
+  <div class="modal-overlay" (click)="closeBulkAddModal()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Bulk Add Accounts</h3>
+        <button class="close-btn" (click)="closeBulkAddModal()">×</button>
+      </div>
+      <div class="modal-body">
+        <p class="help-text">Paste a comma-separated list of account names:</p>
+        <textarea
+          [(ngModel)]="bulkAccountsText"
+          placeholder="e.g., Checking, Savings, Credit Card, Paypal"
+          class="bulk-textarea"
+          rows="6"
+        ></textarea>
+        @if (bulkAddError) {
+          <div class="error-message">{{ bulkAddError }}</div>
+        }
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeBulkAddModal()" [disabled]="bulkAddLoading">Cancel</button>
+        <button class="btn-save" (click)="saveBulkAccounts()" [disabled]="bulkAddLoading">
+          {{ bulkAddLoading ? 'Adding...' : 'Add Accounts' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- DELETE CONFIRMATION MODAL -->
+@if (deleteConfirmation.isOpen) {
+  <div class="modal-overlay" (click)="closeDeleteConfirmation()">
+    <div class="modal confirm-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Confirm Delete</h3>
+        <button class="close-btn" (click)="closeDeleteConfirmation()">×</button>
+      </div>
+      <div class="modal-body">
+        <p>Are you sure you want to delete "{{ deleteConfirmation.itemName }}"?</p>
+        <p class="warning">
+          This action cannot be undone.
+        </p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" (click)="closeDeleteConfirmation()">Cancel</button>
+        <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
+}
