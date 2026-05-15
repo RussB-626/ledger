@@ -18,11 +18,11 @@
 
   <!-- Navigation Icons -->
   <div class="nav-icons">
-    <button class="nav-icon" (click)="navigateToDashboard()" title="Dashboard">
-      🏠
+    <button class="nav-icon" (click)="navigateToDashboard()" title="Dashboard" matTooltip="Dashboard" matTooltipPosition="right">
+      <img src="/assets/icons/house-fill.svg" alt="Dashboard" class="icon-img">
     </button>
-    <button class="nav-icon" (click)="navigateToAdmin()" title="Admin">
-      ⚙️
+    <button class="nav-icon" (click)="navigateToAdmin()" title="Admin" matTooltip="Admin" matTooltipPosition="right">
+      <img src="/assets/icons/gear-fill.svg" alt="Admin" class="icon-img">
     </button>
   </div>
 
@@ -31,8 +31,8 @@
   <div class="sidenav-divider"></div>
   <div class="new-transaction-section">
     @if (!isOnAdminPage()) {
-      <button class="btn-new-transaction" (click)="openCreateTransactionModal()" title="New Transaction">
-        ➕
+      <button class="btn-new-transaction" (click)="openCreateTransactionModal()" title="New Transaction" matTooltip="New Transaction" matTooltipPosition="right">
+        <img src="/assets/icons/plus-circle-fill.svg" alt="New Transaction" class="icon-img">
       </button>
     }
   </div>
