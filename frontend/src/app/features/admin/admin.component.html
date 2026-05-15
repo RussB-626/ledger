@@ -4,9 +4,6 @@
     @if (activeUser) {
       <div class="active-user">
         User: <span class="user-name">{{ activeUser.name }}</span>
-        <button class="delete-user-btn" (click)="deleteCurrentUser()" title="Delete this user and all their data">
-          Delete User
-        </button>
       </div>
     }
   </div>
@@ -111,14 +108,5 @@
   @if (activeTab === 'backups') {
     <app-backups [activeUser]="activeUser"></app-backups>
   }
-
-  <!-- USER DELETION MODAL -->
-  <app-user-deletion-modal
-    [show]="showUserDeletionModal"
-    [availableUsers]="availableUsers"
-    (userSelected)="selectUserAndContinue($event)"
-    (userCreated)="createUserAndContinue($event)"
-  ></app-user-deletion-modal>
-
 
 </div>

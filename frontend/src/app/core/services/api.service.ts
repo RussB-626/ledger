@@ -42,11 +42,6 @@ export class ApiService {
       .pipe(map(response => response.data!));
   }
 
-  deleteUser(userId: number): Observable<{ success: boolean }> {
-    return this.http.delete<ApiResponse<{ success: boolean }>>(`${this.baseUrl}/users/${userId}`)
-      .pipe(map(response => response.data || { success: false }));
-  }
-
   updateUserPreferences(userId: number, preferences: any): Observable<User> {
     return this.http.put<ApiResponse<User>>(`${this.baseUrl}/users/${userId}/preferences`, preferences)
       .pipe(map(response => response.data!));
