@@ -1,82 +1,42 @@
-<nav class="navbar">
-  <div class="navbar-left">
-    <div class="logo">
-      <img src="/assets/favicon.ico" alt="Ledger" class="logo-icon">
-      <span class="logo-text">Ledger</span>
-    </div>
+<aside class="sidenav">
+  <!-- Ledger Logo Section -->
+  <div class="logo-section">
+    <img src="/assets/favicon.ico" alt="Ledger" class="logo-icon">
+    <span class="logo-text">Ledger</span>
+  </div>
 
-    <!-- Desktop nav links (hidden on mobile) -->
-    <div class="nav-links hide-mobile">
-      <button class="nav-link" (click)="navigateToDashboard()">
-        Dashboard
-      </button>
-      <button class="nav-link" (click)="navigateToAdmin()">
-        Admin
-      </button>
-    </div>
-
-    <!-- Mobile nav links (shown when menu is open) -->
-    @if (mobileMenuOpen) {
-      <div class="mobile-nav-menu">
-        <button class="nav-link" (click)="navigateToDashboard()">
-          Dashboard
-        </button>
-        <button class="nav-link" (click)="navigateToAdmin()">
-          Admin
-        </button>
-      </div>
-    }
-
-    <!-- Mobile hamburger button -->
-    <button class="hamburger-btn show-mobile" (click)="toggleMobileMenu()">
-      <span class="hamburger-line" [class.active]="mobileMenuOpen"></span>
-      <span class="hamburger-line" [class.active]="mobileMenuOpen"></span>
-      <span class="hamburger-line" [class.active]="mobileMenuOpen"></span>
+  <!-- User Section -->
+  <div class="sidenav-spacer"></div>
+  <div class="user-section">
+    <button class="user-initial-btn" (click)="openUserManagementPanel()" [title]="(activeUser$ | async)?.name || 'Select User'">
+      <span class="user-initial">{{ getActiveUserInitial() }}</span>
     </button>
   </div>
 
-  <div class="navbar-right">
+  <!-- Navigation Divider -->
+  <div class="sidenav-divider"></div>
+
+  <!-- Navigation Icons -->
+  <div class="nav-icons">
+    <button class="nav-icon" (click)="navigateToDashboard()" title="Dashboard">
+      🏠
+    </button>
+    <button class="nav-icon" (click)="navigateToAdmin()" title="Admin">
+      ⚙️
+    </button>
+  </div>
+
+  <!-- New Transaction Button Section -->
+  <div class="sidenav-spacer"></div>
+  <div class="sidenav-divider"></div>
+  <div class="new-transaction-section">
     @if (!isOnAdminPage()) {
-      <button class="btn-new-transaction" (click)="openCreateTransactionModal()">
-        + New Transaction
+      <button class="btn-new-transaction" (click)="openCreateTransactionModal()" title="New Transaction">
+        ➕
       </button>
     }
-
-    <div class="user-switcher" clickOutside (clickOutside)="closeUserDropdown()">
-      <button class="user-button" (click)="toggleUserDropdown()">
-        <span class="user-icon">👤</span>
-        <span class="user-name">{{ (activeUser$ | async)?.name || 'Select User' }}</span>
-        <span class="dropdown-icon">▼</span>
-      </button>
-
-      @if (showUserDropdown) {
-        <div class="user-dropdown">
-          <div class="dropdown-header">
-            <span>Users</span>
-          </div>
-
-          <div class="dropdown-users">
-            @for (user of allUsers$ | async; track user.id) {
-              <button
-                class="dropdown-user-item"
-                [class.active]="(activeUser$ | async)?.id === user.id"
-                (click)="switchUser(user)"
-              >
-                {{ user.name }}
-              </button>
-            }
-          </div>
-
-          <div class="dropdown-divider"></div>
-
-          <button class="dropdown-create-user" (click)="openCreateUserModal()">
-            + Create New User
-          </button>
-        </div>
-      }
-    </div>
   </div>
-</nav>
+</aside>
 
 @if (showCreateTransactionModal) {
   <app-create-transaction-modal
@@ -85,33 +45,7 @@
   ></app-create-transaction-modal>
 }
 
-<!-- NAVBAR CREATE USER MODAL (optional, has cancel) -->
-@if (showCreateUserModal) {
-  <div class="modal-overlay" (click)="closeCreateUserModal()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <div class="modal-header">
-        <h3>Create New User</h3>
-        <button class="close-btn" (click)="closeCreateUserModal()">×</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <label>User Name</label>
-          <input
-            type="text"
-            [(ngModel)]="newUserName"
-            placeholder="Enter new user name"
-            class="form-input"
-          />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" (click)="closeCreateUserModal()">
-          Cancel
-        </button>
-        <button class="btn-save" (click)="createNewUserFromNavbar()">
-          Create User
-        </button>
-      </div>
-    </div>
-  </div>
-}
+<app-user-management-panel
+  [isOpen]="userManagementPanelOpen"
+  (closed)="closeUserManagementPanel()"
+></app-user-management-panel>
