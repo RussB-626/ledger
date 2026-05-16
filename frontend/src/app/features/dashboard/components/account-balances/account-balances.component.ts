@@ -1,7 +1,4 @@
-// Balances Tab component
-// Per CLAUDE.md: Displays account name + balance + totals row
-
-import { Component, Input } from '@angular/core';
+import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { PageData, User } from '../../../../core/models/index';
 import { UserService } from '../../../../core/services/user.service';
@@ -14,15 +11,18 @@ interface BalanceRow {
 }
 
 @Component({
-  selector: 'app-balances-tab',
-  templateUrl: './balances-tab.component.html',
-  styleUrls: ['./balances-tab.component.scss'],
+  selector: 'app-account-balances',
+  templateUrl: './account-balances.component.html',
+  styleUrls: ['./account-balances.component.scss'],
   standalone: true,
   imports: [CommonModule, FormatCurrencyPipe]
 })
-export class BalancesTabComponent {
+export class AccountBalancesComponent {
   @Input() pageData!: PageData;
+  @Output() accountSelected = new EventEmitter<string>();
+
   activeUser: User | null = null;
+  selectedAccountName: string | null = null;
 
   constructor(private userService: UserService) {
     this.activeUser = this.userService.getActiveUser();
@@ -49,5 +49,16 @@ export class BalancesTabComponent {
     });
 
     return rows;
+  }
+
+  getBalanceColor(balance: number): string {
+    if (balance === 0) return 'var(--color-zero)';
+    if (balance < 0) return this.activeUser?.negative_color || '#ff6b6b';
+    return this.activeUser?.positive_color || '#00d9ff';
+  }
+
+  onAccountCardClick(accountName: string): void {
+    this.selectedAccountName = accountName;
+    this.accountSelected.emit(accountName);
   }
 }

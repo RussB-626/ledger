@@ -1,0 +1,96 @@
+.account-balances-container {
+  width: 100%;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+}
+
+.section-title {
+  margin: 0 0 16px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.accounts-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.card {
+  padding: 16px;
+  margin-bottom: 0;
+  padding-bottom: 16px;
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  background-color: var(--color-surface);
+  transition: all 0.2s ease;
+  min-width: 0;
+  display: grid;
+  place-items: center;
+  min-height: 80px;
+}
+
+.card-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+  width: 100%;
+}
+
+.card-header {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  flex: 1;
+  line-height: 18px;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
+
+.card-balance {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: 'Courier New', monospace;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 18px;
+}
+
+.account-card {
+  cursor: pointer;
+
+  &:hover {
+    transform: scale(1.05);
+    border-color: var(--color-primary);
+    box-shadow: 0 4px 12px rgba(0, 217, 255, 0.1);
+  }
+
+  &.selected {
+    border-color: var(--color-primary);
+    background-color: rgba(0, 217, 255, 0.1);
+    box-shadow: 0 0 12px rgba(0, 217, 255, 0.2);
+  }
+}
+
+.totals-card {
+  opacity: 0.7;
+  cursor: default;
+
+  &:hover {
+    transform: none;
+    border-color: var(--color-border);
+  }
+}

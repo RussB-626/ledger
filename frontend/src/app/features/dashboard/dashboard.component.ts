@@ -10,9 +10,7 @@ import { PageDataService } from '../../core/services/page-data.service';
 import { UserService } from '../../core/services/user.service';
 import { ApiService } from '../../core/services/api.service';
 import { PageData, Transaction, User } from '../../core/models/index';
-import { BalancesTabComponent } from './components/balances-tab/balances-tab.component';
-import { TransactionsTabComponent } from './components/transactions-tab/transactions-tab.component';
-import { PendingTabComponent } from './components/pending-tab/pending-tab.component';
+import { AccountsComponent } from './components/accounts/accounts.component';
 import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
 import { NetworthCardComponent } from './components/networth-card/networth-card.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
@@ -26,9 +24,7 @@ import { EditTransactionModalComponent } from '../../shared/components/edit-tran
   imports: [
     CommonModule,
     FormsModule,
-    BalancesTabComponent,
-    TransactionsTabComponent,
-    PendingTabComponent,
+    AccountsComponent,
     CategoriesSectionComponent,
     NetworthCardComponent,
     CommonWithdrawalsComponent,
@@ -37,7 +33,6 @@ import { EditTransactionModalComponent } from '../../shared/components/edit-tran
 })
 export class DashboardComponent implements OnInit, OnDestroy {
   pageData$: Observable<PageData | null>;
-  activeMainTab: 'accounts' | 'transactions' | 'pending' = 'accounts';
   showCreateTransactionModal = false;
   showEditTransactionModal = false;
   editingTransaction: Transaction | null = null;

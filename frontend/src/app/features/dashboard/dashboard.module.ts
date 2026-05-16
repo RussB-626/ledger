@@ -9,9 +9,7 @@ import { NgChartsModule } from 'ng2-charts';
 
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './dashboard.component';
-import { BalancesTabComponent } from './components/balances-tab/balances-tab.component';
-import { TransactionsTabComponent } from './components/transactions-tab/transactions-tab.component';
-import { PendingTabComponent } from './components/pending-tab/pending-tab.component';
+import { AccountsComponent } from './components/accounts/accounts.component';
 import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
 import { NetworthCardComponent } from './components/networth-card/networth-card.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
@@ -27,9 +25,7 @@ import { SharedModule } from '../../shared/shared.module';
     DashboardRoutingModule,
     SharedModule,
     DashboardComponent,
-    BalancesTabComponent,
-    TransactionsTabComponent,
-    PendingTabComponent,
+    AccountsComponent,
     CategoriesSectionComponent,
     NetworthCardComponent,
     CommonWithdrawalsComponent

@@ -159,7 +159,7 @@
 
     <!-- Mobile Card View -->
     @if (!loading && isMobileView && filteredTransactions.length > 0) {
-      <app-transactions-card-view
+      <app-account-transactions-card-view
         [transactions]="paginatedTransactions"
         [selectedYear]="selectedYear"
         [currentPage]="currentPage"
@@ -168,7 +168,7 @@
         (editTransaction)="onEditTransaction($event)"
         (removePending)="removePending($event)"
         (pageChanged)="goToPage($event)"
-      ></app-transactions-card-view>
+      ></app-account-transactions-card-view>
     }
 
     @if (!loading && transactions.length === 0) {

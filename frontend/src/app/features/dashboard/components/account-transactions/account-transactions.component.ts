@@ -12,17 +12,18 @@ import { UserService } from '../../../../core/services/user.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
 import { PageData, Transaction, User } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
-import { TransactionsCardViewComponent } from './transactions-card-view.component';
+import { AccountTransactionsCardViewComponent } from './account-transactions-card-view.component';
 
 @Component({
-  selector: 'app-transactions-tab',
-  templateUrl: './transactions-tab.component.html',
-  styleUrls: ['./transactions-tab.component.scss'],
+  selector: 'app-account-transactions',
+  templateUrl: './account-transactions.component.html',
+  styleUrls: ['./account-transactions.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmationModalComponent, TransactionsCardViewComponent]
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent, AccountTransactionsCardViewComponent]
 })
-export class TransactionsTabComponent implements OnInit, OnChanges, OnDestroy {
+export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pageData!: PageData;
+  @Input() selectedAccountName: string | null = null;
   @Output() editTransaction = new EventEmitter<Transaction>();
 
   activeUser: User | null = null;
@@ -235,6 +236,11 @@ export class TransactionsTabComponent implements OnInit, OnChanges, OnDestroy {
 
   get filteredTransactions(): Transaction[] {
     let filtered = this.transactions;
+
+    // Filter by selected account (if account card is clicked)
+    if (this.selectedAccountName) {
+      filtered = filtered.filter(txn => txn.account === this.selectedAccountName);
+    }
 
     // Filter by selected month
     if (this.selectedMonth !== 'All') {

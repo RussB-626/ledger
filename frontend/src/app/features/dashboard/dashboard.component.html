@@ -10,37 +10,12 @@
       <app-networth-card [pageData]="pageData" [compact]="true"></app-networth-card>
     </div>
 
-    <!-- Top Row: Combined Accounts/Transactions/Pending Tabs (Full Width) -->
-    <div class="card combined-tabs-card">
-      <div class="section-tabs">
-        <button
-          class="tab-btn"
-          [class.active]="activeMainTab === 'accounts'"
-          (click)="activeMainTab = 'accounts'">
-          Accounts
-        </button>
-        <button
-          class="tab-btn"
-          [class.active]="activeMainTab === 'transactions'"
-          (click)="activeMainTab = 'transactions'">
-          Transactions
-        </button>
-        <button
-          class="tab-btn"
-          [class.active]="activeMainTab === 'pending'"
-          (click)="activeMainTab = 'pending'">
-          Pending
-        </button>
-      </div>
-      @if (activeMainTab === 'accounts') {
-        <app-balances-tab [pageData]="pageData"></app-balances-tab>
-      }
-      @if (activeMainTab === 'transactions') {
-        <app-transactions-tab [pageData]="pageData" (editTransaction)="onEditTransaction($event)"></app-transactions-tab>
-      }
-      @if (activeMainTab === 'pending') {
-        <app-pending-tab [pageData]="pageData" (editTransaction)="onEditTransaction($event)"></app-pending-tab>
-      }
+    <!-- Top Row: Accounts Component with Split Layout (Full Width) -->
+    <div class="card accounts-card">
+      <app-accounts
+        [pageData]="pageData"
+        (editTransaction)="onEditTransaction($event)">
+      </app-accounts>
     </div>
 
     <!-- Bottom Row: 50/50 Split (Hidden on mobile) -->

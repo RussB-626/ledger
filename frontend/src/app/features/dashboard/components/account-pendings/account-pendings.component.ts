@@ -10,17 +10,18 @@ import { PageDataService } from '../../../../core/services/page-data.service';
 import { PageData, Transaction, User } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
-import { PendingCardViewComponent } from './pending-card-view.component';
+import { AccountPendingsCardViewComponent } from './account-pendings-card-view.component';
 
 @Component({
-  selector: 'app-pending-tab',
-  templateUrl: './pending-tab.component.html',
-  styleUrls: ['./pending-tab.component.scss'],
+  selector: 'app-account-pendings',
+  templateUrl: './account-pendings.component.html',
+  styleUrls: ['./account-pendings.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmationModalComponent, FormatCurrencyPipe, PendingCardViewComponent]
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent, FormatCurrencyPipe, AccountPendingsCardViewComponent]
 })
-export class PendingTabComponent implements OnInit, OnChanges, OnDestroy {
+export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pageData!: PageData;
+  @Input() selectedAccountName: string | null = null;
   @Output() editTransaction = new EventEmitter<Transaction>();
 
   activeUser: User | null = null;
@@ -86,8 +87,12 @@ export class PendingTabComponent implements OnInit, OnChanges, OnDestroy {
   get filteredPendingTransactions(): Transaction[] {
     let filtered = this.pendingTransactions;
 
-    // Filter by selected account
-    if (this.selectedAccount !== 'All') {
+    // Filter by selected account from parent (account card click)
+    if (this.selectedAccountName) {
+      filtered = filtered.filter(txn => txn.account === this.selectedAccountName);
+    }
+    // OR by selected account from dropdown
+    else if (this.selectedAccount !== 'All') {
       filtered = filtered.filter(txn => txn.account === this.selectedAccount);
     }
 

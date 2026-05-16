@@ -1,20 +1,22 @@
 import { Component, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Transaction } from '../../../../core/models/index';
+import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
-  selector: 'app-transactions-card-view',
+  selector: 'app-account-pendings-card-view',
   standalone: true,
-  imports: [CommonModule],
-  templateUrl: './transactions-card-view.component.html',
-  styleUrls: ['./transactions-card-view.component.scss']
+  imports: [CommonModule, FormatCurrencyPipe],
+  templateUrl: './account-pendings-card-view.component.html',
+  styleUrls: ['./account-pendings-card-view.component.scss']
 })
-export class TransactionsCardViewComponent {
+export class AccountPendingsCardViewComponent {
   @Input() transactions: Transaction[] = [];
-  @Input() selectedYear: number = new Date().getFullYear();
   @Input() currentPage: number = 1;
   @Input() pageSize: number = 10;
   @Input() totalPages: number = 1;
+  @Input() totalsAmount: number = 0;
+  @Input() totalsAmountColor: string = 'var(--color-text)';
   @Output() editTransaction = new EventEmitter<Transaction>();
   @Output() removePending = new EventEmitter<Transaction>();
   @Output() pageChanged = new EventEmitter<number>();
