@@ -8,8 +8,8 @@
     }
   </div>
 
-  <!-- Desktop Tabs -->
-  <div class="tabs hide-mobile">
+  <!-- Tabs -->
+  <div class="tabs">
     <button
       class="tab-btn"
       [class.active]="activeTab === 'accounts'"
@@ -59,19 +59,6 @@
     >
       Backups
     </button>
-  </div>
-
-  <!-- Mobile Tabs Dropdown -->
-  <div class="mobile-tabs-dropdown show-mobile">
-    <select [(ngModel)]="activeTab" (change)="selectTab(activeTab)" class="tabs-select">
-      <option value="accounts">Accounts</option>
-      <option value="categories">Categories</option>
-      <option value="descriptions">Descriptions</option>
-      <option value="transactions">Transactions</option>
-      <option value="other">Money</option>
-      <option value="themes">Themes</option>
-      <option value="backups">Backups</option>
-    </select>
   </div>
 
   <!-- ACCOUNTS TAB -->

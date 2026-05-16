@@ -113,33 +113,6 @@
   flex-wrap: wrap;
   overflow-x: auto;
 
-  @media (max-width: 767px) {
-    display: none;
-  }
-
-  @media (max-width: 767px) {
-    margin-bottom: 20px;
-    gap: 4px;
-    padding-bottom: 12px;
-
-    &::-webkit-scrollbar {
-      height: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: var(--color-border);
-      border-radius: 2px;
-
-      &:hover {
-        background: rgba(0, 217, 255, 0.3);
-      }
-    }
-  }
-
   .tab-btn {
     background: none;
     border: none;
@@ -168,37 +141,4 @@
   }
 }
 
-// Mobile Tabs Dropdown
-.mobile-tabs-dropdown {
-  display: none;
-  margin-bottom: 20px;
-
-  @media (max-width: 767px) {
-    display: block;
-  }
-
-  .tabs-select {
-    width: 100%;
-    background-color: var(--color-surface);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    padding: 10px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    font-family: inherit;
-
-    &:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
-    }
-
-    option {
-      background-color: var(--color-surface);
-      color: var(--color-text);
-    }
-  }
-}
 
