@@ -7,7 +7,7 @@
         <span class="label">Net worth</span>
         <span class="amount" [style.color]="calculateNetWorth(pageData.balances) === 0 ? '#ffffff' : (calculateNetWorth(pageData.balances) < 0 && activeUser ? activeUser.negative_color : (activeUser ? activeUser.positive_color : '#1dd1a1'))">{{ formatNetWorth(pageData.balances) }}</span>
       </div>
-      <app-balances-card [pageData]="pageData" [compact]="true"></app-balances-card>
+      <app-networth-card [pageData]="pageData" [compact]="true"></app-networth-card>
     </div>
 
     <!-- Mobile Section Selector (only visible on mobile) -->
@@ -116,12 +116,12 @@
 
         <!-- Balances Card Below Header (toggled on mobile, always show on desktop) -->
         <div class="balances-sub-card" [class.hidden-mobile]="!showDifferencesOnMobile">
-          <app-balances-card
+          <app-networth-card
             [pageData]="pageData"
             [compact]="false"
             [selectedYear]="selectedCategoryYear"
             [selectedMonth]="selectedCategoryMonth"
-          ></app-balances-card>
+          ></app-networth-card>
         </div>
 
         <!-- Categories Data Below Balances (toggled on mobile, always show on desktop) -->

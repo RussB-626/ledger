@@ -1,6 +1,6 @@
 @if (compact) {
 <!-- Compact view for header -->
-<div class="balances-card-compact">
+<div class="networth-card-compact">
   @if (!loading && difference) {
   <div class="compact-income">
     <span class="label">Income</span>
@@ -14,14 +14,14 @@
 </div>
 } @else {
 <!-- Full view for card -->
-<div class="balances-card-container">
+<div class="networth-card-container">
   <!-- Only show selectors if not controlled by parent (selectedYear/selectedMonth inputs not provided) -->
   @if (selectedYear === undefined && selectedMonth === undefined) {
     <div class="card-selectors">
       <div class="selector-group">
-        <label for="bal-year">Year:</label>
+        <label for="nw-year">Year:</label>
         <select
-          id="bal-year"
+          id="nw-year"
           [(ngModel)]="year"
           (change)="onYearOrMonthChange()"
         >
@@ -33,9 +33,9 @@
         </select>
       </div>
       <div class="selector-group">
-        <label for="bal-month">Month:</label>
+        <label for="nw-month">Month:</label>
         <select
-          id="bal-month"
+          id="nw-month"
           [(ngModel)]="month"
           (change)="onYearOrMonthChange()"
         >

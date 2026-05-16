@@ -6,13 +6,13 @@ import { UserService } from '../../../../core/services/user.service';
 import { PageData, MonthlyDifference, User } from '../../../../core/models/index';
 
 @Component({
-  selector: 'app-balances-card',
-  templateUrl: './balances-card.component.html',
-  styleUrls: ['./balances-card.component.scss'],
+  selector: 'app-networth-card',
+  templateUrl: './networth-card.component.html',
+  styleUrls: ['./networth-card.component.scss'],
   standalone: true,
   imports: [CommonModule, FormsModule]
 })
-export class BalancesCardComponent implements OnInit, OnChanges {
+export class NetworthCardComponent implements OnInit, OnChanges {
   @Input() pageData!: PageData;
   @Input() compact: boolean = false;
   @Input() selectedYear?: number;

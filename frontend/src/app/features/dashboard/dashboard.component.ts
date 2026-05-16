@@ -1,5 +1,5 @@
 // Dashboard component - main page with all features
-// Per CLAUDE.md: Balances & Transactions tabs, Categories, Differences, Common Withdrawals
+// Per CLAUDE.md: Accounts/Transactions/Pending tabs, Categories, Networth, Common Withdrawals
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -14,7 +14,7 @@ import { BalancesTabComponent } from './components/balances-tab/balances-tab.com
 import { TransactionsTabComponent } from './components/transactions-tab/transactions-tab.component';
 import { PendingTabComponent } from './components/pending-tab/pending-tab.component';
 import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
-import { BalancesCardComponent } from './components/balances-card/balances-card.component';
+import { NetworthCardComponent } from './components/networth-card/networth-card.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
 import { EditTransactionModalComponent } from '../../shared/components/edit-transaction-modal/edit-transaction-modal.component';
 
@@ -30,7 +30,7 @@ import { EditTransactionModalComponent } from '../../shared/components/edit-tran
     TransactionsTabComponent,
     PendingTabComponent,
     CategoriesSectionComponent,
-    BalancesCardComponent,
+    NetworthCardComponent,
     CommonWithdrawalsComponent,
     EditTransactionModalComponent
   ]
