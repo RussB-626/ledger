@@ -10,6 +10,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between;
   gap: 0;
   position: fixed;
   left: 0;
@@ -17,6 +18,23 @@
   height: 100vh;
   z-index: 1000;
   overflow-y: auto;
+}
+
+// Top and Bottom Containers
+.sidenav-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+}
+
+.sidenav-bottom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
 }
 
 // Logo Section (top)
