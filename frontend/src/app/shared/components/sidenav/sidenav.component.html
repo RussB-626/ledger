@@ -1,10 +1,12 @@
-<aside class="sidenav">
+<aside class="sidenav" [class.expanded]="isExpanded">
   <!-- Top Content -->
   <div class="sidenav-top">
-    <!-- Ledger Logo Section -->
+    <!-- Ledger Logo Section / Toggle Button -->
     <div class="logo-section">
-      <img src="/assets/favicon.ico" alt="Ledger" class="logo-icon">
-      <span class="logo-text">Ledger</span>
+      <span class="logo-text" [class.hidden]="!isExpanded">Ledger</span>
+      <button class="toggle-btn" (click)="toggleSidenav()" title="Toggle Sidenav">
+        <i class="bi bi-window-sidebar"></i>
+      </button>
     </div>
 
     <!-- Navigation Icons -->
@@ -12,9 +14,11 @@
     <div class="nav-icons">
       <button class="nav-icon" (click)="navigateToDashboard()" title="Dashboard" matTooltip="Dashboard" matTooltipPosition="right">
         <img src="/assets/icons/house-fill.svg" alt="Dashboard" class="icon-img">
+        <span class="nav-label" [class.hidden]="!isExpanded">Dashboard</span>
       </button>
       <button class="nav-icon" (click)="navigateToAdmin()" title="Admin" matTooltip="Admin" matTooltipPosition="right">
         <img src="/assets/icons/gear-fill.svg" alt="Admin" class="icon-img">
+        <span class="nav-label" [class.hidden]="!isExpanded">Admin</span>
       </button>
     </div>
 
@@ -23,7 +27,8 @@
     <div class="new-transaction-section">
       @if (!isOnAdminPage()) {
         <button class="btn-new-transaction" (click)="openCreateTransactionModal()" title="New Transaction" matTooltip="New Transaction" matTooltipPosition="right">
-          <img src="/assets/icons/plus-circle-fill.svg" alt="New Transaction" class="icon-img">
+          <i class="bi bi-plus-square"></i>
+          <span class="nav-label" [class.hidden]="!isExpanded">New Transaction</span>
         </button>
       }
     </div>
@@ -31,11 +36,11 @@
 
   <!-- User Section (Bottom) -->
   <div class="sidenav-bottom">
-    <div class="sidenav-divider"></div>
     <div class="user-section">
       <button class="user-initial-btn" (click)="openUserManagementPanel()" [title]="(activeUser$ | async)?.name || 'Select User'">
         <span class="user-initial">{{ getActiveUserInitial() }}</span>
       </button>
+      <span class="user-name" [class.hidden]="!isExpanded">{{ (activeUser$ | async)?.name }}</span>
     </div>
   </div>
 </aside>

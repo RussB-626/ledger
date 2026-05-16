@@ -24,6 +24,7 @@ export class SidenavComponent implements OnInit {
   allUsers$: Observable<User[]>;
   showCreateTransactionModal = false;
   userManagementPanelOpen = false;
+  isExpanded = false;
 
   constructor(
     private userService: UserService,
@@ -35,7 +36,21 @@ export class SidenavComponent implements OnInit {
     this.allUsers$ = this.userService.allUsers$;
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    const saved = localStorage.getItem('sidenav-expanded');
+    this.isExpanded = saved ? JSON.parse(saved) : false;
+    this.updateBodyAttribute();
+  }
+
+  toggleSidenav(): void {
+    this.isExpanded = !this.isExpanded;
+    localStorage.setItem('sidenav-expanded', JSON.stringify(this.isExpanded));
+    this.updateBodyAttribute();
+  }
+
+  private updateBodyAttribute(): void {
+    document.body.setAttribute('data-sidenav-expanded', String(this.isExpanded));
+  }
 
   openUserManagementPanel(): void {
     this.userManagementPanelOpen = true;
