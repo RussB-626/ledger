@@ -4,7 +4,6 @@
   <aside class="user-management-panel">
     <div class="panel-header">
       <h2>Users</h2>
-      <button class="close-btn" (click)="closePanel()">×</button>
     </div>
 
     <div class="panel-content">
@@ -27,6 +26,12 @@
         }
       </div>
     </div>
+
+    <div class="panel-footer">
+      <button class="btn-delete-user" (click)="openDeleteUserModal()">
+        Delete User
+      </button>
+    </div>
   </aside>
 }
 
@@ -35,3 +40,11 @@
   (closed)="closeCreateUserModal()"
   (userCreated)="onUserCreated($event)"
 ></app-create-new-user>
+
+@if (showDeleteUserModal) {
+  <app-delete-user-modal
+    [user]="userToDelete"
+    (confirmed)="onUserDeleted()"
+    (closed)="closeDeleteUserModal()"
+  ></app-delete-user-modal>
+}

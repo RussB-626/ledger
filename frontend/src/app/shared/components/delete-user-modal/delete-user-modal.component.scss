@@ -1,0 +1,157 @@
+// Uses CSS custom properties for dynamic theming
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.modal {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 450px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid var(--color-border);
+
+  h2 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: var(--color-text);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.modal-body {
+  padding: 24px;
+
+  .warning-icon {
+    text-align: center;
+    font-size: 40px;
+    margin-bottom: 16px;
+  }
+
+  .warning-title {
+    margin: 0 0 12px 0;
+    color: var(--color-error);
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .warning-message {
+    margin: 0 0 12px 0;
+    color: var(--color-text);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  .warning-list {
+    margin: 12px 0 12px 20px;
+    padding: 0;
+    color: var(--color-text);
+    font-size: 14px;
+    line-height: 1.6;
+
+    li {
+      margin: 4px 0;
+    }
+  }
+
+  .warning-note {
+    margin: 12px 0 0 0;
+    color: var(--color-error);
+    font-size: 13px;
+    font-weight: 600;
+  }
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 20px;
+  border-top: 1px solid var(--color-border);
+  background-color: rgba(0, 0, 0, 0.2);
+
+  .btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+
+  .cancel-btn {
+    background-color: #1a2332;
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-text);
+      color: var(--color-text);
+    }
+  }
+
+  .delete-btn {
+    background-color: var(--color-error);
+    color: white;
+    border: none;
+
+    &:hover:not(:disabled) {
+      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0);
+    }
+  }
+}

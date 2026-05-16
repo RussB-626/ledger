@@ -1,0 +1,42 @@
+@if (user) {
+  <div class="modal-overlay" (clickOutside)="onCancel()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Delete User</h2>
+        <button class="close-btn" (click)="onCancel()" [disabled]="isDeleting">×</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="warning-icon">⚠️</div>
+        <p class="warning-title">Permanently Delete "{{ user.name }}"?</p>
+        <p class="warning-message">
+          This action will permanently delete this user and all of their data, including:
+        </p>
+        <ul class="warning-list">
+          <li>All transactions</li>
+          <li>All accounts</li>
+          <li>All categories</li>
+          <li>All descriptions</li>
+        </ul>
+        <p class="warning-note">This action cannot be undone.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button
+          class="btn cancel-btn"
+          (click)="onCancel()"
+          [disabled]="isDeleting"
+        >
+          Cancel
+        </button>
+        <button
+          class="btn delete-btn"
+          (click)="onConfirm()"
+          [disabled]="isDeleting"
+        >
+          {{ isDeleting ? 'Deleting...' : 'Delete User' }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
