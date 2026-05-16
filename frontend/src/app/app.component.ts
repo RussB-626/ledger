@@ -40,6 +40,18 @@ export class AppComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeApp();
+    this.setupRefreshListener();
+  }
+
+  private setupRefreshListener(): void {
+    this.pageDataService.refresh$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        const activeUser = this.userService.getActiveUserSync();
+        if (activeUser) {
+          this.loadPageData(activeUser.id);
+        }
+      });
   }
 
   ngOnDestroy(): void {
