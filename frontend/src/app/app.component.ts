@@ -6,7 +6,7 @@ import { Router, RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, skip } from 'rxjs/operators';
 import { UserService } from './core/services/user.service';
 import { ApiService } from './core/services/api.service';
 import { PageDataService } from './core/services/page-data.service';
@@ -52,8 +52,9 @@ export class AppComponent implements OnInit, OnDestroy {
     this.themeService.applyTheme('default');
 
     // Subscribe to user list changes to show modal if all users are deleted
+    // Skip initial emission to avoid showing modal on page load
     this.userService.allUsers$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(skip(1), takeUntil(this.destroy$))
       .subscribe((users: User[]) => {
         if (users.length === 0 && !this.showUserSelectionModal) {
           this.showUserSelectionModal = true;
