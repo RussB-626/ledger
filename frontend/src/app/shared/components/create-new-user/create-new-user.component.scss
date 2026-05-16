@@ -11,6 +11,10 @@
   align-items: center;
   justify-content: center;
   z-index: 2000;
+
+  &.no-click-close {
+    cursor: default;
+  }
 }
 
 .modal {
@@ -64,6 +68,13 @@
 
 .modal-body {
   padding: 20px;
+
+  .required-message {
+    margin: 0 0 16px 0;
+    color: var(--color-text-secondary);
+    font-size: 13px;
+    font-style: italic;
+  }
 }
 
 .modal-footer {

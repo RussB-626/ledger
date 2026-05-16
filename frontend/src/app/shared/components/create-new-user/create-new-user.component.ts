@@ -13,6 +13,7 @@ import { User } from '../../../core/models/index';
 })
 export class CreateNewUserComponent implements OnInit {
   @Input() isOpen = false;
+  @Input() isRequired = false;
   @Output() closed = new EventEmitter<void>();
   @Output() userCreated = new EventEmitter<User>();
 
@@ -23,6 +24,7 @@ export class CreateNewUserComponent implements OnInit {
   ngOnInit(): void {}
 
   close(): void {
+    if (this.isRequired) return;
     this.newUserName = '';
     this.closed.emit();
   }

@@ -1,11 +1,16 @@
 @if (isOpen) {
-  <div class="modal-overlay" (click)="close()">
+  <div class="modal-overlay" [class.no-click-close]="isRequired" (click)="close()">
     <div class="modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3>Create New User</h3>
-        <button class="close-btn" (click)="close()">×</button>
+        @if (!isRequired) {
+          <button class="close-btn" (click)="close()">×</button>
+        }
       </div>
       <div class="modal-body">
+        @if (isRequired) {
+          <p class="required-message">A user must be created to continue.</p>
+        }
         <div class="form-group">
           <label>User Name</label>
           <input
@@ -18,9 +23,11 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn-cancel" (click)="close()">
-          Cancel
-        </button>
+        @if (!isRequired) {
+          <button class="btn-cancel" (click)="close()">
+            Cancel
+          </button>
+        }
         <button class="btn-save" (click)="createUser()">
           Create User
         </button>

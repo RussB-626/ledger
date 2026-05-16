@@ -12,6 +12,7 @@ import { ApiService } from './core/services/api.service';
 import { PageDataService } from './core/services/page-data.service';
 import { ThemeService } from './core/services/theme.service';
 import { SharedModule } from './shared/shared.module';
+import { CreateNewUserComponent } from './shared/components/create-new-user/create-new-user.component';
 import { User } from './core/models/index';
 
 @Component({
@@ -19,15 +20,12 @@ import { User } from './core/models/index';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
   standalone: true,
-  imports: [CommonModule, RouterOutlet, SharedModule, FormsModule]
+  imports: [CommonModule, RouterOutlet, SharedModule, FormsModule, CreateNewUserComponent]
 })
 export class AppComponent implements OnInit, OnDestroy {
   title = 'Ledger';
   loading = true;
   showUserSelectionModal = false;
-  hasExistingUsers = false;
-  availableUsers: User[] = [];
-  newUserName = '';
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -50,6 +48,19 @@ export class AppComponent implements OnInit, OnDestroy {
   }
 
   private initializeApp(): void {
+    // Apply default theme immediately
+    this.themeService.applyTheme('default');
+
+    // Subscribe to user list changes to show modal if all users are deleted
+    this.userService.allUsers$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((users: User[]) => {
+        if (users.length === 0 && !this.showUserSelectionModal) {
+          this.showUserSelectionModal = true;
+          this.cdr.markForCheck();
+        }
+      });
+
     // Load all users
     this.apiService.getAllUsers().subscribe({
       next: (users: User[]) => {
@@ -122,36 +133,16 @@ export class AppComponent implements OnInit, OnDestroy {
     this.cdr.markForCheck();
   }
 
-  createNewUserOnInit(): void {
-    if (!this.newUserName.trim()) {
-      alert('Please enter a user name');
-      return;
-    }
+  onInitialUserCreated(user: User): void {
+    this.ngZone.run(() => {
+      // Update all users list
+      const allUsers = this.userService.getAllUsersSync();
+      this.userService.setAllUsers([...allUsers, user]);
 
-    this.apiService.createUser(this.newUserName).subscribe({
-      next: (user) => {
-        this.ngZone.run(() => {
-          // Update all users list
-          const allUsers = this.userService.getAllUsersSync();
-          this.userService.setAllUsers([...allUsers, user]);
-
-          this.userService.setActiveUser(user);
-          this.themeService.applyTheme(user.theme || 'default');
-          this.loadPageData(user.id);
-          this.closeUserSelectionModal();
-        });
-      },
-      error: (error) => {
-        this.ngZone.run(() => {
-          const errorMsg = error?.error?.error || 'Failed to create user';
-          alert(errorMsg);
-        });
-      }
+      this.userService.setActiveUser(user);
+      this.themeService.applyTheme(user.theme || 'default');
+      this.loadPageData(user.id);
+      this.showUserSelectionModal = false;
     });
-  }
-
-  closeUserSelectionModal(): void {
-    this.showUserSelectionModal = false;
-    this.newUserName = '';
   }
 }
