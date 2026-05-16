@@ -7,7 +7,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { AgGridModule } from 'ag-grid-angular';
 import { NgChartsModule } from 'ng2-charts';
 
-import { NavbarComponent } from './components/navbar/navbar.component';
+import { SidenavComponent } from './components/sidenav/sidenav.component';
 import { CreateTransactionModalComponent } from './components/create-transaction-modal/create-transaction-modal.component';
 import { ClickOutsideDirective } from './directives/click-outside.directive';
 
@@ -18,12 +18,12 @@ import { ClickOutsideDirective } from './directives/click-outside.directive';
     FormsModule,
     AgGridModule,
     NgChartsModule,
-    NavbarComponent,
+    SidenavComponent,
     CreateTransactionModalComponent,
     ClickOutsideDirective
   ],
   exports: [
-    NavbarComponent,
+    SidenavComponent,
     CreateTransactionModalComponent,
     ClickOutsideDirective,
     CommonModule,

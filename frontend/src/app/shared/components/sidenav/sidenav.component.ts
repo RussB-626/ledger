@@ -1,5 +1,5 @@
-// Navbar component with user switcher and navigation
-// Per CLAUDE.md: Navbar with logo, Dashboard/Admin tabs, New Transaction button, User dropdown
+// Sidenav component with user switcher and navigation
+// Per CLAUDE.md: Sidenav with logo, Dashboard/Admin tabs, New Transaction button, User dropdown
 
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
@@ -13,13 +13,13 @@ import { CreateTransactionModalComponent } from '../create-transaction-modal/cre
 import { UserManagementPanelComponent } from '../user-management-panel/user-management-panel.component';
 
 @Component({
-  selector: 'app-navbar',
-  templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.scss'],
+  selector: 'app-sidenav',
+  templateUrl: './sidenav.component.html',
+  styleUrls: ['./sidenav.component.scss'],
   standalone: true,
   imports: [CommonModule, CreateTransactionModalComponent, UserManagementPanelComponent]
 })
-export class NavbarComponent implements OnInit {
+export class SidenavComponent implements OnInit {
   activeUser$: Observable<User | null>;
   allUsers$: Observable<User[]>;
   showCreateTransactionModal = false;
