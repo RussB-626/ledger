@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
+import { PageDataService } from '../../../../core/services/page-data.service';
 import { User } from '../../../../core/models/index';
 
 interface ParsedTransaction {
@@ -44,6 +45,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
 
   constructor(
     private apiService: ApiService,
+    private pageDataService: PageDataService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -280,6 +282,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
         next: () => {
           this.bulkUploadLoading = false;
           this.bulkUploadStatus = 'Upload successful!';
+          this.pageDataService.refreshPageData();
           setTimeout(() => {
             this.closeBulkUploadModal();
           }, 1500);

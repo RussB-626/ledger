@@ -67,6 +67,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
           // This is here to handle user switches
         }
       });
+
+    // Watch for refresh signals (e.g., after admin panel changes)
+    this.pageDataService.refresh$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        const activeUser = this.userService.getActiveUserSync();
+        if (activeUser) {
+          this.apiService.getPageData(activeUser.id).subscribe({
+            next: (pageData) => {
+              this.pageDataService.setPageData(pageData);
+            },
+            error: (error) => {
+              console.error('Failed to refresh page data:', error);
+            }
+          });
+        }
+      });
   }
 
   calculateNetWorth(balances: Record<string, number>): number {

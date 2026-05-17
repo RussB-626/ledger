@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
+import { PageDataService } from '../../../../core/services/page-data.service';
 import { Account, User } from '../../../../core/models/index';
 
 interface ModalState {
@@ -51,6 +52,7 @@ export class AccountsComponent implements OnInit, OnDestroy {
 
   constructor(
     private apiService: ApiService,
+    private pageDataService: PageDataService,
     private cdr: ChangeDetectorRef
   ) {}
 
@@ -69,6 +71,8 @@ export class AccountsComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(accounts => {
         this.accounts = accounts;
+        this.pageDataService.setAccounts(accounts);
+        this.pageDataService.refreshPageData();
         this.cdr.markForCheck();
       });
   }

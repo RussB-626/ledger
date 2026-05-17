@@ -1,7 +1,11 @@
 <div class="account-balances-container">
-  <h3 class="section-title">Accounts</h3>
-
+  <!-- Accounts Grid with Title and Scrolling -->
   <div class="accounts-grid">
+    <!-- Title Card -->
+    <div class="title-card">
+      <h3 class="section-title">Account Balances</h3>
+    </div>
+
     @for (row of balanceRows; track row.accountName) {
       @if (row.isTotal) {
         <div class="card totals-card">
