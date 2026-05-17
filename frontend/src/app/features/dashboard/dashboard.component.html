@@ -55,17 +55,7 @@
           </div>
         </div>
 
-        <!-- Balances Card -->
-        <div class="balances-sub-card">
-          <app-networth-card
-            [pageData]="pageData"
-            [compact]="false"
-            [selectedYear]="selectedCategoryYear"
-            [selectedMonth]="selectedCategoryMonth"
-          ></app-networth-card>
-        </div>
-
-        <!-- Categories Data Below Balances -->
+        <!-- Categories Data -->
         <app-categories-section
           #categoriesSection
           [pageData]="pageData"

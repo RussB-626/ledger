@@ -1,9 +1,10 @@
 import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
-import { PageData, CategoryTotals } from '../../../../core/models/index';
+import { PageData, CategoryTotals, MonthlyDifference, User } from '../../../../core/models/index';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
@@ -23,6 +24,8 @@ export class CategoriesSectionComponent implements OnInit, OnChanges {
   selectedMonth: number;
   selectedTab: 'expenses' | 'incomes' = 'expenses';
   categoryTotals: CategoryTotals | null = null;
+  monthlyDifference: MonthlyDifference | null = null;
+  activeUser: User | null = null;
   loading = false;
   Object = Object;
 
@@ -39,6 +42,7 @@ export class CategoriesSectionComponent implements OnInit, OnChanges {
     const today = new Date();
     this.selectedYear = today.getFullYear();
     this.selectedMonth = today.getMonth() + 1;
+    this.activeUser = this.userService.getActiveUser();
   }
 
   ngOnInit(): void {
@@ -68,14 +72,18 @@ export class CategoriesSectionComponent implements OnInit, OnChanges {
     if (!activeUser) return;
 
     this.loading = true;
-    this.apiService.getCategoryTotals(activeUser.id, this.selectedYear, this.selectedMonth).subscribe({
-      next: (totals) => {
+    forkJoin({
+      totals: this.apiService.getCategoryTotals(activeUser.id, this.selectedYear, this.selectedMonth),
+      difference: this.apiService.getMonthlyDifference(activeUser.id, this.selectedYear, this.selectedMonth)
+    }).subscribe({
+      next: ({ totals, difference }) => {
         this.categoryTotals = totals;
+        this.monthlyDifference = difference;
         this.loading = false;
         this.cdr.markForCheck();
       },
       error: (error) => {
-        console.error('Error loading category totals:', error);
+        console.error('Error loading category data:', error);
         this.loading = false;
         this.cdr.markForCheck();
       }

@@ -5,6 +5,25 @@
   </div>
   }
 
+  @if (!loading && monthlyDifference) {
+  <div class="net-worth-display">
+    <div class="net-row">
+      <span class="net-label">Income</span>
+      <span class="net-amount positive" [style.color]="monthlyDifference.income === 0 ? 'var(--color-zero)' : (activeUser ? activeUser.positive_color : 'inherit')">{{ formatCurrency(monthlyDifference.income) }}</span>
+    </div>
+    <div class="net-row">
+      <span class="net-label">Expenses</span>
+      <span class="net-amount negative" [style.color]="monthlyDifference.expenses === 0 ? 'var(--color-zero)' : (activeUser ? activeUser.negative_color : 'inherit')">{{ formatCurrency(-monthlyDifference.expenses) }}</span>
+    </div>
+    <div class="net-row net-total">
+      <span class="net-label">Net For {{ monthNames[selectedMonth - 1] }} {{ selectedYear }}</span>
+      <span class="net-amount" [class]="monthlyDifference.difference >= 0 ? 'positive' : 'negative'" [style.color]="monthlyDifference.difference === 0 ? 'var(--color-zero)' : (monthlyDifference.difference < 0 && activeUser ? activeUser.negative_color : (activeUser ? activeUser.positive_color : '#1dd1a1'))">
+        {{ formatCurrency(monthlyDifference.difference) }}
+      </span>
+    </div>
+  </div>
+  }
+
   @if (!loading && categoryTotals) {
   <!-- List with Tabs -->
   <div class="list-section">
