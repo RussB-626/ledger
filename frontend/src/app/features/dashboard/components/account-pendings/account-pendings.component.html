@@ -12,6 +12,7 @@
   </div>
 
   @if (filteredPendingTransactions.length > 0) {
+    <hr />
     <div class="pendings-grid">
       @for (txn of paginatedPendingTransactions; track txn.id) {
         <div class="pending-card">
@@ -81,6 +82,7 @@
       }
     </div>
 
+    <hr />
     <div class="totals-card">
       <span class="totals-card-label">Total Pending:</span>
       <span class="totals-card-value" [style.color]="getFilteredTotal() === 0 ? 'var(--color-zero)' : (isFilteredTotalNegative() ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">

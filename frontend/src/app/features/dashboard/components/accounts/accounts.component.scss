@@ -10,12 +10,12 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow-y: auto;
-  min-height: 850px;
-  max-height: 850px;
+  min-height: 900px;
+  max-height: 900px;
 
   @media (max-width: 767px) {
-    min-height: 650px;
-    max-height: 650px;
+    min-height: 700px;
+    max-height: 700px;
   }
 }
 
@@ -26,12 +26,12 @@
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  min-height: 850px;
-  max-height: 850px;
+  min-height: 900px;
+  max-height: 900px;
 
   @media (max-width: 767px) {
-    min-height: 650px;
-    max-height: 650px;
+    min-height: 700px;
+    max-height: 700px;
   }
 }
 

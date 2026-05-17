@@ -40,6 +40,8 @@
     </div>
   </div>
 
+  <hr />
+
   <div class="transactions-content" [class.loading]="loading">
     @if (loading) {
       <div class="loading-spinner">
@@ -134,6 +136,7 @@
   </div>
 
   @if (filteredTransactions.length > 0) {
+  <hr />
   <div class="pagination-controls">
     <div class="page-size-selector">
       <label for="page-size">Items per page:</label>
