@@ -11,12 +11,10 @@
     </div>
 
     <!-- Top Row: Accounts Component with Split Layout (Full Width) -->
-    <div class="card accounts-card">
-      <app-accounts
-        [pageData]="pageData"
-        (editTransaction)="onEditTransaction($event)">
-      </app-accounts>
-    </div>
+    <app-accounts
+      [pageData]="pageData"
+      (editTransaction)="onEditTransaction($event)">
+    </app-accounts>
 
     <!-- Bottom Row: 50/50 Split (Hidden on mobile) -->
     <div class="bottom-content-row">

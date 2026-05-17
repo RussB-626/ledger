@@ -1,44 +1,42 @@
-<div class="accounts-container">
-  <!-- LEFT PANEL: Account Balances (Card Layout) -->
-  <div class="accounts-left-panel">
-    <app-account-balances
-      [pageData]="pageData"
-      (accountSelected)="onAccountSelected($event)">
-    </app-account-balances>
+<!-- LEFT PANEL: Account Balances Card -->
+<div class="card accounts-left-panel">
+  <app-account-balances
+    [pageData]="pageData"
+    (accountSelected)="onAccountSelected($event)">
+  </app-account-balances>
+</div>
+
+<!-- RIGHT PANEL: Transactions/Pending Tabs Card -->
+<div class="card accounts-right-panel">
+  <div class="tab-header">
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'transactions'"
+      (click)="activeTab = 'transactions'">
+      Transactions
+    </button>
+    <button
+      class="tab-button"
+      [class.active]="activeTab === 'pending'"
+      (click)="activeTab = 'pending'">
+      Pending
+    </button>
   </div>
 
-  <!-- RIGHT PANEL: Transactions/Pending Tabs -->
-  <div class="accounts-right-panel">
-    <div class="tab-header">
-      <button
-        class="tab-button"
-        [class.active]="activeTab === 'transactions'"
-        (click)="activeTab = 'transactions'">
-        Transactions
-      </button>
-      <button
-        class="tab-button"
-        [class.active]="activeTab === 'pending'"
-        (click)="activeTab = 'pending'">
-        Pending
-      </button>
-    </div>
-
-    <div class="tab-content">
-      @if (activeTab === 'transactions') {
-        <app-account-transactions
-          [pageData]="pageData"
-          [selectedAccountName]="selectedAccountName"
-          (editTransaction)="onEditTransaction($event)">
-        </app-account-transactions>
-      }
-      @if (activeTab === 'pending') {
-        <app-account-pendings
-          [pageData]="pageData"
-          [selectedAccountName]="selectedAccountName"
-          (editTransaction)="onEditTransaction($event)">
-        </app-account-pendings>
-      }
-    </div>
+  <div class="tab-content">
+    @if (activeTab === 'transactions') {
+      <app-account-transactions
+        [pageData]="pageData"
+        [selectedAccountName]="selectedAccountName"
+        (editTransaction)="onEditTransaction($event)">
+      </app-account-transactions>
+    }
+    @if (activeTab === 'pending') {
+      <app-account-pendings
+        [pageData]="pageData"
+        [selectedAccountName]="selectedAccountName"
+        (editTransaction)="onEditTransaction($event)">
+      </app-account-pendings>
+    }
   </div>
 </div>
