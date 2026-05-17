@@ -12,14 +12,12 @@ import { UserService } from '../../../../core/services/user.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
 import { PageData, Transaction, User } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
-import { AccountTransactionsCardViewComponent } from './account-transactions-card-view.component';
-
 @Component({
   selector: 'app-account-transactions',
   templateUrl: './account-transactions.component.html',
   styleUrls: ['./account-transactions.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmationModalComponent, AccountTransactionsCardViewComponent]
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent]
 })
 export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pageData!: PageData;

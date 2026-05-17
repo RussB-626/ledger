@@ -157,19 +157,6 @@
     </div>
     }
 
-    <!-- Mobile Card View -->
-    @if (!loading && isMobileView && filteredTransactions.length > 0) {
-      <app-account-transactions-card-view
-        [transactions]="paginatedTransactions"
-        [selectedYear]="selectedYear"
-        [currentPage]="currentPage"
-        [pageSize]="pageSize"
-        [totalPages]="totalPages"
-        (editTransaction)="onEditTransaction($event)"
-        (removePending)="removePending($event)"
-        (pageChanged)="goToPage($event)"
-      ></app-account-transactions-card-view>
-    }
 
     @if (!loading && transactions.length === 0) {
     <div class="empty-state">
