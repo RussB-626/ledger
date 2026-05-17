@@ -92,6 +92,7 @@ export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
         txn.account.toLowerCase().includes(term) ||
         txn.category.toLowerCase().includes(term) ||
         (txn.description?.toLowerCase() ?? '').includes(term) ||
+        (txn.note?.toLowerCase() ?? '').includes(term) ||
         this.formatCurrency(txn.amount).toLowerCase().includes(term)
       );
     }
