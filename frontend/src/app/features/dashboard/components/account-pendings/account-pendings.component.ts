@@ -9,13 +9,12 @@ import { UserService } from '../../../../core/services/user.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
 import { PageData, Transaction, User } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
-import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 @Component({
   selector: 'app-account-pendings',
   templateUrl: './account-pendings.component.html',
   styleUrls: ['./account-pendings.component.scss'],
   standalone: true,
-  imports: [CommonModule, FormsModule, ConfirmationModalComponent, FormatCurrencyPipe]
+  imports: [CommonModule, FormsModule, ConfirmationModalComponent]
 })
 export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pageData!: PageData;

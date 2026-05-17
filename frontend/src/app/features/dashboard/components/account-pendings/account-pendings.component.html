@@ -11,120 +11,139 @@
     </div>
   </div>
 
-  <!-- Desktop Table View -->
-  @if (!isMobileView && filteredPendingTransactions.length > 0) {
-  <div class="table-wrapper">
-    <table class="pending-table">
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Account</th>
-          <th>Category</th>
-          <th>Description</th>
-          <th>Notes</th>
-          <th class="text-right">Amount</th>
-          <th>Type</th>
-          <th class="text-center">Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (txn of paginatedPendingTransactions; track txn.id) {
-          <tr>
-            <td>{{ formatDate(txn.date) }}</td>
-            <td>{{ txn.account }}</td>
-            <td>{{ txn.category }}</td>
-            <td>{{ txn.description }}</td>
-            <td [title]="txn.note || ''">{{ truncateText(txn.note) }}</td>
-            <td class="text-right" [style.color]="txn.amount === 0 ? 'var(--color-zero)' : ((txn.type === 'W' || txn.type === 'TW') ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">{{ formatCurrency(txn.amount, txn.type) }}</td>
-            <td>
+  @if (filteredPendingTransactions.length > 0) {
+    <div class="totals-card">
+      <span class="totals-card-label">Total Pending:</span>
+      <span class="totals-card-value" [style.color]="getFilteredTotal() === 0 ? 'var(--color-zero)' : (isFilteredTotalNegative() ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">
+        {{ formatCurrency(getFilteredTotal()) }}
+      </span>
+    </div>
+
+    <div class="pendings-grid">
+      @for (txn of paginatedPendingTransactions; track txn.id) {
+        <div class="pending-card">
+          <div class="card-row">
+            <div class="card-field">
+              <span class="card-field-label">Date</span>
+              <span class="card-field-value">{{ formatDate(txn.date) }}</span>
+            </div>
+            <div class="card-field">
+              <span class="card-field-label">Type</span>
               <span class="badge" [ngClass]="'badge-' + txn.type.toLowerCase()">
                 {{ txn.type }}
               </span>
-            </td>
-            <td class="text-center">
-              <button class="action-btn edit-btn" (click)="onEditTransaction(txn)" title="Edit">
-                ✎
-              </button>
-              <button class="action-btn confirm-btn" (click)="removePending(txn)" title="Remove Pending">
-                ✓
-              </button>
-              <button class="action-btn delete-btn" (click)="deleteTransaction(txn.id)" title="Delete">
-                🗑
-              </button>
-            </td>
-          </tr>
-        }
-      </tbody>
-      <tfoot>
-        <tr class="totals-row">
-          <td colspan="5">Total:</td>
-          <td class="text-right" [style.color]="getFilteredTotal() === 0 ? 'var(--color-zero)' : (isFilteredTotalNegative() ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">{{ getFilteredTotal() | formatCurrency }}</td>
-          <td></td>
-          <td></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+            </div>
+            <div class="card-field text-right">
+              <span class="card-field-label">Amount</span>
+              <span class="card-field-value amount" [style.color]="txn.amount === 0 ? 'var(--color-zero)' : ((txn.type === 'W' || txn.type === 'TW') ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">
+                {{ formatCurrency(txn.amount, txn.type) }}
+              </span>
+            </div>
+          </div>
 
-  <!-- Desktop Pagination Controls -->
-  <div class="pagination-controls">
-    <div class="page-size-selector">
-      <label for="page-size">Items per page:</label>
-      <select
-        id="page-size"
-        [value]="pageSize"
-        (change)="onPageSizeChange(+$any($event.target).value)"
-      >
-        @for (size of pageSizeOptions; track size) {
-          <option [value]="size">{{ size }}</option>
-        }
-      </select>
+          <div class="card-row">
+            <div class="card-field">
+              <span class="card-field-label">Account</span>
+              <span class="card-field-value">{{ txn.account }}</span>
+            </div>
+          </div>
+
+          <div class="card-row">
+            <div class="card-field">
+              <span class="card-field-label">Category</span>
+              <span class="card-field-value">{{ txn.category }}</span>
+            </div>
+          </div>
+
+          <div class="card-row">
+            <div class="card-field">
+              <span class="card-field-label">Description</span>
+              <span class="card-field-value">{{ txn.description }}</span>
+            </div>
+          </div>
+
+          @if (txn.note) {
+            <div class="card-row">
+              <div class="card-field">
+                <span class="card-field-label">Notes</span>
+                <span class="card-field-value" [title]="txn.note">{{ truncateText(txn.note) }}</span>
+              </div>
+            </div>
+          }
+
+          <div class="card-actions">
+            <button class="action-btn edit-btn" (click)="onEditTransaction(txn)" title="Edit">
+              ✎
+            </button>
+            <button class="action-btn confirm-btn" (click)="removePending(txn)" title="Remove Pending">
+              ✓
+            </button>
+            <button class="action-btn delete-btn" (click)="deleteTransaction(txn.id)" title="Delete">
+              🗑
+            </button>
+          </div>
+        </div>
+      }
     </div>
 
-    <div class="pagination-info">
-      Showing {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, filteredPendingTransactions.length) }} of {{ filteredPendingTransactions.length }}
-    </div>
-
-    <div class="pagination-buttons">
-      <button
-        class="page-btn"
-        [disabled]="currentPage === 1"
-        (click)="goToPage(1)"
-        title="First page"
-      >
-        ⌂ Home
-      </button>
-
-      <button
-        class="page-btn"
-        [disabled]="currentPage === 1"
-        (click)="previousPage()"
-      >
-        ← Previous
-      </button>
-
-      <div class="page-info">
-        Page {{ currentPage }} of {{ totalPages }}
+    <div class="pagination-controls">
+      <div class="page-size-selector">
+        <label for="page-size">Items per page:</label>
+        <select
+          id="page-size"
+          [value]="pageSize"
+          (change)="onPageSizeChange(+$any($event.target).value)"
+        >
+          @for (size of pageSizeOptions; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
       </div>
 
-      <button
-        class="page-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="nextPage()"
-      >
-        Next →
-      </button>
+      <div class="pagination-info">
+        Showing {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, filteredPendingTransactions.length) }} of {{ filteredPendingTransactions.length }}
+      </div>
 
-      <button
-        class="page-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="goToPage(totalPages)"
-        title="Last page"
-      >
-        End ⌂
-      </button>
+      <div class="pagination-buttons">
+        <button
+          class="page-btn"
+          [disabled]="currentPage === 1"
+          (click)="goToPage(1)"
+          title="First page"
+        >
+          ⌂ Home
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === 1"
+          (click)="previousPage()"
+        >
+          ← Previous
+        </button>
+
+        <div class="page-info">
+          Page {{ currentPage }} of {{ totalPages }}
+        </div>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="nextPage()"
+        >
+          Next →
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="goToPage(totalPages)"
+          title="Last page"
+        >
+          End ⌂
+        </button>
+      </div>
     </div>
-  </div>
   }
 
 
