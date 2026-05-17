@@ -12,7 +12,6 @@
   overflow-y: auto;
   min-height: 850px;
   max-height: 850px;
-  overflow: hidden;
 
   @media (max-width: 767px) {
     min-height: 650px;
@@ -74,8 +73,6 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
-  overflow-x: hidden;
   margin-top: 16px;
 }
 
