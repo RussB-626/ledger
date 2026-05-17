@@ -1,30 +1,37 @@
 <div class="account-balances-container">
+  <!-- Title Card -->
+  <div class="title-card">
+    <h3 class="section-title">Accounts</h3>
+  </div>
+
   <!-- Accounts Grid with Title and Scrolling -->
   <div class="accounts-grid">
-    <!-- Title Card -->
-    <div class="title-card">
-      <h3 class="section-title">Accounts</h3>
-    </div>
-
     @for (row of balanceRows; track row.accountName) {
       @if (row.isTotal) {
-        <div class="card totals-card"
-             [title]="row.accountName">
+        <div class="card totals-card" [title]="row.accountName">
           <div class="card-content">
             <div class="card-header">{{ row.accountName }}</div>
-            <div class="card-balance" [style.color]="getBalanceColor(row.balance)">
+            <div
+              class="card-balance"
+              [style.color]="getBalanceColor(row.balance)"
+            >
               {{ row.balance | formatCurrency }}
             </div>
           </div>
         </div>
       } @else {
-        <div class="card account-card"
-             [class.selected]="selectedAccountName === row.accountName"
-             (click)="onAccountCardClick(row.accountName)"
-             [title]="row.accountName">
+        <div
+          class="card account-card"
+          [class.selected]="selectedAccountName === row.accountName"
+          (click)="onAccountCardClick(row.accountName)"
+          [title]="row.accountName"
+        >
           <div class="card-content">
             <div class="card-header">{{ row.accountName }}</div>
-            <div class="card-balance" [style.color]="getBalanceColor(row.balance)">
+            <div
+              class="card-balance"
+              [style.color]="getBalanceColor(row.balance)"
+            >
               {{ row.balance | formatCurrency }}
             </div>
           </div>
