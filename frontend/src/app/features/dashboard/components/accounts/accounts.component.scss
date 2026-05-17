@@ -10,13 +10,13 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
   overflow-y: auto;
-  min-height: 700px;
-  max-height: 700px;
+  min-height: 850px;
+  max-height: 850px;
   overflow: hidden;
 
   @media (max-width: 767px) {
-    min-height: 500px;
-    max-height: 500px;
+    min-height: 650px;
+    max-height: 650px;
   }
 }
 
@@ -27,12 +27,12 @@
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: 8px;
-  min-height: 700px;
-  max-height: 700px;
+  min-height: 850px;
+  max-height: 850px;
 
   @media (max-width: 767px) {
-    min-height: 500px;
-    max-height: 500px;
+    min-height: 650px;
+    max-height: 650px;
   }
 }
 
