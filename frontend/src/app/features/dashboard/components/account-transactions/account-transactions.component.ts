@@ -357,4 +357,14 @@ export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestro
     this.showRemovePendingConfirmation = false;
     this.transactionToRemovePending = null;
   }
+
+  mapTransactionType(type: string): string {
+    const typeMap: Record<string, string> = {
+      'W': 'Withdrawal',
+      'D': 'Deposit',
+      'TW': 'Transfer Out',
+      'TD': 'Transfer In'
+    };
+    return typeMap[type] || type;
+  }
 }

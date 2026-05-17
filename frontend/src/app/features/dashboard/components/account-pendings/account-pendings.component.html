@@ -12,65 +12,60 @@
   </div>
 
   @if (filteredPendingTransactions.length > 0) {
-    <div class="totals-card">
-      <span class="totals-card-label">Total Pending:</span>
-      <span class="totals-card-value" [style.color]="getFilteredTotal() === 0 ? 'var(--color-zero)' : (isFilteredTotalNegative() ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">
-        {{ formatCurrency(getFilteredTotal()) }}
-      </span>
-    </div>
-
     <div class="pendings-grid">
       @for (txn of paginatedPendingTransactions; track txn.id) {
         <div class="pending-card">
-          <div class="card-row">
-            <div class="card-field">
-              <span class="card-field-label">Date</span>
+          <!-- Row 1: Date, Account, Type -->
+          <div class="card-row row-1">
+            <div class="card-field no-label">
               <span class="card-field-value">{{ formatDate(txn.date) }}</span>
             </div>
-            <div class="card-field">
-              <span class="card-field-label">Type</span>
-              <span class="badge" [ngClass]="'badge-' + txn.type.toLowerCase()">
-                {{ txn.type }}
-              </span>
+            <div class="card-field center-aligned no-label">
+              <span class="card-field-value">{{ txn.account }}</span>
             </div>
-            <div class="card-field text-right">
-              <span class="card-field-label">Amount</span>
+            <div class="card-field right-aligned no-label">
+              <span class="card-field-value">{{ mapTransactionType(txn.type) }}</span>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <!-- Row 2: Category, Description -->
+          <div class="card-row row-2">
+            <div class="card-field">
+              <span class="card-field-label">Category</span>
+              <span class="card-field-value">{{ txn.category }}</span>
+            </div>
+            <div class="card-field center-aligned">
+              <span class="card-field-label">Description</span>
+              <span class="card-field-value">{{ txn.description }}</span>
+            </div>
+          </div>
+
+          <!-- Row 3: Notes, Amount -->
+          <div class="card-row row-3">
+            @if (txn.note) {
+              <div class="card-field">
+                <span class="card-field-label">Notes</span>
+                <span class="card-field-value" [title]="txn.note">{{ truncateText(txn.note) }}</span>
+              </div>
+            }
+            @if (!txn.note) {
+              <div class="card-field">
+                <span class="card-field-label">Notes</span>
+                <span class="card-field-value">—</span>
+              </div>
+            }
+            <div class="card-field right-aligned no-label">
               <span class="card-field-value amount" [style.color]="txn.amount === 0 ? 'var(--color-zero)' : ((txn.type === 'W' || txn.type === 'TW') ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">
                 {{ formatCurrency(txn.amount, txn.type) }}
               </span>
             </div>
           </div>
 
-          <div class="card-row">
-            <div class="card-field">
-              <span class="card-field-label">Account</span>
-              <span class="card-field-value">{{ txn.account }}</span>
-            </div>
-          </div>
+          <div class="divider"></div>
 
-          <div class="card-row">
-            <div class="card-field">
-              <span class="card-field-label">Category</span>
-              <span class="card-field-value">{{ txn.category }}</span>
-            </div>
-          </div>
-
-          <div class="card-row">
-            <div class="card-field">
-              <span class="card-field-label">Description</span>
-              <span class="card-field-value">{{ txn.description }}</span>
-            </div>
-          </div>
-
-          @if (txn.note) {
-            <div class="card-row">
-              <div class="card-field">
-                <span class="card-field-label">Notes</span>
-                <span class="card-field-value" [title]="txn.note">{{ truncateText(txn.note) }}</span>
-              </div>
-            </div>
-          }
-
+          <!-- Row 4: Actions -->
           <div class="card-actions">
             <button class="action-btn edit-btn" (click)="onEditTransaction(txn)" title="Edit">
               ✎
@@ -84,6 +79,13 @@
           </div>
         </div>
       }
+    </div>
+
+    <div class="totals-card">
+      <span class="totals-card-label">Total Pending:</span>
+      <span class="totals-card-value" [style.color]="getFilteredTotal() === 0 ? 'var(--color-zero)' : (isFilteredTotalNegative() ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">
+        {{ formatCurrency(getFilteredTotal()) }}
+      </span>
     </div>
 
     <div class="pagination-controls">

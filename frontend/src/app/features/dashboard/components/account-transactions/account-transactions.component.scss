@@ -222,6 +222,34 @@
     flex-direction: column;
     align-items: flex-start;
   }
+
+  &.row-1 {
+    justify-content: space-between;
+    align-items: center;
+
+    .card-field:first-child {
+      flex: 0 0 auto;
+      justify-content: flex-start;
+    }
+
+    .card-field:nth-child(2) {
+      flex: 1;
+      justify-content: center;
+    }
+
+    .card-field:last-child {
+      flex: 0 0 auto;
+      justify-content: flex-end;
+    }
+  }
+
+  &.row-2 {
+    gap: 16px;
+  }
+
+  &.row-3 {
+    gap: 16px;
+  }
 }
 
 .card-field {
@@ -236,6 +264,30 @@
 
     @media (max-width: 767px) {
       align-items: flex-start;
+    }
+  }
+
+  &.no-label {
+    gap: 0;
+  }
+
+  &.center-aligned {
+    align-items: center;
+    text-align: center;
+
+    @media (max-width: 767px) {
+      align-items: flex-start;
+      text-align: left;
+    }
+  }
+
+  &.right-aligned {
+    align-items: flex-end;
+    text-align: right;
+
+    @media (max-width: 767px) {
+      align-items: flex-start;
+      text-align: left;
     }
   }
 }
@@ -262,11 +314,18 @@
   }
 }
 
+.divider {
+  width: 100%;
+  height: 1px;
+  background-color: var(--color-border);
+  margin: 0;
+}
+
 .card-actions {
   display: flex;
   gap: 8px;
-  padding-top: 8px;
-  border-top: 1px solid var(--color-border);
+  padding: 0;
+  border-top: none;
   justify-content: flex-end;
 
   @media (max-width: 767px) {
@@ -342,6 +401,8 @@
   padding: 12px 20px;
   border-top: 1px solid var(--color-border);
   background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  margin-top: 12px;
   flex-wrap: wrap;
 
   @media (max-width: 768px) {
@@ -402,7 +463,7 @@
   border: 1px solid var(--color-border);
   color: var(--color-text);
   padding: 6px 12px;
-  border-radius: 3px;
+  border-radius: 6px;
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s ease;

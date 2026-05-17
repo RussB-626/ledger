@@ -309,4 +309,14 @@ export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
   isFilteredTotalNegative(): boolean {
     return this.getFilteredTotal() < 0;
   }
+
+  mapTransactionType(type: string): string {
+    const typeMap: Record<string, string> = {
+      'W': 'Withdrawal',
+      'D': 'Deposit',
+      'TW': 'Transfer Out',
+      'TD': 'Transfer In'
+    };
+    return typeMap[type] || type;
+  }
 }
