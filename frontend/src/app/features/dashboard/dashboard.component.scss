@@ -23,10 +23,6 @@
   min-height: calc(100vh - 60px);
   padding: 20px;
   background-color: var(--color-background);
-
-  @media (max-width: 767px) {
-    padding: 12px;
-  }
 }
 
 .dashboard-content {
@@ -47,12 +43,6 @@
   border: 1px solid rgba(0, 217, 255, 0.2);
   border-radius: 8px;
   margin-bottom: 10px;
-
-  @media (max-width: 767px) {
-    grid-template-columns: 1fr;
-    padding: 16px;
-    gap: 16px;
-  }
 }
 
 .net-worth-title {
@@ -66,19 +56,11 @@
     color: var(--color-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-
-    @media (max-width: 767px) {
-      font-size: 12px;
-    }
   }
 
   .amount {
     font-size: 32px;
     font-weight: 700;
-
-    @media (max-width: 767px) {
-      font-size: 24px;
-    }
   }
 }
 
@@ -87,19 +69,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
-
-  @media (max-width: 767px) {
-    gap: 12px;
-
-    .chart-card {
-      min-height: auto;
-      max-height: none;
-    }
-  }
 }
 
 .balances-card {
@@ -112,10 +81,6 @@
   gap: 0;
   min-height: 400px;
   overflow: hidden;
-
-  @media (max-width: 767px) {
-    min-height: auto;
-  }
 
   .categories-header {
     flex-shrink: 0;
@@ -134,10 +99,6 @@
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-
-      @media (max-width: 767px) {
-        gap: 8px;
-      }
     }
 
     .selector-group {
@@ -173,45 +134,6 @@
     }
   }
 
-  .mobile-view-toggle {
-    display: none;
-    flex-shrink: 0;
-    gap: 0;
-    border-bottom: 1px solid var(--color-border);
-    background-color: rgba(0, 0, 0, 0.2);
-
-    @media (max-width: 767px) {
-    }
-
-    .toggle-btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      background: none;
-      color: var(--color-text-secondary);
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      border-bottom: 2px solid transparent;
-      transition: all 0.2s ease;
-      min-height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-
-      &:hover {
-        color: var(--color-text);
-      }
-
-      &.active {
-        color: var(--color-primary);
-        border-bottom-color: var(--color-primary);
-      }
-    }
-  }
-
   .balances-sub-card {
     flex-shrink: 0;
     border: 1px solid var(--color-border);
@@ -220,25 +142,12 @@
     padding: 5px;
     overflow-y: auto;
     @include custom-scrollbar;
-
-    @media (max-width: 767px) {
-      flex: 1;
-      min-height: 0;
-      margin: 8px;
-    }
   }
 
   app-categories-section {
     min-height: 350px;
     max-height: 350px;
     overflow: hidden;
-
-    @media (max-width: 767px) {
-      min-height: 0;
-      max-height: none;
-      flex: 1;
-      overflow: visible;
-    }
   }
 }
 
@@ -247,11 +156,6 @@
   flex-direction: column;
   min-height: 700px;
   max-height: 700px;
-
-  @media (max-width: 767px) {
-    min-height: 500px;
-    max-height: 500px;
-  }
 
   app-common-withdrawals {
     display: flex;
@@ -265,14 +169,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 20px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
-
-  @media (max-width: 767px) {
-    gap: 12px;
-  }
 }
 
 .card {
@@ -295,10 +191,6 @@
     border-bottom: 1px solid var(--color-border);
     padding: 0 20px;
     background-color: rgba(0, 0, 0, 0.2);
-
-    @media (max-width: 767px) {
-      padding: 0 8px;
-    }
   }
 
   .tab-btn {
@@ -317,12 +209,6 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-
-    @media (max-width: 767px) {
-      padding: 8px 4px;
-      font-size: 11px;
-      letter-spacing: 0;
-    }
 
     &:hover {
       color: var(--color-text);
@@ -363,51 +249,6 @@
   font-size: 16px;
 }
 
-// Mobile Section Selector
-.mobile-section-selector {
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 8px;
-
-  @media (max-width: 767px) {
-    display: flex;
-  }
-
-  label {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--color-text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-  }
-
-  .mobile-dropdown {
-    background-color: var(--color-surface);
-    color: var(--color-text);
-    border: 1px solid var(--color-border);
-    padding: 10px 12px;
-    border-radius: 4px;
-    font-size: 14px;
-    font-family: inherit;
-    cursor: pointer;
-    min-height: 44px;
-
-    &:focus {
-      outline: none;
-      border-color: var(--color-primary);
-      box-shadow: 0 0 0 3px rgba(0, 217, 255, 0.1);
-    }
-  }
-}
-
-// Mobile Hidden Class
-.mobile-hidden {
-  @media (max-width: 767px) {
-    display: none !important;
-  }
-}
-
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -416,11 +257,5 @@
   to {
     opacity: 1;
     transform: translateY(0);
-  }
-}
-
-.hidden-mobile {
-  @media (max-width: 767px) {
-    display: none;
   }
 }

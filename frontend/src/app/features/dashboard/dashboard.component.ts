@@ -41,7 +41,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   selectedCategoryYear: number;
   selectedCategoryMonth: number;
   monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-  showDifferencesOnMobile: boolean = true;
 
   private destroy$ = new Subject<void>();
 
@@ -172,10 +171,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onCategoryYearMonthChange(): void {
     // This method is called when year/month changes in the dashboard header
     // The bindings will automatically update the differences card and categories section
-  }
-
-  toggleMobileView(): void {
-    this.showDifferencesOnMobile = !this.showDifferencesOnMobile;
   }
 
   ngOnDestroy(): void {

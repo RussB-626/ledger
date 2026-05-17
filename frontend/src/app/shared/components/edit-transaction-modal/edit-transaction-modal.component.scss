@@ -61,10 +61,6 @@
 
 .modal-body {
   padding: 20px;
-
-  @media (max-width: 767px) {
-    padding: 16px;
-  }
 }
 
 .error-message {
@@ -87,11 +83,6 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-
-  @media (max-width: 767px) {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
 }
 
 .form-group {
@@ -149,11 +140,6 @@
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 8px;
-
-  @media (max-width: 767px) {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-  }
 }
 
 .type-btn {
@@ -175,11 +161,6 @@
   align-items: center;
   justify-content: center;
   text-align: center;
-
-  @media (max-width: 767px) {
-    font-size: 11px;
-    padding: 8px 10px;
-  }
 
   &:hover {
     border-color: var(--color-primary);
@@ -223,12 +204,6 @@
   border-top: 1px solid var(--color-border);
   background-color: rgba(0, 0, 0, 0.2);
   flex-wrap: wrap;
-
-  @media (max-width: 767px) {
-    flex-direction: column-reverse;
-    padding: 16px;
-    gap: 8px;
-  }
 }
 
 .btn-secondary,
@@ -244,12 +219,6 @@
   display: flex;
   align-items: center;
   justify-content: center;
-
-  @media (max-width: 767px) {
-    width: 100%;
-    font-size: 13px;
-    padding: 10px 12px;
-  }
 
   &:disabled {
     opacity: 0.5;

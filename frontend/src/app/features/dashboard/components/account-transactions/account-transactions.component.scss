@@ -13,10 +13,6 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
-
-  @media (max-width: 767px) {
-    padding: 12px;
-  }
 }
 
 .transactions-header {
@@ -25,24 +21,12 @@
   align-items: center;
   gap: 20px;
   flex-shrink: 0;
-
-  @media (max-width: 767px) {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
 }
 
 .selectors-group {
   display: flex;
   align-items: center;
   gap: 0;
-
-  @media (max-width: 767px) {
-    width: 100%;
-    gap: 8px;
-    flex-direction: column;
-  }
 }
 
 .year-selector {
@@ -50,21 +34,12 @@
   align-items: center;
   gap: 8px;
 
-  @media (max-width: 767px) {
-    width: 100%;
-  }
-
   label {
     font-size: 13px;
     font-weight: 500;
     color: var(--color-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-
-    @media (max-width: 767px) {
-      font-size: 11px;
-      white-space: nowrap;
-    }
   }
 
   select {
@@ -75,12 +50,6 @@
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
-
-    @media (max-width: 767px) {
-      width: 100%;
-      font-size: 13px;
-      padding: 6px 8px;
-    }
 
     &:focus {
       outline: none;
@@ -96,22 +65,12 @@
   gap: 8px;
   padding-left: 10px;
 
-  @media (max-width: 767px) {
-    width: 100%;
-    padding-left: 0;
-  }
-
   label {
     font-size: 13px;
     font-weight: 500;
     color: var(--color-text);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-
-    @media (max-width: 767px) {
-      font-size: 11px;
-      white-space: nowrap;
-    }
   }
 
   select {
@@ -122,12 +81,6 @@
     border-radius: 4px;
     font-size: 14px;
     cursor: pointer;
-
-    @media (max-width: 767px) {
-      width: 100%;
-      font-size: 13px;
-      padding: 6px 8px;
-    }
 
     &:focus {
       outline: none;
@@ -140,11 +93,6 @@
 .search-box {
   flex: 1;
   max-width: 300px;
-
-  @media (max-width: 767px) {
-    width: 100%;
-    max-width: 100%;
-  }
 }
 
 .search-input {
@@ -191,10 +139,6 @@
   gap: 16px;
   margin-bottom: 16px;
   align-content: start;
-
-  @media (max-width: 767px) {
-    gap: 12px;
-  }
 }
 
 .transaction-card {
@@ -208,11 +152,6 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
   transition: all 0.2s ease;
-
-  @media (max-width: 767px) {
-    padding: 12px;
-    gap: 10px;
-  }
 
   &:hover {
     border-color: var(--color-primary);
@@ -230,11 +169,6 @@
   align-items: center;
   flex-wrap: wrap;
   gap: 8px;
-
-  @media (max-width: 767px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
 
   &.row-1 {
     justify-content: space-between;
@@ -274,10 +208,6 @@
 
   &.text-right {
     align-items: flex-end;
-
-    @media (max-width: 767px) {
-      align-items: flex-start;
-    }
   }
 
   &.no-label {
@@ -287,21 +217,11 @@
   &.center-aligned {
     align-items: center;
     text-align: center;
-
-    @media (max-width: 767px) {
-      align-items: flex-start;
-      text-align: left;
-    }
   }
 
   &.right-aligned {
     align-items: flex-end;
     text-align: right;
-
-    @media (max-width: 767px) {
-      align-items: flex-start;
-      text-align: left;
-    }
   }
 }
 
@@ -321,10 +241,6 @@
     font-family: 'Courier New', monospace;
     font-weight: 600;
   }
-
-  @media (max-width: 767px) {
-    font-size: 13px;
-  }
 }
 
 .divider {
@@ -340,10 +256,6 @@
   padding: 0;
   border-top: none;
   justify-content: flex-end;
-
-  @media (max-width: 767px) {
-    justify-content: flex-start;
-  }
 }
 
 .badge {
@@ -417,11 +329,6 @@
   border-radius: 8px;
   flex-wrap: wrap;
   flex-shrink: 0;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
 }
 
 .page-size-selector {
@@ -464,11 +371,6 @@
   gap: 8px;
   align-items: center;
   margin-left: auto;
-
-  @media (max-width: 768px) {
-    margin-left: 0;
-    justify-content: center;
-  }
 }
 
 .page-btn {

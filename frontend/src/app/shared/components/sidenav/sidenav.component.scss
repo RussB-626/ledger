@@ -310,35 +310,3 @@
 }
 
 
-// Mobile: collapse sidenav to minimal width
-@media (max-width: 767px) {
-  .sidenav {
-    width: 70px;
-    padding: 16px 0;
-  }
-
-  .logo-section {
-    .logo-text {
-      display: none;
-    }
-
-    .logo-icon {
-      width: 32px;
-      height: 32px;
-    }
-  }
-
-  .user-initial-btn,
-  .nav-icon,
-  .btn-new-transaction {
-    width: 44px;
-    height: 44px;
-    font-size: 20px;
-  }
-
-  .user-dropdown {
-    left: 100%;
-    margin-left: 4px;
-    min-width: 180px;
-  }
-}

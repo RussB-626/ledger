@@ -17,19 +17,12 @@ $success-color: #2ed573;
 $warning-color: #ffa502;
 
 // Responsive breakpoints
-$bp-mobile: 320px;
 $bp-tablet: 768px;
 $bp-desktop: 1024px;
 $bp-large: 1200px;
 $bp-xlarge: 1400px;
 
 // Media query mixins
-@mixin mobile-only {
-  @media (max-width: 767px) {
-    @content;
-  }
-}
-
 @mixin tablet-and-up {
   @media (min-width: 768px) {
     @content;
@@ -107,11 +100,6 @@ input, textarea, select {
   transition: all 0.2s ease;
   min-height: 44px;
   color-scheme: var(--color-scheme, dark);
-
-  @media (max-width: 767px) {
-    font-size: 16px;
-    padding: 10px 12px;
-  }
 
   &:focus {
     outline: none;
@@ -229,10 +217,6 @@ table {
   align-items: center;
   z-index: 2000;
   padding: 12px;
-
-  @media (max-width: 767px) {
-    align-items: flex-end;
-  }
 }
 
 .modal {
@@ -245,14 +229,6 @@ table {
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-
-  @media (max-width: 767px) {
-    width: 100%;
-    max-width: 100%;
-    max-height: 90vh;
-    border-radius: 12px 12px 0 0;
-    padding: 16px;
-  }
 
   .modal-header {
     display: flex;
@@ -293,23 +269,12 @@ table {
     border-top: 1px solid $border-color;
     padding-top: 16px;
 
-    @media (max-width: 767px) {
-      gap: 8px;
-      flex-direction: column-reverse;
-    }
-
     button {
       padding: 8px 16px;
       border-radius: 4px;
       border: 1px solid $border-color;
       background: none;
       color: $text-light;
-
-      @media (max-width: 767px) {
-        width: 100%;
-        padding: 10px 12px;
-        font-size: 13px;
-      }
 
       &.btn-primary {
         background-color: $teal-accent;
@@ -425,20 +390,6 @@ table {
 }
 
 // Responsive visibility utilities
-.show-mobile {
-  display: none;
-
-  @include mobile-only {
-    display: block;
-  }
-}
-
-.hide-mobile {
-  @include mobile-only {
-    display: none;
-  }
-}
-
 .show-tablet {
   display: none;
 
@@ -462,16 +413,6 @@ table {
 }
 
 // Stack utilities for flex/grid
-.stack-mobile {
-  @include mobile-only {
-    flex-direction: column;
-
-    & > * {
-      width: 100%;
-    }
-  }
-}
-
 .stack-tablet {
   @include tablet-only {
     flex-direction: column;
@@ -479,88 +420,6 @@ table {
     & > * {
       width: 100%;
     }
-  }
-}
-
-// Responsive padding utilities
-@each $size, $value in (0: 0, 1: 4px, 2: 8px, 3: 12px, 4: 16px, 5: 20px) {
-  .p-mobile-#{$size} {
-    @include mobile-only {
-      padding: $value;
-    }
-  }
-
-  .px-mobile-#{$size} {
-    @include mobile-only {
-      padding-left: $value;
-      padding-right: $value;
-    }
-  }
-
-  .py-mobile-#{$size} {
-    @include mobile-only {
-      padding-top: $value;
-      padding-bottom: $value;
-    }
-  }
-}
-
-// Responsive margin utilities
-@each $size, $value in (0: 0, 1: 4px, 2: 8px, 3: 12px, 4: 16px, 5: 20px) {
-  .m-mobile-#{$size} {
-    @include mobile-only {
-      margin: $value;
-    }
-  }
-
-  .mx-mobile-#{$size} {
-    @include mobile-only {
-      margin-left: $value;
-      margin-right: $value;
-    }
-  }
-
-  .my-mobile-#{$size} {
-    @include mobile-only {
-      margin-top: $value;
-      margin-bottom: $value;
-    }
-  }
-}
-
-// Responsive gap utilities
-@each $size, $value in (0: 0, 1: 4px, 2: 8px, 3: 12px, 4: 16px, 5: 20px) {
-  .gap-mobile-#{$size} {
-    @include mobile-only {
-      gap: $value;
-    }
-  }
-}
-
-// Responsive width utilities
-.w-mobile-full {
-  @include mobile-only {
-    width: 100%;
-  }
-}
-
-// Full-width grid on mobile
-.grid-mobile-1 {
-  @include mobile-only {
-    grid-template-columns: 1fr;
-  }
-}
-
-// Responsive font size utilities
-.text-mobile-sm {
-  @include mobile-only {
-    font-size: 12px;
-  }
-}
-
-.text-mobile-base {
-  @include mobile-only {
-    font-size: 14px;
   }
 }
 

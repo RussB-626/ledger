@@ -34,10 +34,6 @@
     display: flex;
     flex-wrap: wrap;
     gap: 12px;
-
-    @media (max-width: 767px) {
-      gap: 8px;
-    }
   }
 
   .selector-group {
@@ -47,20 +43,12 @@
     flex: 1;
     min-width: 45%;
 
-    @media (max-width: 767px) {
-      gap: 4px;
-    }
-
     label {
       font-size: 12px;
       font-weight: 600;
       color: var(--color-text-secondary);
       text-transform: uppercase;
       letter-spacing: 0.5px;
-
-      @media (max-width: 767px) {
-        font-size: 11px;
-      }
     }
 
     select {
@@ -131,13 +119,6 @@
       &.text-right {
         text-align: right;
       }
-
-      @media (max-width: 767px) {
-        &:nth-child(2),
-        &:nth-child(4) {
-          display: none;
-        }
-      }
     }
   }
 
@@ -162,13 +143,6 @@
         &.text-right {
           text-align: right;
           font-family: 'Courier New', monospace;
-        }
-
-        @media (max-width: 767px) {
-          &:nth-child(2),
-          &:nth-child(4) {
-            display: none;
-          }
         }
       }
     }

@@ -42,36 +42,6 @@
     }
   }
 
-  @media (max-width: 767px) {
-    .setting-row {
-      flex-direction: column;
-      align-items: stretch;
-      gap: 0.5rem;
-
-      label {
-        min-width: auto;
-      }
-
-      input[type='time'],
-      input[type='number'],
-      .select-input {
-        width: 100%;
-      }
-    }
-
-    .save-btn {
-      width: 100%;
-    }
-
-    .button-group {
-      flex-direction: column;
-      gap: 0.5rem;
-
-      button {
-        width: 100%;
-      }
-    }
-  }
 }
 
 .settings-group {
@@ -155,11 +125,6 @@
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
-
-  @media (max-width: 767px) {
-    flex-direction: column;
-    gap: 0.5rem;
-  }
 }
 
 .action-btn {
@@ -172,13 +137,6 @@
   transition: all 0.2s ease;
   margin: 0;
   box-sizing: border-box;
-
-  @media (max-width: 767px) {
-    width: 100%;
-    display: block;
-    text-align: center;
-    padding: 0.75rem 0.5rem;
-  }
 
   &.primary-btn {
     background: var(--color-secondary);

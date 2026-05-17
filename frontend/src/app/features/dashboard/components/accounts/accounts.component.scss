@@ -12,11 +12,6 @@
   overflow-y: auto;
   min-height: 900px;
   max-height: 900px;
-
-  @media (max-width: 767px) {
-    min-height: 700px;
-    max-height: 700px;
-  }
 }
 
 .accounts-right-panel {
@@ -28,11 +23,6 @@
   border-radius: 8px;
   min-height: 900px;
   max-height: 900px;
-
-  @media (max-width: 767px) {
-    min-height: 700px;
-    max-height: 700px;
-  }
 }
 
 .tab-header {
@@ -82,19 +72,3 @@
   }
 }
 
-@media (max-width: 768px) {
-  :host {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-
-  .accounts-left-panel {
-    min-height: auto;
-    max-height: none;
-  }
-
-  .accounts-right-panel {
-    min-height: auto;
-    max-height: none;
-  }
-}

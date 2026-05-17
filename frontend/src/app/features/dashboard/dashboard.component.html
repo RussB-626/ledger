@@ -16,7 +16,7 @@
       (editTransaction)="onEditTransaction($event)">
     </app-accounts>
 
-    <!-- Bottom Row: 50/50 Split (Hidden on mobile) -->
+    <!-- Bottom Row: 50/50 Split -->
     <div class="bottom-content-row">
       <!-- Left: Categories, Differences & Categories Data -->
       <div class="card chart-card">
@@ -55,26 +55,8 @@
           </div>
         </div>
 
-        <!-- Mobile View Toggle Buttons (only show on mobile) -->
-        <div class="mobile-view-toggle">
-          <button
-            class="toggle-btn"
-            [class.active]="showDifferencesOnMobile"
-            (click)="showDifferencesOnMobile = true"
-          >
-            Balances
-          </button>
-          <button
-            class="toggle-btn"
-            [class.active]="!showDifferencesOnMobile"
-            (click)="showDifferencesOnMobile = false"
-          >
-            Categories
-          </button>
-        </div>
-
-        <!-- Balances Card Below Header (toggled on mobile, always show on desktop) -->
-        <div class="balances-sub-card" [class.hidden-mobile]="!showDifferencesOnMobile">
+        <!-- Balances Card -->
+        <div class="balances-sub-card">
           <app-networth-card
             [pageData]="pageData"
             [compact]="false"
@@ -83,14 +65,13 @@
           ></app-networth-card>
         </div>
 
-        <!-- Categories Data Below Balances (toggled on mobile, always show on desktop) -->
+        <!-- Categories Data Below Balances -->
         <app-categories-section
           #categoriesSection
           [pageData]="pageData"
           [externalSelectedYear]="selectedCategoryYear"
           [externalSelectedMonth]="selectedCategoryMonth"
           (yearMonthChanged)="onCategoryYearMonthChange()"
-          [class.hidden-mobile]="showDifferencesOnMobile"
         ></app-categories-section>
       </div>
 
