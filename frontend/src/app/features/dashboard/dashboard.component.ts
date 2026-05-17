@@ -12,7 +12,6 @@ import { ApiService } from '../../core/services/api.service';
 import { PageData, Transaction, User } from '../../core/models/index';
 import { AccountsComponent } from './components/accounts/accounts.component';
 import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
-import { NetworthCardComponent } from './components/networth-card/networth-card.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
 import { EditTransactionModalComponent } from '../../shared/components/edit-transaction-modal/edit-transaction-modal.component';
 
@@ -26,7 +25,6 @@ import { EditTransactionModalComponent } from '../../shared/components/edit-tran
     FormsModule,
     AccountsComponent,
     CategoriesSectionComponent,
-    NetworthCardComponent,
     CommonWithdrawalsComponent,
     EditTransactionModalComponent
   ]
@@ -85,61 +83,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
       });
   }
 
-  calculateNetWorth(balances: Record<string, number>): number {
-    return Object.values(balances).reduce((sum, balance) => sum + balance, 0);
-  }
-
-  formatNetWorth(balances: Record<string, number>): string {
-    const netWorth = this.calculateNetWorth(balances);
-    const user = this.activeUser;
-    if (!user) {
-      return `$${netWorth.toFixed(2)}`;
-    }
-
-    const symbol = user.currency_symbol;
-    const decimalPlaces = user.decimal_places;
-    const thousandSep = user.thousand_separator;
-    const decimalSep = user.decimal_separator;
-    const currencyPos = user.currency_position;
-    const negativeFormat = user.negative_format;
-
-    const absAmount = Math.abs(netWorth);
-    const isNegative = netWorth < 0;
-
-    const formatted = this.formatNumber(absAmount, decimalPlaces, thousandSep, decimalSep);
-    const withCurrency = currencyPos === 'before'
-      ? `${symbol}${formatted}`
-      : `${formatted}${symbol}`;
-
-    if (!isNegative) {
-      return withCurrency;
-    }
-
-    return this.applyNegativeFormat(withCurrency, negativeFormat);
-  }
-
-  private formatNumber(num: number, decimalPlaces: number, thousandSep: string, decimalSep: string): string {
-    const parts = num.toFixed(decimalPlaces).split('.');
-    const intPart = parts[0];
-    const decPart = parts[1];
-
-    const withThousands = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, thousandSep);
-    return decPart !== undefined ? `${withThousands}${decimalSep}${decPart}` : withThousands;
-  }
-
-  private applyNegativeFormat(value: string, format: string): string {
-    switch (format) {
-      case 'parentheses':
-        return `(${value})`;
-      case 'brackets':
-        return `[${value}]`;
-      case 'braces':
-        return `{${value}}`;
-      case '-prefix':
-      default:
-        return `-${value}`;
-    }
-  }
 
   onEditTransaction(transaction: Transaction): void {
     this.editingTransaction = transaction;

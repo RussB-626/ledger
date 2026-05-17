@@ -11,7 +11,6 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './dashboard.component';
 import { AccountsComponent } from './components/accounts/accounts.component';
 import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
-import { NetworthCardComponent } from './components/networth-card/networth-card.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -27,7 +26,6 @@ import { SharedModule } from '../../shared/shared.module';
     DashboardComponent,
     AccountsComponent,
     CategoriesSectionComponent,
-    NetworthCardComponent,
     CommonWithdrawalsComponent
   ]
 })
