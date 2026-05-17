@@ -24,7 +24,6 @@ export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
 
   activeUser: User | null = null;
   searchTerm: string = '';
-  selectedAccount: string = 'All';
 
   // Pagination properties
   currentPage = 1;
@@ -77,21 +76,12 @@ export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
     return this.pageData?.pendingTransactions || [];
   }
 
-  get uniqueAccounts(): string[] {
-    const accounts = new Set(this.pendingTransactions.map(txn => txn.account));
-    return Array.from(accounts).sort();
-  }
-
   get filteredPendingTransactions(): Transaction[] {
     let filtered = this.pendingTransactions;
 
     // Filter by selected account from parent (account card click)
     if (this.selectedAccountName) {
       filtered = filtered.filter(txn => txn.account === this.selectedAccountName);
-    }
-    // OR by selected account from dropdown
-    else if (this.selectedAccount !== 'All') {
-      filtered = filtered.filter(txn => txn.account === this.selectedAccount);
     }
 
     // Filter by search term
