@@ -37,15 +37,20 @@
   border: 1px solid var(--color-border);
   border-radius: 8px;
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
 }
 
 .section-title {
   margin: 0;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
   color: var(--color-text);
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  text-align: center;
 }
 
 .card {
@@ -91,12 +96,12 @@
 }
 
 .card-balance {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   font-family: 'Courier New', monospace;
   white-space: nowrap;
   flex-shrink: 0;
-  line-height: 18px;
+  line-height: 16px;
 }
 
 .account-card {
@@ -116,11 +121,20 @@
 }
 
 .totals-card {
-  opacity: 0.7;
   cursor: default;
+  border-color: var(--color-primary);
+  background-color: rgba(0, 217, 255, 0.05);
+
+  .card-header {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
 
   &:hover {
     transform: none;
-    border-color: var(--color-border);
+    border-color: var(--color-primary);
+    box-shadow: 0 0 12px rgba(0, 217, 255, 0.15);
   }
 }
