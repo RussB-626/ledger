@@ -1,4 +1,41 @@
-<div class="categories-section-container">
+<div class="card chart-card">
+  <!-- Categories Header with Year/Month Selectors -->
+  <div class="categories-header">
+    <h3>Categories</h3>
+    <div class="selectors">
+      <div class="selector-group">
+        <label for="category-year">Year:</label>
+        <select
+          id="category-year"
+          [(ngModel)]="selectedYear"
+          (change)="onYearOrMonthChange()"
+        >
+          @for (year of pageData.years; track year) {
+            <option [value]="year">
+              {{ year }}
+            </option>
+          }
+        </select>
+      </div>
+      <div class="selector-group">
+        <label for="category-month">Month:</label>
+        <select
+          id="category-month"
+          [(ngModel)]="selectedMonth"
+          (change)="onYearOrMonthChange()"
+        >
+          @for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) {
+            <option [value]="month">
+              {{ monthNames[month - 1] }}
+            </option>
+          }
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Categories Data -->
+  <div class="categories-section-container">
   @if (loading) {
   <div class="loading-state">
     Loading category data...
@@ -71,4 +108,5 @@
     </div>
   </div>
   }
+  </div>
 </div>

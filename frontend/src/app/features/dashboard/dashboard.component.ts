@@ -36,10 +36,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   editingTransaction: Transaction | null = null;
   activeUser: User | null = null;
 
-  selectedCategoryYear: number;
-  selectedCategoryMonth: number;
-  monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -49,9 +45,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {
     this.pageData$ = this.pageDataService.pageData$;
     this.activeUser = this.userService.getActiveUser();
-    const now = new Date();
-    this.selectedCategoryYear = now.getFullYear();
-    this.selectedCategoryMonth = now.getMonth() + 1;
   }
 
   ngOnInit(): void {
@@ -109,11 +102,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
         }
       });
     }
-  }
-
-  onCategoryYearMonthChange(): void {
-    // This method is called when year/month changes in the dashboard header
-    // The bindings will automatically update the differences card and categories section
   }
 
   ngOnDestroy(): void {

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
@@ -16,9 +16,6 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pip
 })
 export class CategoriesSectionComponent implements OnInit, OnChanges {
   @Input() pageData!: PageData;
-  @Input() externalSelectedYear?: number;
-  @Input() externalSelectedMonth?: number;
-  @Output() yearMonthChanged = new EventEmitter<void>();
 
   selectedYear: number;
   selectedMonth: number;
@@ -50,17 +47,6 @@ export class CategoriesSectionComponent implements OnInit, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    // Reload when year/month changes
-    if (changes['externalSelectedYear'] || changes['externalSelectedMonth']) {
-      if (this.externalSelectedYear !== undefined) {
-        this.selectedYear = this.externalSelectedYear;
-      }
-      if (this.externalSelectedMonth !== undefined) {
-        this.selectedMonth = this.externalSelectedMonth;
-      }
-      this.loadCategoryTotals();
-    }
-
     // Reload when page data changes (e.g., transaction added/deleted)
     if (changes['pageData'] && this.pageData) {
       this.loadCategoryTotals();

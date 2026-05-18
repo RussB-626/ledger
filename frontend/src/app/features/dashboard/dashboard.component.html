@@ -9,52 +9,8 @@
 
     <!-- Bottom Row: 50/50 Split -->
     <div class="bottom-content-row">
-      <!-- Left: Categories, Differences & Categories Data -->
-      <div class="card chart-card">
-        <!-- Categories Header with Year/Month Selectors -->
-        <div class="categories-header">
-          <h3>Categories</h3>
-          <div class="selectors">
-            <div class="selector-group">
-              <label for="category-year">Year:</label>
-              <select
-                id="category-year"
-                [(ngModel)]="selectedCategoryYear"
-                (change)="onCategoryYearMonthChange()"
-              >
-                @for (year of pageData.years; track year) {
-                  <option [value]="year">
-                    {{ year }}
-                  </option>
-                }
-              </select>
-            </div>
-            <div class="selector-group">
-              <label for="category-month">Month:</label>
-              <select
-                id="category-month"
-                [(ngModel)]="selectedCategoryMonth"
-                (change)="onCategoryYearMonthChange()"
-              >
-                @for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) {
-                  <option [value]="month">
-                    {{ monthNames[month - 1] }}
-                  </option>
-                }
-              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Categories Data -->
-        <app-categories-section
-          #categoriesSection
-          [pageData]="pageData"
-          [externalSelectedYear]="selectedCategoryYear"
-          [externalSelectedMonth]="selectedCategoryMonth"
-          (yearMonthChanged)="onCategoryYearMonthChange()"
-        ></app-categories-section>
-      </div>
+      <!-- Left: Categories Section -->
+      <app-categories-section [pageData]="pageData"></app-categories-section>
 
       <!-- Right: Common Withdrawals -->
       <div class="card">
