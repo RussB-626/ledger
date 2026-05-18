@@ -8,13 +8,13 @@ import { PageData, CategoryTotals, MonthlyDifference, User } from '../../../../c
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
-  selector: 'app-categories-section',
-  templateUrl: './categories-section.component.html',
-  styleUrls: ['./categories-section.component.scss'],
+  selector: 'app-fin-summary',
+  templateUrl: './fin-summary.component.html',
+  styleUrls: ['./fin-summary.component.scss'],
   standalone: true,
   imports: [CommonModule, FormsModule, FormatCurrencyPipe]
 })
-export class CategoriesSectionComponent implements OnInit, OnChanges {
+export class FinSummaryComponent implements OnInit, OnChanges {
   @Input() pageData!: PageData;
 
   selectedYear: number;

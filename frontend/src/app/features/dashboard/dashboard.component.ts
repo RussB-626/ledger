@@ -11,7 +11,7 @@ import { UserService } from '../../core/services/user.service';
 import { ApiService } from '../../core/services/api.service';
 import { PageData, Transaction, User } from '../../core/models/index';
 import { AccountsComponent } from './components/accounts/accounts.component';
-import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
+import { FinSummaryComponent } from './components/fin-summary/fin-summary.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
 import { EditTransactionModalComponent } from '../../shared/components/edit-transaction-modal/edit-transaction-modal.component';
 
@@ -24,7 +24,7 @@ import { EditTransactionModalComponent } from '../../shared/components/edit-tran
     CommonModule,
     FormsModule,
     AccountsComponent,
-    CategoriesSectionComponent,
+    FinSummaryComponent,
     CommonWithdrawalsComponent,
     EditTransactionModalComponent
   ]

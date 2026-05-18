@@ -10,7 +10,7 @@ import { NgChartsModule } from 'ng2-charts';
 import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './dashboard.component';
 import { AccountsComponent } from './components/accounts/accounts.component';
-import { CategoriesSectionComponent } from './components/categories-section/categories-section.component';
+import { FinSummaryComponent } from './components/fin-summary/fin-summary.component';
 import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
 import { SharedModule } from '../../shared/shared.module';
 
@@ -25,7 +25,7 @@ import { SharedModule } from '../../shared/shared.module';
     SharedModule,
     DashboardComponent,
     AccountsComponent,
-    CategoriesSectionComponent,
+    FinSummaryComponent,
     CommonWithdrawalsComponent
   ]
 })
