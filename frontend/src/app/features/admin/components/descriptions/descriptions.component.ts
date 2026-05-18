@@ -15,7 +15,8 @@ interface ModalState {
 
 interface DescriptionModalData {
   description: string;
-  is_common: boolean;
+  is_monthly: boolean;
+  is_yearly: boolean;
 }
 
 @Component({
@@ -34,11 +35,12 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
   searchDescriptions = '';
 
   descriptionModal: ModalState = { isOpen: false, mode: 'create' };
-  descriptionFormData: DescriptionModalData = { description: '', is_common: false };
+  descriptionFormData: DescriptionModalData = { description: '', is_monthly: false, is_yearly: false };
 
   bulkDescriptionModal = { isOpen: false };
   bulkDescriptionsText = '';
-  bulkDescriptionIsCommon = false;
+  bulkDescriptionIsMonthly = false;
+  bulkDescriptionIsYearly = false;
   bulkDescriptionError = '';
   bulkDescriptionLoading = false;
 
@@ -84,16 +86,17 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
     if (mode === 'edit' && description) {
       this.descriptionFormData = {
         description: description.description,
-        is_common: description.is_common
+        is_monthly: description.is_monthly,
+        is_yearly: description.is_yearly
       };
     } else {
-      this.descriptionFormData = { description: '', is_common: false };
+      this.descriptionFormData = { description: '', is_monthly: false, is_yearly: false };
     }
   }
 
   closeDescriptionModal(): void {
     this.descriptionModal = { isOpen: false, mode: 'create' };
-    this.descriptionFormData = { description: '', is_common: false };
+    this.descriptionFormData = { description: '', is_monthly: false, is_yearly: false };
   }
 
   saveDescription(): void {
@@ -101,7 +104,8 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
 
     const payload = {
       description: this.descriptionFormData.description,
-      is_common: this.descriptionFormData.is_common
+      is_monthly: this.descriptionFormData.is_monthly,
+      is_yearly: this.descriptionFormData.is_yearly
     };
 
     if (this.descriptionModal.mode === 'create') {
@@ -122,7 +126,8 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
   openBulkDescriptionModal(): void {
     this.bulkDescriptionModal = { isOpen: true };
     this.bulkDescriptionsText = '';
-    this.bulkDescriptionIsCommon = false;
+    this.bulkDescriptionIsMonthly = false;
+    this.bulkDescriptionIsYearly = false;
     this.bulkDescriptionError = '';
     this.bulkDescriptionLoading = false;
   }
@@ -130,7 +135,8 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
   closeBulkDescriptionModal(): void {
     this.bulkDescriptionModal = { isOpen: false };
     this.bulkDescriptionsText = '';
-    this.bulkDescriptionIsCommon = false;
+    this.bulkDescriptionIsMonthly = false;
+    this.bulkDescriptionIsYearly = false;
     this.bulkDescriptionError = '';
   }
 
@@ -153,7 +159,7 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
     this.bulkDescriptionLoading = true;
     this.bulkDescriptionError = '';
 
-    this.apiService.bulkCreateDescriptions(this.activeUser.id, descriptions, this.bulkDescriptionIsCommon)
+    this.apiService.bulkCreateDescriptions(this.activeUser.id, descriptions, this.bulkDescriptionIsMonthly, this.bulkDescriptionIsYearly)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

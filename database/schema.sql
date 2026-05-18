@@ -47,13 +47,14 @@ CREATE TABLE categories (
   UNIQUE KEY unique_user_category (user_id, name)
 );
 
--- Descriptions table: Transaction descriptions with common flag
+-- Descriptions table: Transaction descriptions with monthly and yearly flags
 -- MUST be created before transactions table (FK dependency)
 CREATE TABLE descriptions (
   id          INT AUTO_INCREMENT PRIMARY KEY,
   user_id     INT NOT NULL,
   description VARCHAR(255) NOT NULL,
-  is_common   TINYINT(1) NOT NULL DEFAULT 0,
+  is_monthly  TINYINT(1) NOT NULL DEFAULT 0,
+  is_yearly   TINYINT(1) NOT NULL DEFAULT 0,
   FOREIGN KEY (user_id) REFERENCES users(id),
   UNIQUE KEY unique_user_description (user_id, description)
 );

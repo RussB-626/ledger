@@ -65,7 +65,8 @@ export interface Description {
   id: number;
   user_id: number;
   description: string;
-  is_common: boolean;
+  is_monthly: boolean;
+  is_yearly: boolean;
 }
 
 // API Response format: all endpoints return { data?, error? }
@@ -157,12 +158,14 @@ export interface UpdateCategoryRequest {
 // Request for creating/updating description
 export interface CreateDescriptionRequest {
   description: string;
-  is_common?: boolean;
+  is_monthly?: boolean;
+  is_yearly?: boolean;
 }
 
 export interface UpdateDescriptionRequest {
   description?: string;
-  is_common?: boolean;
+  is_monthly?: boolean;
+  is_yearly?: boolean;
 }
 
 // Request for creating user

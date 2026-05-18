@@ -185,10 +185,10 @@ export class ApiService {
 
   // ====== DESCRIPTIONS ======
 
-  getDescriptions(userId: number, common?: boolean): Observable<Description[]> {
+  getDescriptions(userId: number, recurring?: 'monthly' | 'yearly'): Observable<Description[]> {
     let params = new HttpParams();
-    if (common) {
-      params = params.set('common', 'true');
+    if (recurring) {
+      params = params.set('recurring', recurring);
     }
 
     return this.http.get<ApiResponse<Description[]>>(
@@ -197,8 +197,12 @@ export class ApiService {
     ).pipe(map(response => response.data || []));
   }
 
-  getCommonDescriptions(userId: number): Observable<Description[]> {
-    return this.getDescriptions(userId, true);
+  getMonthlyDescriptions(userId: number): Observable<Description[]> {
+    return this.getDescriptions(userId, 'monthly');
+  }
+
+  getYearlyDescriptions(userId: number): Observable<Description[]> {
+    return this.getDescriptions(userId, 'yearly');
   }
 
   createDescription(userId: number, description: any): Observable<Description> {
@@ -221,10 +225,10 @@ export class ApiService {
     ).pipe(map(response => response.data || { success: false }));
   }
 
-  bulkCreateDescriptions(userId: number, descriptions: string[], isCommon: boolean): Observable<Description[]> {
+  bulkCreateDescriptions(userId: number, descriptions: string[], isMonthly: boolean = false, isYearly: boolean = false): Observable<Description[]> {
     return this.http.post<ApiResponse<Description[]>>(
       `${this.baseUrl}/users/${userId}/txn-descriptions/bulk`,
-      { descriptions, is_common: isCommon }
+      { descriptions, is_monthly: isMonthly, is_yearly: isYearly }
     ).pipe(map(response => response.data || []));
   }
 

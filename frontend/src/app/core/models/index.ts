@@ -60,7 +60,8 @@ export interface Description {
   id: number;
   user_id: number;
   description: string;
-  is_common: boolean;
+  is_monthly: boolean;
+  is_yearly: boolean;
 }
 
 export interface PageData {

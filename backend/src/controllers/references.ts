@@ -249,29 +249,32 @@ export async function getDescriptionsByUserId(userId: number): Promise<Descripti
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, description, is_common FROM descriptions WHERE user_id = ? ORDER BY description ASC',
+      'SELECT id, user_id, description, is_monthly, is_yearly FROM descriptions WHERE user_id = ? ORDER BY description ASC',
       [userId]
     );
     return rows.map(row => ({
       ...row,
-      is_common: Boolean(row.is_common)
+      is_monthly: Boolean(row.is_monthly),
+      is_yearly: Boolean(row.is_yearly)
     })) as Description[];
   } finally {
     connection.release();
   }
 }
 
-// Get only common descriptions
-export async function getCommonDescriptionsByUserId(userId: number): Promise<Description[]> {
+// Get recurring descriptions by type (monthly or yearly)
+export async function getRecurringDescriptionsByUserId(userId: number, type: 'monthly' | 'yearly'): Promise<Description[]> {
   const connection = await pool.getConnection();
   try {
+    const column = type === 'monthly' ? 'is_monthly' : 'is_yearly';
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, description, is_common FROM descriptions WHERE user_id = ? AND is_common = 1 ORDER BY description ASC',
+      `SELECT id, user_id, description, is_monthly, is_yearly FROM descriptions WHERE user_id = ? AND ${column} = 1 ORDER BY description ASC`,
       [userId]
     );
     return rows.map(row => ({
       ...row,
-      is_common: Boolean(row.is_common)
+      is_monthly: Boolean(row.is_monthly),
+      is_yearly: Boolean(row.is_yearly)
     })) as Description[];
   } finally {
     connection.release();
@@ -297,8 +300,8 @@ export async function getOrCreateDescription(
 
     // Create new description if not exists
     const [result] = await connection.query<ResultSetHeader>(
-      'INSERT INTO descriptions (user_id, description, is_common) VALUES (?, ?, ?)',
-      [userId, descriptionText, 0]
+      'INSERT INTO descriptions (user_id, description, is_monthly, is_yearly) VALUES (?, ?, ?, ?)',
+      [userId, descriptionText, 0, 0]
     );
 
     return result.insertId;
@@ -314,15 +317,16 @@ export async function createDescription(
   const connection = await pool.getConnection();
   try {
     const [result] = await connection.query<ResultSetHeader>(
-      'INSERT INTO descriptions (user_id, description, is_common) VALUES (?, ?, ?)',
-      [userId, req.description, req.is_common ? 1 : 0]
+      'INSERT INTO descriptions (user_id, description, is_monthly, is_yearly) VALUES (?, ?, ?, ?)',
+      [userId, req.description, req.is_monthly ? 1 : 0, req.is_yearly ? 1 : 0]
     );
 
     return {
       id: result.insertId,
       user_id: userId,
       description: req.description,
-      is_common: req.is_common ?? false
+      is_monthly: req.is_monthly ?? false,
+      is_yearly: req.is_yearly ?? false
     };
   } finally {
     connection.release();
@@ -343,9 +347,13 @@ export async function updateDescription(
       updates.push('description = ?');
       values.push(req.description);
     }
-    if (req.is_common !== undefined) {
-      updates.push('is_common = ?');
-      values.push(req.is_common ? 1 : 0);
+    if (req.is_monthly !== undefined) {
+      updates.push('is_monthly = ?');
+      values.push(req.is_monthly ? 1 : 0);
+    }
+    if (req.is_yearly !== undefined) {
+      updates.push('is_yearly = ?');
+      values.push(req.is_yearly ? 1 : 0);
     }
 
     if (updates.length === 0) {
@@ -364,7 +372,7 @@ export async function updateDescription(
     }
 
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, description, is_common FROM descriptions WHERE id = ?',
+      'SELECT id, user_id, description, is_monthly, is_yearly FROM descriptions WHERE id = ?',
       [descriptionId]
     );
 
@@ -377,7 +385,8 @@ export async function updateDescription(
       id: row.id,
       user_id: row.user_id,
       description: row.description,
-      is_common: Boolean(row.is_common)
+      is_monthly: Boolean(row.is_monthly),
+      is_yearly: Boolean(row.is_yearly)
     };
   } finally {
     connection.release();

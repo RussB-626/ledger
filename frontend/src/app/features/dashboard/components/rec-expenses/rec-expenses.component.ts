@@ -15,6 +15,7 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pip
 export class RecExpensesComponent implements OnChanges {
   @Input() pageData!: PageData;
 
+  selectedTab: 'monthly' | 'yearly' = 'monthly';
   selectedYear: number;
   selectedMonth: number;
   monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -31,8 +32,12 @@ export class RecExpensesComponent implements OnChanges {
     }
   }
 
-  get commonDescriptions() {
-    return this.pageData?.txnDescriptions.filter(d => d.is_common) || [];
+  get monthlyDescriptions() {
+    return this.pageData?.txnDescriptions.filter(d => d.is_monthly) || [];
+  }
+
+  get yearlyDescriptions() {
+    return this.pageData?.txnDescriptions.filter(d => d.is_yearly) || [];
   }
 
   private getTransactionsForMonth(year: number, month: number, descriptionId: number): Transaction[] {
@@ -88,6 +93,23 @@ export class RecExpensesComponent implements OnChanges {
     }, 0);
   }
 
+  getCurrentYearTotal(descriptionId: number): number {
+    return this.getYearTotal(descriptionId);
+  }
+
+  getPriorYearTotal(descriptionId: number): number {
+    if (!this.pageData?.transactions) return 0;
+
+    const priorYear = Number(this.selectedYear) - 1;
+    return this.pageData.transactions.filter(txn => {
+      const [txnYear] = txn.date.split('-').map(Number);
+      return txn.description_id === descriptionId && txnYear === priorYear;
+    }).reduce((sum, txn) => {
+      const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
+  }
+
   formatCurrency(amount: number): string {
     const user = this.userService.getActiveUser();
     if (!user) {
@@ -125,5 +147,9 @@ export class RecExpensesComponent implements OnChanges {
 
   onYearOrMonthChange(): void {
     // Filtering happens through the getters
+  }
+
+  onTabChange(tab: 'monthly' | 'yearly'): void {
+    this.selectedTab = tab;
   }
 }

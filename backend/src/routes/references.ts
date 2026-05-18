@@ -357,7 +357,7 @@ router.post(
   '/:userId/txn-descriptions/bulk',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
-    const { descriptions, is_common } = req.body as { descriptions?: string[], is_common?: boolean };
+    const { descriptions, is_monthly, is_yearly } = req.body as { descriptions?: string[], is_monthly?: boolean, is_yearly?: boolean };
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -386,7 +386,8 @@ router.post(
         try {
           const description = await referencesController.createDescription(userId, {
             description: trimmedDesc,
-            is_common: is_common ?? false
+            is_monthly: is_monthly ?? false,
+            is_yearly: is_yearly ?? false
           });
           createdDescriptions.push(description);
         } catch {
@@ -402,12 +403,12 @@ router.post(
   })
 );
 
-// GET /api/users/:userId/txn-descriptions - Get all descriptions (or filtered by common flag)
+// GET /api/users/:userId/txn-descriptions - Get all descriptions (or filtered by monthly/yearly flags)
 router.get(
   '/:userId/txn-descriptions',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
-    const common = req.query.common === 'true';
+    const recurring = req.query.recurring as string | undefined; // 'monthly' | 'yearly'
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -417,8 +418,8 @@ router.get(
 
     let descriptions: Description[];
 
-    if (common) {
-      descriptions = await referencesController.getCommonDescriptionsByUserId(userId);
+    if (recurring === 'monthly' || recurring === 'yearly') {
+      descriptions = await referencesController.getRecurringDescriptionsByUserId(userId, recurring);
     } else {
       descriptions = await referencesController.getDescriptionsByUserId(userId);
     }

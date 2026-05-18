@@ -21,7 +21,8 @@
       <thead>
         <tr>
           <th>Description Text</th>
-          <th>Is Common</th>
+          <th>Monthly</th>
+          <th>Yearly</th>
           <th style="text-align: right;">Actions</th>
         </tr>
       </thead>
@@ -29,7 +30,8 @@
         @for (desc of getPaginatedDescriptions(); track desc.id) {
           <tr>
             <td>{{ desc.description }}</td>
-            <td class="checkbox-col">{{ desc.is_common ? '✓' : '' }}</td>
+            <td class="checkbox-col">{{ desc.is_monthly ? '✓' : '' }}</td>
+            <td class="checkbox-col">{{ desc.is_yearly ? '✓' : '' }}</td>
             <td class="actions">
               <button
                 class="action-btn edit-btn"
@@ -114,10 +116,18 @@
           <label class="checkbox-label">
             <input
               type="checkbox"
-              [(ngModel)]="descriptionFormData.is_common"
+              [(ngModel)]="descriptionFormData.is_monthly"
               class="checkbox-input"
             />
-            Is Common (shows in recurring withdrawals)
+            Mark as Monthly
+          </label>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="descriptionFormData.is_yearly"
+              class="checkbox-input"
+            />
+            Mark as Yearly
           </label>
         </div>
       </div>
@@ -150,10 +160,18 @@
           <label class="checkbox-label">
             <input
               type="checkbox"
-              [(ngModel)]="bulkDescriptionIsCommon"
+              [(ngModel)]="bulkDescriptionIsMonthly"
               class="checkbox-input"
             />
-            Mark as Common (for recurring withdrawals)
+            Mark as Monthly
+          </label>
+          <label class="checkbox-label">
+            <input
+              type="checkbox"
+              [(ngModel)]="bulkDescriptionIsYearly"
+              class="checkbox-input"
+            />
+            Mark as Yearly
           </label>
         </div>
 
