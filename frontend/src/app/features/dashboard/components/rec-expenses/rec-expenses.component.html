@@ -1,11 +1,11 @@
-<div class="common-withdrawals-container">
+<div class="rec-expenses-container">
   <div class="section-header">
-    <h3>Common Withdrawals</h3>
+    <h3>Recurring Expenses</h3>
     <div class="selectors">
       <div class="selector-group">
-        <label for="cw-year">Year:</label>
+        <label for="re-year">Year:</label>
         <select
-          id="cw-year"
+          id="re-year"
           [(ngModel)]="selectedYear"
           (change)="onYearOrMonthChange()"
         >
@@ -17,9 +17,9 @@
         </select>
       </div>
       <div class="selector-group">
-        <label for="cw-month">Month:</label>
+        <label for="re-month">Month:</label>
         <select
-          id="cw-month"
+          id="re-month"
           [(ngModel)]="selectedMonth"
           (change)="onYearOrMonthChange()"
         >
@@ -35,7 +35,7 @@
 
   @if (commonDescriptions.length > 0) {
   <div class="table-wrapper">
-    <table class="common-withdrawals-table">
+    <table class="rec-expenses-table">
       <thead>
         <tr>
           <th>Description</th>
@@ -60,7 +60,7 @@
 
   @if (commonDescriptions.length === 0) {
   <div class="empty-state">
-    <p>No common withdrawals tracked</p>
+    <p>No recurring expenses tracked</p>
   </div>
   }
 </div>

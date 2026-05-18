@@ -1,11 +1,11 @@
-// Common Withdrawals styles
+// Recurring Expenses styles
 
 :host {
   display: flex;
   flex-direction: column;
 }
 
-.common-withdrawals-container {
+.rec-expenses-container {
   width: 100%;
   height: 100%;
   padding: 0;
@@ -94,7 +94,7 @@
   }
 }
 
-.common-withdrawals-table {
+.rec-expenses-table {
   width: 100%;
   border-collapse: collapse;
   background-color: var(--color-surface);

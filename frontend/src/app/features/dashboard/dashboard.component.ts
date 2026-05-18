@@ -1,5 +1,5 @@
 // Dashboard component - main page with all features
-// Per CLAUDE.md: Accounts/Transactions/Pending tabs, Categories, Networth, Common Withdrawals
+// Per CLAUDE.md: Accounts/Transactions/Pending tabs, Categories, Networth, Recurring Expenses
 
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ import { ApiService } from '../../core/services/api.service';
 import { PageData, Transaction, User } from '../../core/models/index';
 import { AccountsComponent } from './components/accounts/accounts.component';
 import { FinSummaryComponent } from './components/fin-summary/fin-summary.component';
-import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
+import { RecExpensesComponent } from './components/rec-expenses/rec-expenses.component';
 import { EditTransactionModalComponent } from '../../shared/components/edit-transaction-modal/edit-transaction-modal.component';
 
 @Component({
@@ -25,7 +25,7 @@ import { EditTransactionModalComponent } from '../../shared/components/edit-tran
     FormsModule,
     AccountsComponent,
     FinSummaryComponent,
-    CommonWithdrawalsComponent,
+    RecExpensesComponent,
     EditTransactionModalComponent
   ]
 })

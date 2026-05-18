@@ -6,13 +6,13 @@ import { UserService } from '../../../../core/services/user.service';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
-  selector: 'app-common-withdrawals',
-  templateUrl: './common-withdrawals.component.html',
-  styleUrls: ['./common-withdrawals.component.scss'],
+  selector: 'app-rec-expenses',
+  templateUrl: './rec-expenses.component.html',
+  styleUrls: ['./rec-expenses.component.scss'],
   standalone: true,
   imports: [CommonModule, FormsModule, FormatCurrencyPipe]
 })
-export class CommonWithdrawalsComponent implements OnChanges {
+export class RecExpensesComponent implements OnChanges {
   @Input() pageData!: PageData;
 
   selectedYear: number;

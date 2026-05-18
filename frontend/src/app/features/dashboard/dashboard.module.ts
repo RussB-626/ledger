@@ -11,7 +11,7 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './dashboard.component';
 import { AccountsComponent } from './components/accounts/accounts.component';
 import { FinSummaryComponent } from './components/fin-summary/fin-summary.component';
-import { CommonWithdrawalsComponent } from './components/common-withdrawals/common-withdrawals.component';
+import { RecExpensesComponent } from './components/rec-expenses/rec-expenses.component';
 import { SharedModule } from '../../shared/shared.module';
 
 @NgModule({
@@ -26,7 +26,7 @@ import { SharedModule } from '../../shared/shared.module';
     DashboardComponent,
     AccountsComponent,
     FinSummaryComponent,
-    CommonWithdrawalsComponent
+    RecExpensesComponent
   ]
 })
 export class DashboardModule { }
