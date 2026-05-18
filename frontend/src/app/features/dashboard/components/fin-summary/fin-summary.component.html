@@ -1,12 +1,12 @@
 <div class="card chart-card">
   <!-- Financial Summary Header with Year/Month Selectors -->
-  <div class="categories-header">
+  <div class="fin-summary-header">
     <h3>Monthly Financial Summary</h3>
     <div class="selectors">
       <div class="selector-group">
-        <label for="category-year">Year:</label>
+        <label for="fin-summary-year">Year:</label>
         <select
-          id="category-year"
+          id="fin-summary-year"
           [(ngModel)]="selectedYear"
           (change)="onYearOrMonthChange()"
         >
@@ -18,9 +18,9 @@
         </select>
       </div>
       <div class="selector-group">
-        <label for="category-month">Month:</label>
+        <label for="fin-summary-month">Month:</label>
         <select
-          id="category-month"
+          id="fin-summary-month"
           [(ngModel)]="selectedMonth"
           (change)="onYearOrMonthChange()"
         >
@@ -35,7 +35,7 @@
   </div>
 
   <!-- Financial Summary Data -->
-  <div class="categories-section-container">
+  <div class="fin-summary-container">
   @if (loading) {
   <div class="loading-state">
     Loading category data...
@@ -65,16 +65,16 @@
   <!-- List with Tabs -->
   <div class="list-section">
     <!-- Tabs -->
-    <div class="category-tabs">
+    <div class="fin-summary-tabs">
       <button
-        class="tab-btn"
+        class="summary-tab-btn"
         [class.active]="selectedTab === 'expenses'"
         (click)="selectTab('expenses')"
       >
         Expenses
       </button>
       <button
-        class="tab-btn"
+        class="summary-tab-btn"
         [class.active]="selectedTab === 'incomes'"
         (click)="selectTab('incomes')"
       >
@@ -83,10 +83,10 @@
     </div>
 
     <!-- Scrollable List -->
-    <div class="category-list">
+    <div class="fin-summary-list">
       @if (sortedCategoryEntries.length > 0) {
         @for (item of sortedCategoryEntries; track item[0]) {
-          <div class="category-item">
+          <div class="summary-item">
             <div class="item-header">
               <span class="item-name">{{ item[0] }}</span>
               <span class="item-amount" style="color: var(--color-text);">{{ item[1] | formatCurrency }}</span>
