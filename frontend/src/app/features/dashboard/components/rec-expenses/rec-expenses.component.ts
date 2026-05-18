@@ -1,8 +1,11 @@
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Subject, forkJoin } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { PageData, Transaction } from '../../../../core/models/index';
 import { UserService } from '../../../../core/services/user.service';
+import { ApiService } from '../../../../core/services/api.service';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
@@ -12,18 +15,30 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pip
   standalone: true,
   imports: [CommonModule, FormsModule, FormatCurrencyPipe]
 })
-export class RecExpensesComponent implements OnChanges {
+export class RecExpensesComponent implements OnChanges, OnDestroy {
   @Input() pageData!: PageData;
 
   selectedTab: 'monthly' | 'yearly' = 'monthly';
   selectedYear: number;
   selectedMonth: number;
   monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+  yearlyTransactions: Transaction[] = [];
+  private destroy$ = new Subject<void>();
 
-  constructor(private userService: UserService) {
+  constructor(
+    private userService: UserService,
+    private apiService: ApiService,
+    private cdr: ChangeDetectorRef
+  ) {
     const now = new Date();
     this.selectedYear = now.getFullYear();
     this.selectedMonth = now.getMonth() + 1;
+    this.loadYearlyTransactions();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -41,14 +56,10 @@ export class RecExpensesComponent implements OnChanges {
   }
 
   private getTransactionsForMonth(year: number, month: number, descriptionId: number): Transaction[] {
-    if (!this.pageData?.transactions) {
-      return [];
-    }
-
     const monthNum = Number(month);
     const yearNum = Number(year);
 
-    return this.pageData.transactions.filter(txn => {
+    return this.yearlyTransactions.filter(txn => {
       const [txnYear, txnMonth] = txn.date.split('-').map(Number);
       return txn.description_id === descriptionId &&
              txnYear === yearNum &&
@@ -81,10 +92,8 @@ export class RecExpensesComponent implements OnChanges {
   }
 
   getYearTotal(descriptionId: number): number {
-    if (!this.pageData?.transactions) return 0;
-
     const yearNum = Number(this.selectedYear);
-    return this.pageData.transactions.filter(txn => {
+    return this.yearlyTransactions.filter(txn => {
       const [txnYear] = txn.date.split('-').map(Number);
       return txn.description_id === descriptionId && txnYear === yearNum;
     }).reduce((sum, txn) => {
@@ -94,20 +103,38 @@ export class RecExpensesComponent implements OnChanges {
   }
 
   getCurrentYearTotal(descriptionId: number): number {
-    return this.getYearTotal(descriptionId);
+    return this.yearlyTransactions.filter(txn => {
+      const [txnYear] = txn.date.split('-').map(Number);
+      return txn.description_id === descriptionId && txnYear === Number(this.selectedYear);
+    }).reduce((sum, txn) => {
+      const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
+      return sum + (isNaN(amount) ? 0 : amount);
+    }, 0);
   }
 
   getPriorYearTotal(descriptionId: number): number {
-    if (!this.pageData?.transactions) return 0;
-
     const priorYear = Number(this.selectedYear) - 1;
-    return this.pageData.transactions.filter(txn => {
+    return this.yearlyTransactions.filter(txn => {
       const [txnYear] = txn.date.split('-').map(Number);
       return txn.description_id === descriptionId && txnYear === priorYear;
     }).reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
       return sum + (isNaN(amount) ? 0 : amount);
     }, 0);
+  }
+
+  getYearDifference(descriptionId: number): number {
+    return this.getCurrentYearTotal(descriptionId) - this.getPriorYearTotal(descriptionId);
+  }
+
+  getPositiveColor(): string {
+    const user = this.userService.getActiveUser();
+    return user?.positive_color || '#4ade80';
+  }
+
+  getNegativeColor(): string {
+    const user = this.userService.getActiveUser();
+    return user?.negative_color || '#ef4444';
   }
 
   formatCurrency(amount: number): string {
@@ -145,11 +172,39 @@ export class RecExpensesComponent implements OnChanges {
     return this.monthNames[priorMonth - 1];
   }
 
+  getPriorMonthNameWithYear(): string {
+    if (Number(this.selectedMonth) !== 1) {
+      return this.getPriorMonthName();
+    }
+    const priorYear = Number(this.selectedYear) - 1;
+    return `December Of ${priorYear}`;
+  }
+
+  private loadYearlyTransactions(): void {
+    const user = this.userService.getActiveUser();
+    if (!user) return;
+
+    forkJoin({
+      currentYear: this.apiService.getTransactionsByYear(user.id, this.selectedYear),
+      priorYear: this.apiService.getTransactionsByYear(user.id, this.selectedYear - 1)
+    })
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(({ currentYear, priorYear }) => {
+        this.yearlyTransactions = [...currentYear, ...priorYear];
+        this.cdr.markForCheck();
+      });
+  }
+
   onYearOrMonthChange(): void {
-    // Filtering happens through the getters
+    // Reload transactions when year changes to ensure year totals are current
+    this.loadYearlyTransactions();
   }
 
   onTabChange(tab: 'monthly' | 'yearly'): void {
     this.selectedTab = tab;
+    // Load transactions for yearly tab
+    if (tab === 'yearly') {
+      this.loadYearlyTransactions();
+    }
   }
 }

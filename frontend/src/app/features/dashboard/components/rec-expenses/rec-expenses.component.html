@@ -61,7 +61,7 @@
             <thead>
               <tr>
                 <th>Description</th>
-                <th class="text-right">{{ getPriorMonthName() }}</th>
+                <th class="text-right">{{ getPriorMonthNameWithYear() }}</th>
                 <th class="text-right">{{ monthNames[selectedMonth - 1] }}</th>
                 <th class="text-right">Total {{ selectedYear }}</th>
               </tr>
@@ -125,7 +125,7 @@
                   <td>{{ desc.description }}</td>
                   <td class="text-right">{{ getPriorYearTotal(desc.id) | formatCurrency }}</td>
                   <td class="text-right">{{ getCurrentYearTotal(desc.id) | formatCurrency }}</td>
-                  <td class="text-right">{{ (getCurrentYearTotal(desc.id) - getPriorYearTotal(desc.id)) | formatCurrency }}</td>
+                  <td class="text-right" [style.color]="getYearDifference(desc.id) >= 0 ? getPositiveColor() : getNegativeColor()">{{ getYearDifference(desc.id) | formatCurrency }}</td>
                 </tr>
               }
             </tbody>
