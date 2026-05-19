@@ -12,21 +12,33 @@
     <!-- Navigation Icons -->
     <div class="sidenav-divider"></div>
     <div class="nav-icons">
-      <button class="nav-icon" (click)="navigateToDashboard()" title="Dashboard" matTooltip="Dashboard" matTooltipPosition="right">
+      <button class="nav-icon" (click)="navigateToDashboard()" title="Dashboard">
         <img src="/assets/icons/house-fill.svg" alt="Dashboard" class="icon-img">
         <span class="nav-label" [class.hidden]="!isExpanded">Dashboard</span>
       </button>
-      <button class="nav-icon" (click)="navigateToAdmin()" title="Admin" matTooltip="Admin" matTooltipPosition="right">
+      <button class="nav-icon" (click)="navigateToAdmin()" title="Admin">
         <img src="/assets/icons/gear-fill.svg" alt="Admin" class="icon-img">
         <span class="nav-label" [class.hidden]="!isExpanded">Admin</span>
       </button>
     </div>
 
-    <!-- New Transaction Button Section -->
+    <!-- Group and New Transaction Section -->
     <div class="sidenav-divider"></div>
+
+    <!-- Group Selector -->
+    @if (!isOnAdminPage()) {
+      <div class="group-section-top">
+        <button class="group-initial-btn" (click)="openGroupManagementPanel()" [title]="(activeGroup$ | async)?.name || 'Select Group'">
+          <span class="group-initial">{{ getActiveGroupInitial() }}</span>
+        </button>
+        <span class="group-name" [class.hidden]="!isExpanded">{{ (activeGroup$ | async)?.name }}</span>
+      </div>
+    }
+
+    <!-- New Transaction Button Section -->
     <div class="new-transaction-section">
       @if (!isOnAdminPage()) {
-        <button class="btn-new-transaction" (click)="openCreateTransactionModal()" title="New Transaction" matTooltip="New Transaction" matTooltipPosition="right">
+        <button class="btn-new-transaction" (click)="openCreateTransactionModal()" title="New Transaction">
           <i class="bi bi-plus-square"></i>
           <span class="nav-label" [class.hidden]="!isExpanded">New Transaction</span>
         </button>
@@ -36,15 +48,6 @@
 
   <!-- User Section (Bottom) -->
   <div class="sidenav-bottom">
-    @if (!isOnAdminPage()) {
-      <div class="group-section">
-        <button class="group-initial-btn" (click)="openGroupManagementPanel()" [title]="(activeGroup$ | async)?.name || 'Select Group'">
-          <i class="bi bi-folder"></i>
-        </button>
-        <span class="group-name" [class.hidden]="!isExpanded">{{ (activeGroup$ | async)?.name }}</span>
-      </div>
-    }
-
     <div class="user-section">
       <button class="user-initial-btn" (click)="openUserManagementPanel()" [title]="(activeUser$ | async)?.name || 'Select User'">
         <span class="user-initial">{{ getActiveUserInitial() }}</span>

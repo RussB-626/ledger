@@ -116,9 +116,9 @@ export class SidenavComponent implements OnInit {
     return user.name.charAt(0).toUpperCase();
   }
 
-  getActiveGroupName(): string {
+  getActiveGroupInitial(): string {
     const group = this.userService.getActiveGroupSync();
     if (!group || !group.name) return '?';
-    return group.name.substring(0, 1).toUpperCase();
+    return group.name.charAt(0).toUpperCase();
   }
 }

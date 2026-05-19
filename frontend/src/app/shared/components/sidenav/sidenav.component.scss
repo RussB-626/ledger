@@ -121,8 +121,8 @@
   }
 }
 
-// Group Section
-.group-section {
+// Group Section (Top - above New Transaction)
+.group-section-top {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -140,14 +140,16 @@
   }
 }
 
+// Group Initial Button (Round, like user button)
 .group-initial-btn {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  background: rgba(0, 217, 255, 0.1);
-  border: 2px solid var(--color-primary);
-  color: var(--color-primary);
-  font-size: 20px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  color: var(--color-text-secondary);
+  font-size: 16px;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -156,14 +158,13 @@
   flex-shrink: 0;
 
   &:hover {
-    background: rgba(0, 217, 255, 0.2);
-    box-shadow: 0 0 12px rgba(0, 217, 255, 0.3);
+    background: var(--color-surface-alt);
+    border-color: var(--color-text-secondary);
+    color: var(--color-text);
   }
 
-  i {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  .group-initial {
+    line-height: 1;
   }
 }
 
@@ -206,8 +207,8 @@
 }
 
 .user-initial-btn {
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: rgba(0, 217, 255, 0.1);
   border: 2px solid var(--color-primary);
