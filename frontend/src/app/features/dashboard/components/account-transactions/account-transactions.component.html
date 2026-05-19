@@ -44,9 +44,7 @@
 
   <div class="transactions-content" [class.loading]="loading">
     @if (loading) {
-      <div class="loading-spinner">
-        Loading transactions...
-      </div>
+      <div class="loading-spinner">Loading transactions...</div>
     }
 
     @if (!loading && filteredTransactions.length > 0) {
@@ -58,11 +56,10 @@
               <div class="card-field no-label">
                 <span class="card-field-value">{{ formatDate(txn.date) }}</span>
               </div>
-              <div class="card-field center-aligned no-label">
-                <span class="card-field-value">{{ txn.account }}</span>
-              </div>
               <div class="card-field right-aligned no-label">
-                <span class="card-field-value">{{ mapTransactionType(txn.type) }}</span>
+                <span class="card-field-value">{{
+                  mapTransactionType(txn.type)
+                }}</span>
               </div>
             </div>
 
@@ -71,12 +68,18 @@
             <!-- Row 2: Category, Description -->
             <div class="card-row row-2">
               <div class="card-field">
-                <span class="card-field-label">Category</span>
-                <span class="card-field-value">{{ txn.category }}</span>
+                <div class="card-field left-aligned">
+                  <span class="card-field-label">Account</span>
+                  <span class="card-field-value" [title]="txn.account">{{ truncateText(txn.account, 25) }}</span>
+                </div>
               </div>
-              <div class="card-field center-aligned">
+              <div class="card-field">
+                <span class="card-field-label">Category</span>
+                <span class="card-field-value" [title]="txn.category">{{ truncateText(txn.category, 25) }}</span>
+              </div>
+              <div class="card-field">
                 <span class="card-field-label">Description</span>
-                <span class="card-field-value">{{ txn.description }}</span>
+                <span class="card-field-value" [title]="txn.description">{{ truncateText(txn.description, 25) }}</span>
               </div>
             </div>
 
@@ -85,7 +88,9 @@
               @if (txn.note) {
                 <div class="card-field">
                   <span class="card-field-label">Notes</span>
-                  <span class="card-field-value" [title]="txn.note">{{ truncateText(txn.note) }}</span>
+                  <span class="card-field-value" [title]="txn.note">{{
+                    truncateText(txn.note)
+                  }}</span>
                 </div>
               }
               @if (!txn.note) {
@@ -95,7 +100,16 @@
                 </div>
               }
               <div class="card-field right-aligned no-label">
-                <span class="card-field-value amount" [style.color]="txn.amount === 0 ? 'var(--color-zero)' : ((txn.type === 'W' || txn.type === 'TW') ? (activeUser?.negative_color || '#ff6b6b') : (activeUser?.positive_color || 'inherit'))">
+                <span
+                  class="card-field-value amount"
+                  [style.color]="
+                    txn.amount === 0
+                      ? 'var(--color-zero)'
+                      : txn.type === 'W' || txn.type === 'TW'
+                        ? activeUser?.negative_color || '#ff6b6b'
+                        : activeUser?.positive_color || 'inherit'
+                  "
+                >
                   {{ formatCurrency(txn.amount, txn.type) }}
                 </span>
               </div>
@@ -105,15 +119,27 @@
 
             <!-- Row 4: Actions -->
             <div class="card-actions">
-              <button class="action-btn edit-btn" (click)="onEditTransaction(txn)" title="Edit">
+              <button
+                class="action-btn edit-btn"
+                (click)="onEditTransaction(txn)"
+                title="Edit"
+              >
                 ✎
               </button>
               @if (txn.pending) {
-                <button class="action-btn confirm-btn" (click)="removePending(txn)" title="Remove Pending">
+                <button
+                  class="action-btn confirm-btn"
+                  (click)="removePending(txn)"
+                  title="Remove Pending"
+                >
                   ✓
                 </button>
               }
-              <button class="action-btn delete-btn" (click)="deleteTransaction(txn.id)" title="Delete">
+              <button
+                class="action-btn delete-btn"
+                (click)="deleteTransaction(txn.id)"
+                title="Delete"
+              >
                 🗑
               </button>
             </div>
@@ -128,7 +154,9 @@
       </div>
     }
 
-    @if (!loading && transactions.length > 0 && filteredTransactions.length === 0) {
+    @if (
+      !loading && transactions.length > 0 && filteredTransactions.length === 0
+    ) {
       <div class="empty-state">
         <p>No transactions match your search</p>
       </div>
@@ -136,65 +164,65 @@
   </div>
 
   @if (filteredTransactions.length > 0) {
-  <hr />
-  <div class="pagination-controls">
-    <div class="page-size-selector">
-      <label for="page-size">Items per page:</label>
-      <select
-        id="page-size"
-        [value]="pageSize"
-        (change)="onPageSizeChange(+$any($event.target).value)"
-      >
-        @for (size of pageSizeOptions; track size) {
-          <option [value]="size">{{ size }}</option>
-        }
-      </select>
-    </div>
-
-    <div class="pagination-info">
-      Showing {{ (currentPage - 1) * pageSize + 1 }} - {{ Math.min(currentPage * pageSize, filteredTransactions.length) }} of {{ filteredTransactions.length }}
-    </div>
-
-    <div class="pagination-buttons">
-      <button
-        class="page-btn"
-        [disabled]="currentPage === 1"
-        (click)="goToPage(1)"
-        title="First page"
-      >
-        ⌂ Home
-      </button>
-
-      <button
-        class="page-btn"
-        [disabled]="currentPage === 1"
-        (click)="previousPage()"
-      >
-        ← Previous
-      </button>
-
-      <div class="page-info">
-        Page {{ currentPage }} of {{ totalPages }}
+    <hr />
+    <div class="pagination-controls">
+      <div class="page-size-selector">
+        <label for="page-size">Items per page:</label>
+        <select
+          id="page-size"
+          [value]="pageSize"
+          (change)="onPageSizeChange(+$any($event.target).value)"
+        >
+          @for (size of pageSizeOptions; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
       </div>
 
-      <button
-        class="page-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="nextPage()"
-      >
-        Next →
-      </button>
+      <div class="pagination-info">
+        Showing {{ (currentPage - 1) * pageSize + 1 }} -
+        {{ Math.min(currentPage * pageSize, filteredTransactions.length) }} of
+        {{ filteredTransactions.length }}
+      </div>
 
-      <button
-        class="page-btn"
-        [disabled]="currentPage === totalPages"
-        (click)="goToPage(totalPages)"
-        title="Last page"
-      >
-        End ⌂
-      </button>
+      <div class="pagination-buttons">
+        <button
+          class="page-btn"
+          [disabled]="currentPage === 1"
+          (click)="goToPage(1)"
+          title="First page"
+        >
+          ⌂ Home
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === 1"
+          (click)="previousPage()"
+        >
+          ← Previous
+        </button>
+
+        <div class="page-info">Page {{ currentPage }} of {{ totalPages }}</div>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="nextPage()"
+        >
+          Next →
+        </button>
+
+        <button
+          class="page-btn"
+          [disabled]="currentPage === totalPages"
+          (click)="goToPage(totalPages)"
+          title="Last page"
+        >
+          End ⌂
+        </button>
+      </div>
     </div>
-  </div>
   }
 
   <!-- Delete Confirmation Modal -->

@@ -21,9 +21,6 @@
             <div class="card-field no-label">
               <span class="card-field-value">{{ formatDate(txn.date) }}</span>
             </div>
-            <div class="card-field center-aligned no-label">
-              <span class="card-field-value">{{ txn.account }}</span>
-            </div>
             <div class="card-field right-aligned no-label">
               <span class="card-field-value">{{ mapTransactionType(txn.type) }}</span>
             </div>
@@ -34,12 +31,16 @@
           <!-- Row 2: Category, Description -->
           <div class="card-row row-2">
             <div class="card-field">
-              <span class="card-field-label">Category</span>
-              <span class="card-field-value">{{ txn.category }}</span>
+              <span class="card-field-label">Account</span>
+              <span class="card-field-value" [title]="txn.account">{{ truncateText(txn.account, 25) }}</span>
             </div>
-            <div class="card-field center-aligned">
+            <div class="card-field">
+              <span class="card-field-label">Category</span>
+              <span class="card-field-value" [title]="txn.category">{{ truncateText(txn.category, 25) }}</span>
+            </div>
+            <div class="card-field">
               <span class="card-field-label">Description</span>
-              <span class="card-field-value">{{ txn.description }}</span>
+              <span class="card-field-value" [title]="txn.description">{{ truncateText(txn.description, 25) }}</span>
             </div>
           </div>
 

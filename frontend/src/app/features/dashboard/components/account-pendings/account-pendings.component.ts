@@ -231,7 +231,7 @@ export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
     return `${month}/${day}/${year}`;
   }
 
-  truncateText(text: string | undefined | null, maxLength: number = 20): string {
+  truncateText(text: string | undefined | null, maxLength: number = 40): string {
     if (!text) return '';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   }

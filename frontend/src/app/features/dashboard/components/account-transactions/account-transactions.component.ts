@@ -218,7 +218,7 @@ export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestro
     return `${month}/${day}/${year}`;
   }
 
-  truncateText(text: string | undefined | null, maxLength: number = 20): string {
+  truncateText(text: string | undefined | null, maxLength: number = 40): string {
     if (!text) return '';
     return text.length > maxLength ? text.substring(0, maxLength) + '...' : text;
   }
