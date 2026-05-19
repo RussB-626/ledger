@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
-import { Description, User } from '../../../../core/models/index';
+import { Description, User, Group } from '../../../../core/models/index';
 
 interface ModalState {
   isOpen: boolean;
@@ -30,6 +30,7 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
   @Input() activeUser: User | null = null;
 
   descriptions: Description[] = [];
+  groups: Group[] = [];
   itemsPerPage = 10;
   descriptionsPage = 1;
   searchDescriptions = '';
@@ -39,8 +40,8 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
 
   bulkDescriptionModal = { isOpen: false };
   bulkDescriptionsText = '';
-  bulkDescriptionIsMonthly = false;
-  bulkDescriptionIsYearly = false;
+  bulkMonthlyGroupIds: number[] = [];
+  bulkYearlyGroupIds: number[] = [];
   bulkDescriptionError = '';
   bulkDescriptionLoading = false;
 
@@ -62,6 +63,12 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadDescriptions();
+    this.pageDataService.groups$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(groups => {
+        this.groups = groups;
+        this.cdr.markForCheck();
+      });
   }
 
   ngOnDestroy(): void {
@@ -126,8 +133,8 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
   openBulkDescriptionModal(): void {
     this.bulkDescriptionModal = { isOpen: true };
     this.bulkDescriptionsText = '';
-    this.bulkDescriptionIsMonthly = false;
-    this.bulkDescriptionIsYearly = false;
+    this.bulkMonthlyGroupIds = [];
+    this.bulkYearlyGroupIds = [];
     this.bulkDescriptionError = '';
     this.bulkDescriptionLoading = false;
   }
@@ -135,8 +142,8 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
   closeBulkDescriptionModal(): void {
     this.bulkDescriptionModal = { isOpen: false };
     this.bulkDescriptionsText = '';
-    this.bulkDescriptionIsMonthly = false;
-    this.bulkDescriptionIsYearly = false;
+    this.bulkMonthlyGroupIds = [];
+    this.bulkYearlyGroupIds = [];
     this.bulkDescriptionError = '';
   }
 
@@ -159,7 +166,7 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
     this.bulkDescriptionLoading = true;
     this.bulkDescriptionError = '';
 
-    this.apiService.bulkCreateDescriptions(this.activeUser.id, descriptions, [], [])
+    this.apiService.bulkCreateDescriptions(this.activeUser.id, descriptions, this.bulkMonthlyGroupIds, this.bulkYearlyGroupIds)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -215,5 +222,89 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
 
   getTotalPages(): number {
     return Math.ceil(this.getFilteredDescriptions().length / this.itemsPerPage);
+  }
+
+  toggleMonthlyGroup(groupId: number): void {
+    const index = this.descriptionFormData.monthly_group_ids.indexOf(groupId);
+    if (index === -1) {
+      this.descriptionFormData.monthly_group_ids.push(groupId);
+    } else {
+      this.descriptionFormData.monthly_group_ids.splice(index, 1);
+    }
+  }
+
+  toggleYearlyGroup(groupId: number): void {
+    const index = this.descriptionFormData.yearly_group_ids.indexOf(groupId);
+    if (index === -1) {
+      this.descriptionFormData.yearly_group_ids.push(groupId);
+    } else {
+      this.descriptionFormData.yearly_group_ids.splice(index, 1);
+    }
+  }
+
+  toggleBulkMonthlyGroup(groupId: number): void {
+    const index = this.bulkMonthlyGroupIds.indexOf(groupId);
+    if (index === -1) {
+      this.bulkMonthlyGroupIds.push(groupId);
+    } else {
+      this.bulkMonthlyGroupIds.splice(index, 1);
+    }
+  }
+
+  toggleBulkYearlyGroup(groupId: number): void {
+    const index = this.bulkYearlyGroupIds.indexOf(groupId);
+    if (index === -1) {
+      this.bulkYearlyGroupIds.push(groupId);
+    } else {
+      this.bulkYearlyGroupIds.splice(index, 1);
+    }
+  }
+
+  isMonthlyGroupSelected(groupId: number): boolean {
+    return this.descriptionFormData.monthly_group_ids.includes(groupId);
+  }
+
+  isYearlyGroupSelected(groupId: number): boolean {
+    return this.descriptionFormData.yearly_group_ids.includes(groupId);
+  }
+
+  isBulkMonthlyGroupSelected(groupId: number): boolean {
+    return this.bulkMonthlyGroupIds.includes(groupId);
+  }
+
+  isBulkYearlyGroupSelected(groupId: number): boolean {
+    return this.bulkYearlyGroupIds.includes(groupId);
+  }
+
+  getMonthlyGroupNames(groupIds: number[]): string {
+    const names = this.getGroupNamesList(groupIds);
+    return this.truncateWithEllipsis(names, 20);
+  }
+
+  getYearlyGroupNames(groupIds: number[]): string {
+    const names = this.getGroupNamesList(groupIds);
+    return this.truncateWithEllipsis(names, 20);
+  }
+
+  getFullMonthlyGroupNames(groupIds: number[]): string {
+    return this.getGroupNamesList(groupIds);
+  }
+
+  getFullYearlyGroupNames(groupIds: number[]): string {
+    return this.getGroupNamesList(groupIds);
+  }
+
+  private getGroupNamesList(groupIds: number[]): string {
+    return groupIds
+      .map(id => this.groups.find(g => g.id === id)?.name)
+      .filter((name): name is string => name !== undefined)
+      .join(', ');
+  }
+
+  private truncateWithEllipsis(text: string, maxLength: number): string {
+    if (text.length <= maxLength) {
+      return text;
+    }
+    return text.substring(0, maxLength) + '...';
   }
 }

@@ -30,8 +30,12 @@
         @for (desc of getPaginatedDescriptions(); track desc.id) {
           <tr>
             <td>{{ desc.description }}</td>
-            <td class="checkbox-col">{{ desc.monthly_group_ids.length > 0 ? '✓' : '' }}</td>
-            <td class="checkbox-col">{{ desc.yearly_group_ids.length > 0 ? '✓' : '' }}</td>
+            <td class="group-names-col" [title]="getFullMonthlyGroupNames(desc.monthly_group_ids)">
+              {{ getMonthlyGroupNames(desc.monthly_group_ids) || '—' }}
+            </td>
+            <td class="group-names-col" [title]="getFullYearlyGroupNames(desc.yearly_group_ids)">
+              {{ getYearlyGroupNames(desc.yearly_group_ids) || '—' }}
+            </td>
             <td class="actions">
               <button
                 class="action-btn edit-btn"
@@ -113,8 +117,45 @@
         </div>
 
         <div class="form-group">
-          <label>Recurring Groups (Coming Soon)</label>
-          <p style="font-size: 0.9em; color: #999;">Group selection for monthly/yearly recurring expenses will be available soon.</p>
+          <label>Monthly Groups</label>
+          <div class="group-checkboxes">
+            @if (groups.length > 0) {
+              @for (group of groups; track group.id) {
+                <label class="group-checkbox">
+                  <input
+                    type="checkbox"
+                    [checked]="isMonthlyGroupSelected(group.id)"
+                    (change)="toggleMonthlyGroup(group.id)"
+                    class="checkbox-input"
+                  />
+                  {{ group.name }}
+                </label>
+              }
+            } @else {
+              <p style="font-size: 0.9em; color: #999;">No groups available</p>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Yearly Groups</label>
+          <div class="group-checkboxes">
+            @if (groups.length > 0) {
+              @for (group of groups; track group.id) {
+                <label class="group-checkbox">
+                  <input
+                    type="checkbox"
+                    [checked]="isYearlyGroupSelected(group.id)"
+                    (change)="toggleYearlyGroup(group.id)"
+                    class="checkbox-input"
+                  />
+                  {{ group.name }}
+                </label>
+              }
+            } @else {
+              <p style="font-size: 0.9em; color: #999;">No groups available</p>
+            }
+          </div>
         </div>
       </div>
       <div class="modal-footer">
@@ -142,10 +183,46 @@
           rows="6"
         ></textarea>
 
-        <div style="padding: 10px; background: #f0f0f0; border-radius: 4px; margin-bottom: 15px;">
-          <p style="font-size: 0.9em; color: #666; margin: 0;">
-            Group selection for monthly/yearly recurring expenses will be available soon.
-          </p>
+        <div class="form-group">
+          <label>Monthly Groups</label>
+          <div class="group-checkboxes">
+            @if (groups.length > 0) {
+              @for (group of groups; track group.id) {
+                <label class="group-checkbox">
+                  <input
+                    type="checkbox"
+                    [checked]="isBulkMonthlyGroupSelected(group.id)"
+                    (change)="toggleBulkMonthlyGroup(group.id)"
+                    class="checkbox-input"
+                  />
+                  {{ group.name }}
+                </label>
+              }
+            } @else {
+              <p style="font-size: 0.9em; color: #999;">No groups available</p>
+            }
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Yearly Groups</label>
+          <div class="group-checkboxes">
+            @if (groups.length > 0) {
+              @for (group of groups; track group.id) {
+                <label class="group-checkbox">
+                  <input
+                    type="checkbox"
+                    [checked]="isBulkYearlyGroupSelected(group.id)"
+                    (change)="toggleBulkYearlyGroup(group.id)"
+                    class="checkbox-input"
+                  />
+                  {{ group.name }}
+                </label>
+              }
+            } @else {
+              <p style="font-size: 0.9em; color: #999;">No groups available</p>
+            }
+          </div>
         </div>
 
         @if (bulkDescriptionError) {

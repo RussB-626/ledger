@@ -124,10 +124,18 @@
     }
   }
 
-  .checkbox-col {
-    text-align: center;
-    color: var(--color-primary);
-    font-weight: 600;
+  .group-names-col {
+    max-width: 150px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--color-text);
+    font-size: 12px;
+    font-weight: 500;
+
+    &:hover {
+      color: var(--color-primary);
+    }
   }
 
   .actions {
@@ -417,4 +425,63 @@
 button[disabled] {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.group-checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px;
+  background: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+
+  // Custom scrollbar styling
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--color-background);
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--color-border);
+    border-radius: 3px;
+
+    &:hover {
+      background: var(--color-text-secondary);
+    }
+  }
+}
+
+.group-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  color: var(--color-text);
+  font-size: 13px;
+  cursor: pointer;
+  gap: 8px;
+  line-height: 1.4;
+  margin: 0;
+
+  .checkbox-input {
+    min-width: 16px;
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    margin-right: 10px;
+    cursor: pointer;
+    accent-color: var(--color-primary);
+    flex-shrink: 0;
+    vertical-align: middle;
+  }
+
+  &:hover {
+    background: rgba(0, 217, 255, 0.08);
+    color: var(--color-primary);
+  }
 }
