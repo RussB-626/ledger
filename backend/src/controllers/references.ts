@@ -67,6 +67,21 @@ export async function updateAccount(
 ): Promise<Account | null> {
   const connection = await pool.getConnection();
   try {
+    await connection.beginTransaction();
+
+    // Get the current account to check if group_id is changing
+    const [currentAccountRows] = await connection.query<RowDataPacket[]>(
+      'SELECT id, group_id FROM accounts WHERE id = ? AND user_id = ?',
+      [accountId, userId]
+    );
+
+    if (currentAccountRows.length === 0) {
+      return null;
+    }
+
+    const oldGroupId = (currentAccountRows[0] as any).group_id;
+    const isMovingToNewGroup = req.group_id !== undefined && req.group_id !== oldGroupId;
+
     const updates: string[] = [];
     const values: (string | number)[] = [];
 
@@ -94,12 +109,53 @@ export async function updateAccount(
       return null;
     }
 
+    // If account was moved to a different group, recalculate sort orders for both groups
+    if (isMovingToNewGroup) {
+      // Recalculate sort orders for old group
+      const [oldGroupAccounts] = await connection.query<RowDataPacket[]>(
+        'SELECT id FROM accounts WHERE user_id = ? AND group_id = ? ORDER BY sort_order ASC',
+        [userId, oldGroupId]
+      );
+
+      for (let i = 0; i < oldGroupAccounts.length; i++) {
+        await connection.query(
+          'UPDATE accounts SET sort_order = ? WHERE id = ?',
+          [i + 1, (oldGroupAccounts[i] as any).id]
+        );
+      }
+
+      // For new group: get existing accounts (excluding the moved one) and assign moved account to the end
+      const [newGroupAccounts] = await connection.query<RowDataPacket[]>(
+        'SELECT id FROM accounts WHERE user_id = ? AND group_id = ? AND id != ? ORDER BY sort_order ASC',
+        [userId, req.group_id, accountId]
+      );
+
+      // Existing accounts keep their positions (1, 2, 3, etc.)
+      for (let i = 0; i < newGroupAccounts.length; i++) {
+        await connection.query(
+          'UPDATE accounts SET sort_order = ? WHERE id = ?',
+          [i + 1, (newGroupAccounts[i] as any).id]
+        );
+      }
+
+      // Moved account goes to the end
+      await connection.query(
+        'UPDATE accounts SET sort_order = ? WHERE id = ?',
+        [newGroupAccounts.length + 1, accountId]
+      );
+    }
+
+    await connection.commit();
+
     const [rows] = await connection.query<RowDataPacket[]>(
       'SELECT id, user_id, group_id, name, sort_order FROM accounts WHERE id = ?',
       [accountId]
     );
 
     return rows.length > 0 ? (rows[0] as Account) : null;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
   } finally {
     connection.release();
   }
@@ -108,11 +164,48 @@ export async function updateAccount(
 export async function deleteAccount(userId: number, accountId: number): Promise<boolean> {
   const connection = await pool.getConnection();
   try {
+    await connection.beginTransaction();
+
+    // Get the account to find its group_id
+    const [accountRows] = await connection.query<RowDataPacket[]>(
+      'SELECT id, group_id FROM accounts WHERE id = ? AND user_id = ?',
+      [accountId, userId]
+    );
+
+    if (accountRows.length === 0) {
+      return false;
+    }
+
+    const groupId = (accountRows[0] as any).group_id;
+
+    // Delete the account
     const [result] = await connection.query<ResultSetHeader>(
       'DELETE FROM accounts WHERE id = ? AND user_id = ?',
       [accountId, userId]
     );
-    return result.affectedRows > 0;
+
+    if (result.affectedRows === 0) {
+      return false;
+    }
+
+    // Recalculate sort orders for remaining accounts in the same group
+    const [remainingAccounts] = await connection.query<RowDataPacket[]>(
+      'SELECT id FROM accounts WHERE user_id = ? AND group_id = ? ORDER BY sort_order ASC',
+      [userId, groupId]
+    );
+
+    for (let i = 0; i < remainingAccounts.length; i++) {
+      await connection.query(
+        'UPDATE accounts SET sort_order = ? WHERE id = ?',
+        [i + 1, (remainingAccounts[i] as any).id]
+      );
+    }
+
+    await connection.commit();
+    return true;
+  } catch (error) {
+    await connection.rollback();
+    throw error;
   } finally {
     connection.release();
   }

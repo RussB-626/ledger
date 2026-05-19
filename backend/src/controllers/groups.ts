@@ -113,6 +113,8 @@ export async function reorderGroups(
 export async function deleteGroup(userId: number, groupId: number): Promise<void> {
   const connection = await pool.getConnection();
   try {
+    await connection.beginTransaction();
+
     // Verify group exists and belongs to user
     const existingGroup = await getGroupById(userId, groupId);
     if (!existingGroup) {
@@ -124,6 +126,24 @@ export async function deleteGroup(userId: number, groupId: number): Promise<void
       'DELETE FROM groups WHERE id = ? AND user_id = ?',
       [groupId, userId]
     );
+
+    // Recalculate sort orders for remaining groups
+    const [remainingGroups] = await connection.query<RowDataPacket[]>(
+      'SELECT id FROM groups WHERE user_id = ? ORDER BY sort_order ASC',
+      [userId]
+    );
+
+    for (let i = 0; i < remainingGroups.length; i++) {
+      await connection.query(
+        'UPDATE groups SET sort_order = ? WHERE id = ?',
+        [i + 1, (remainingGroups[i] as any).id]
+      );
+    }
+
+    await connection.commit();
+  } catch (error) {
+    await connection.rollback();
+    throw error;
   } finally {
     connection.release();
   }

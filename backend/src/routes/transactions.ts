@@ -183,10 +183,16 @@ router.post(
   '/:userId/transactions/bulk-upload',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
-    const { transactions: txnsToUpload } = req.body as { transactions?: any[] };
+    const { transactions: txnsToUpload, groupId } = req.body as { transactions?: any[]; groupId?: number };
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
+      res.status(400).json(response);
+      return;
+    }
+
+    if (!groupId || groupId < 1) {
+      const response: ApiResponse<never> = { error: 'Valid groupId is required' };
       res.status(400).json(response);
       return;
     }
@@ -198,7 +204,7 @@ router.post(
     }
 
     // Call the bulk upload controller
-    const result = await transactionsController.bulkUploadTransactions(userId, txnsToUpload);
+    const result = await transactionsController.bulkUploadTransactions(userId, txnsToUpload, groupId);
     const response: ApiResponse<any> = { data: result };
     res.status(201).json(response);
   })

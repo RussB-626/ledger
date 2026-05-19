@@ -13,6 +13,7 @@ import {
   BatchCreateTransactionsRequest
 } from '../types/index';
 import { getOrCreateDescription } from './references';
+import { getGroupsByUserId } from './groups';
 
 // ====== TRANSACTION RETRIEVAL ======
 
@@ -556,7 +557,8 @@ export async function getMonthlyDifference(
 // Bulk upload transactions with auto-creation of missing references
 export async function bulkUploadTransactions(
   userId: number,
-  transactionsData: any[]
+  transactionsData: any[],
+  groupId: number
 ): Promise<{
   accountsCreated: any[];
   categoriesCreated: any[];
@@ -569,6 +571,12 @@ export async function bulkUploadTransactions(
     descriptionsAdded: number;
   };
 }> {
+  // Validate that the group exists and belongs to the user
+  const groups = await getGroupsByUserId(userId);
+  if (!groups.find(g => g.id === groupId)) {
+    throw new Error('Invalid group selected.');
+  }
+
   const connection = await pool.getConnection();
   try {
     await connection.beginTransaction();
@@ -599,12 +607,20 @@ export async function bulkUploadTransactions(
       const accountSet = new Set((existingAccounts as any[]).map(a => a.name));
       const accountsToCreate = [...uniqueAccounts].filter(name => !accountSet.has(name));
 
+      // Get the highest sort_order for the group to use for new accounts
+      const [sortOrderResult] = await connection.query<RowDataPacket[]>(
+        'SELECT COALESCE(MAX(sort_order), 0) as maxSortOrder FROM accounts WHERE user_id = ? AND group_id = ?',
+        [userId, groupId]
+      );
+      let nextSortOrder = ((sortOrderResult as any[])[0]?.maxSortOrder || 0) + 1;
+
       for (const accountName of accountsToCreate) {
         const [result] = await connection.query<ResultSetHeader>(
-          'INSERT INTO accounts (user_id, name) VALUES (?, ?)',
-          [userId, accountName]
+          'INSERT INTO accounts (user_id, group_id, name, sort_order) VALUES (?, ?, ?, ?)',
+          [userId, groupId, accountName, nextSortOrder]
         );
         accountsCreated.push({ id: result.insertId, name: accountName });
+        nextSortOrder++;
       }
 
       // Create/update missing categories - fetch all at once, batch updates

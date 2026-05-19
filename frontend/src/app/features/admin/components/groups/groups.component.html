@@ -83,13 +83,14 @@
   <div class="modal-overlay" (click)="closeBulkAddModal()"></div>
   <div class="modal" (click)="$event.stopPropagation()">
     <h3>Bulk Add Groups</h3>
-    <p class="instructions">Enter group names (one per line):</p>
+    <p class="instructions">Enter group names separated by commas:</p>
     <textarea
       [(ngModel)]="bulkGroupsText"
-      placeholder="Group 1&#10;Group 2&#10;Group 3"
+      placeholder="Group 1, Group 2, Group 3"
       class="bulk-textarea"
       rows="6"
     ></textarea>
+    <p class="help-text">Each group will be created and assigned a sort order automatically.</p>
     @if (bulkAddError) {
       <div class="error-message">{{ bulkAddError }}</div>
     }

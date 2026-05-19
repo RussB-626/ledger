@@ -128,7 +128,7 @@ export class GroupsComponent implements OnInit, OnDestroy {
     }
 
     const groupNames = this.bulkGroupsText
-      .split('\n')
+      .split(',')
       .map(name => name.trim())
       .filter(name => name.length > 0);
 

@@ -298,11 +298,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.bulkUploadLoading = false;
-          this.bulkUploadStatus = 'Upload successful!';
           this.pageDataService.refreshPageData();
-          setTimeout(() => {
-            this.closeBulkUploadModal();
-          }, 1500);
+          this.closeBulkUploadModal();
         },
         error: (error: unknown) => {
           this.bulkUploadLoading = false;

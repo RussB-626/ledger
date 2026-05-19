@@ -306,10 +306,7 @@ export class ApiService {
   // ====== BULK UPLOAD ======
 
   bulkUploadTransactions(userId: number, transactions: any[], groupId?: number): Observable<any> {
-    const body: any = { transactions };
-    if (groupId) {
-      body.group_id = groupId;
-    }
+    const body: any = { transactions, groupId };
     return this.http.post<ApiResponse<any>>(
       `${this.baseUrl}/users/${userId}/transactions/bulk-upload`,
       body
