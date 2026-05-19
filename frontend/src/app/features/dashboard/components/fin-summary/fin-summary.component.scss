@@ -6,6 +6,8 @@
   border-radius: 8px;
   overflow: hidden;
   transition: border-color 0.2s ease;
+  min-height: 700px;
+  max-height: 700px;
 }
 
 .chart-card {
@@ -14,6 +16,8 @@
   gap: 0;
   min-height: 400px;
   overflow: hidden;
+  min-height: 700px;
+  max-height: 700px;
 }
 
 .fin-summary-header {
