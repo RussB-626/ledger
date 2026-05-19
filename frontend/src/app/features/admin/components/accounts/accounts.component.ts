@@ -240,15 +240,14 @@ export class AccountsComponent implements OnInit, OnDestroy {
     const index = groupAccounts.findIndex(a => a.id === account.id);
     if (index <= 0) return;
 
-    // Swap with previous account
-    const temp = groupAccounts[index].sort_order;
-    groupAccounts[index].sort_order = groupAccounts[index - 1].sort_order;
-    groupAccounts[index - 1].sort_order = temp;
+    // Swap positions in the array
+    [groupAccounts[index], groupAccounts[index - 1]] = [groupAccounts[index - 1], groupAccounts[index]];
 
-    // Send reorder request to backend
+    // Send reorder request to backend with sequential sort_order
     const reorderData = groupAccounts.map((a, i) => ({ id: a.id, sort_order: i + 1 }));
     this.apiService.reorderAccounts(this.activeUser.id, reorderData)
       .subscribe(() => {
+        this.accountsPage = 1;
         this.loadAccounts();
       });
   }
@@ -263,15 +262,14 @@ export class AccountsComponent implements OnInit, OnDestroy {
     const index = groupAccounts.findIndex(a => a.id === account.id);
     if (index >= groupAccounts.length - 1) return;
 
-    // Swap with next account
-    const temp = groupAccounts[index].sort_order;
-    groupAccounts[index].sort_order = groupAccounts[index + 1].sort_order;
-    groupAccounts[index + 1].sort_order = temp;
+    // Swap positions in the array
+    [groupAccounts[index], groupAccounts[index + 1]] = [groupAccounts[index + 1], groupAccounts[index]];
 
-    // Send reorder request to backend
+    // Send reorder request to backend with sequential sort_order
     const reorderData = groupAccounts.map((a, i) => ({ id: a.id, sort_order: i + 1 }));
     this.apiService.reorderAccounts(this.activeUser.id, reorderData)
       .subscribe(() => {
+        this.accountsPage = 1;
         this.loadAccounts();
       });
   }

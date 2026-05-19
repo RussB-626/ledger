@@ -22,6 +22,7 @@
         <tr>
           <th>Group Name</th>
           <th>Account Name</th>
+          <th style="text-align: center;">Sort Order</th>
           <th style="text-align: right;">Actions</th>
         </tr>
       </thead>
@@ -30,6 +31,7 @@
           <tr>
             <td>{{ groups.find(g => g.id === account.group_id)?.name || 'Unknown' }}</td>
             <td>{{ account.name }}</td>
+            <td style="text-align: center;">{{ account.sort_order }}</td>
             <td class="actions">
               <button
                 class="action-btn reorder-btn"
