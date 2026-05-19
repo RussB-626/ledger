@@ -57,7 +57,11 @@
                 <span class="card-field-value">{{ formatDate(txn.date) }}</span>
               </div>
               <div class="card-field right-aligned no-label">
-                <span class="card-field-value">{{
+                <span
+                  class="card-field-value type-badge"
+                  [style.backgroundColor]="getTransactionTypeBgColor(txn.type)"
+                  [style.color]="getTransactionTypeColor(txn.type)"
+                >{{
                   mapTransactionType(txn.type)
                 }}</span>
               </div>

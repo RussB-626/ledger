@@ -367,4 +367,28 @@ export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestro
     };
     return typeMap[type] || type;
   }
+
+  getTransactionTypeColor(type: string): string {
+    if (!this.activeUser) return 'var(--color-text)';
+    const isNegative = type === 'W' || type === 'TW';
+    return isNegative
+      ? this.activeUser.negative_color || '#ff6b6b'
+      : this.activeUser.positive_color || '#2ed573';
+  }
+
+  getTransactionTypeBgColor(type: string): string {
+    if (!this.activeUser) return 'var(--color-surface)';
+    const isNegative = type === 'W' || type === 'TW';
+    const baseColor = isNegative
+      ? this.activeUser.negative_color || '#ff6b6b'
+      : this.activeUser.positive_color || '#2ed573';
+    return this.hexToRgba(baseColor, 0.2);
+  }
+
+  private hexToRgba(hex: string, alpha: number): string {
+    const r = parseInt(hex.slice(1, 3), 16);
+    const g = parseInt(hex.slice(3, 5), 16);
+    const b = parseInt(hex.slice(5, 7), 16);
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
 }
