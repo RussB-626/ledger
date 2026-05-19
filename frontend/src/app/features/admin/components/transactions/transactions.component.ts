@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
-import { User } from '../../../../core/models/index';
+import { User, Group } from '../../../../core/models/index';
 
 interface ParsedTransaction {
   date: string;
@@ -40,6 +40,8 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   bulkUploadFileLoading = false;
   bulkUploadDateFormat = '';
   bulkUploadStatus = '';
+  bulkUploadGroupId = 0;
+  groups: Group[] = [];
 
   private destroy$ = new Subject<void>();
 
@@ -49,7 +51,16 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     private cdr: ChangeDetectorRef
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.pageDataService.groups$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(groups => {
+        this.groups = groups;
+        if (groups.length > 0 && this.bulkUploadGroupId === 0) {
+          this.bulkUploadGroupId = groups[0].id;
+        }
+      });
+  }
 
   ngOnDestroy(): void {
     this.destroy$.next();
@@ -65,6 +76,9 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.bulkUploadLoading = false;
     this.bulkUploadDateFormat = '';
     this.bulkUploadStatus = '';
+    if (this.groups.length > 0 && this.bulkUploadGroupId === 0) {
+      this.bulkUploadGroupId = this.groups[0].id;
+    }
     (this as any).bulkUploadAllParsedData = [];
   }
 
@@ -262,7 +276,10 @@ export class TransactionsComponent implements OnInit, OnDestroy {
   }
 
   saveBulkUpload(): void {
-    if (!this.activeUser) return;
+    if (!this.activeUser || !this.bulkUploadGroupId) {
+      this.bulkUploadError = 'Please select a group for new accounts';
+      return;
+    }
 
     const allData = (this as any).bulkUploadAllParsedData as ParsedTransaction[] || this.bulkUploadParsedData;
     const transactionsToUpload = allData.filter((t: ParsedTransaction) => !t.parseError);
@@ -276,7 +293,7 @@ export class TransactionsComponent implements OnInit, OnDestroy {
     this.bulkUploadError = '';
     this.bulkUploadStatus = 'Uploading transactions...';
 
-    this.apiService.bulkUploadTransactions(this.activeUser.id, transactionsToUpload)
+    this.apiService.bulkUploadTransactions(this.activeUser.id, transactionsToUpload, this.bulkUploadGroupId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

@@ -9,7 +9,7 @@ import { takeUntil } from 'rxjs/operators';
 import { PageDataService } from '../../core/services/page-data.service';
 import { UserService } from '../../core/services/user.service';
 import { ApiService } from '../../core/services/api.service';
-import { PageData, Transaction, User } from '../../core/models/index';
+import { PageData, Transaction, User, Group } from '../../core/models/index';
 import { AccountsComponent } from './components/accounts/accounts.component';
 import { FinSummaryComponent } from './components/fin-summary/fin-summary.component';
 import { RecExpensesComponent } from './components/rec-expenses/rec-expenses.component';
@@ -55,6 +55,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
         if (user) {
           // Page data is loaded via app initialization
           // This is here to handle user switches
+        }
+      });
+
+    // Watch for group changes and reload page data filtered by group
+    this.userService.activeGroup$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((group) => {
+        const activeUser = this.userService.getActiveUserSync();
+        if (activeUser && group) {
+          this.apiService.getPageData(activeUser.id).subscribe({
+            next: (pageData) => {
+              this.pageDataService.setPageData(pageData);
+            },
+            error: (error) => {
+              console.error('Failed to load page data for group:', error);
+            }
+          });
         }
       });
 

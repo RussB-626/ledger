@@ -121,6 +121,66 @@
   }
 }
 
+// Group Section
+.group-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 8px;
+  min-height: 50px;
+
+  .sidenav.expanded & {
+    align-items: center;
+    flex-direction: row;
+    gap: 12px;
+    min-height: 50px;
+  }
+}
+
+.group-initial-btn {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  background: rgba(0, 217, 255, 0.1);
+  border: 2px solid var(--color-primary);
+  color: var(--color-primary);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  &:hover {
+    background: rgba(0, 217, 255, 0.2);
+    box-shadow: 0 0 12px rgba(0, 217, 255, 0.3);
+  }
+
+  i {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.group-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+
+  &.hidden {
+    display: none;
+  }
+}
+
 // User Section
 .user-section {
   display: flex;

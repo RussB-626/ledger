@@ -3,22 +3,27 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { User } from '../models/index';
+import { User, Group } from '../models/index';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private readonly STORAGE_KEY = 'ledger_active_user_id';
+  private readonly USER_STORAGE_KEY = 'ledger_active_user_id';
+  private readonly GROUP_STORAGE_KEY = 'ledger_active_group_id';
 
   private activeUserSubject = new BehaviorSubject<User | null>(null);
   activeUser$: Observable<User | null> = this.activeUserSubject.asObservable();
+
+  private activeGroupSubject = new BehaviorSubject<Group | null>(null);
+  activeGroup$: Observable<Group | null> = this.activeGroupSubject.asObservable();
 
   private allUsersSubject = new BehaviorSubject<User[]>([]);
   allUsers$: Observable<User[]> = this.allUsersSubject.asObservable();
 
   constructor() {
     this.loadActiveUserFromStorage();
+    this.loadActiveGroupFromStorage();
   }
 
   /**
@@ -26,7 +31,7 @@ export class UserService {
    */
   setActiveUser(user: User): void {
     this.activeUserSubject.next(user);
-    localStorage.setItem(this.STORAGE_KEY, user.id.toString());
+    localStorage.setItem(this.USER_STORAGE_KEY, user.id.toString());
   }
 
   /**
@@ -41,6 +46,21 @@ export class UserService {
    */
   getActiveUser(): User | null {
     return this.activeUserSubject.value;
+  }
+
+  /**
+   * Set the currently active group
+   */
+  setActiveGroup(group: Group): void {
+    this.activeGroupSubject.next(group);
+    localStorage.setItem(this.GROUP_STORAGE_KEY, group.id.toString());
+  }
+
+  /**
+   * Get current active group synchronously
+   */
+  getActiveGroupSync(): Group | null {
+    return this.activeGroupSubject.value;
   }
 
   /**
@@ -61,7 +81,7 @@ export class UserService {
    * Load active user ID from localStorage
    */
   private loadActiveUserFromStorage(): void {
-    const storedUserId = localStorage.getItem(this.STORAGE_KEY);
+    const storedUserId = localStorage.getItem(this.USER_STORAGE_KEY);
     if (storedUserId) {
       const userId = parseInt(storedUserId, 10);
       // Will be set by the app initialization
@@ -70,10 +90,24 @@ export class UserService {
   }
 
   /**
-   * Clear active user
+   * Load active group ID from localStorage
+   */
+  private loadActiveGroupFromStorage(): void {
+    const storedGroupId = localStorage.getItem(this.GROUP_STORAGE_KEY);
+    if (storedGroupId) {
+      const groupId = parseInt(storedGroupId, 10);
+      // Will be set by the app initialization
+      // The actual group object will be loaded via API
+    }
+  }
+
+  /**
+   * Clear active user and group
    */
   clearActiveUser(): void {
     this.activeUserSubject.next(null);
-    localStorage.removeItem(this.STORAGE_KEY);
+    this.activeGroupSubject.next(null);
+    localStorage.removeItem(this.USER_STORAGE_KEY);
+    localStorage.removeItem(this.GROUP_STORAGE_KEY);
   }
 }

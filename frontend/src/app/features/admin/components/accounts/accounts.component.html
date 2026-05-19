@@ -20,6 +20,7 @@
     <table class="admin-table">
       <thead>
         <tr>
+          <th>Group Name</th>
           <th>Account Name</th>
           <th style="text-align: right;">Actions</th>
         </tr>
@@ -27,8 +28,25 @@
       <tbody>
         @for (account of getPaginatedAccounts(); track account.id) {
           <tr>
+            <td>{{ groups.find(g => g.id === account.group_id)?.name || 'Unknown' }}</td>
             <td>{{ account.name }}</td>
             <td class="actions">
+              <button
+                class="action-btn reorder-btn"
+                (click)="moveAccountUp(account)"
+                [disabled]="isFirstAccountInGroup(account)"
+                title="Move Up"
+              >
+                ↑
+              </button>
+              <button
+                class="action-btn reorder-btn"
+                (click)="moveAccountDown(account)"
+                [disabled]="isLastAccountInGroup(account)"
+                title="Move Down"
+              >
+                ↓
+              </button>
               <button
                 class="action-btn edit-btn"
                 (click)="openAccountModal('edit', account)"
@@ -99,6 +117,15 @@
       </div>
       <div class="modal-body">
         <div class="form-group">
+          <label>Group</label>
+          <select [(ngModel)]="accountFormData.group_id" class="form-input">
+            <option [value]="0" disabled>Select a group</option>
+            @for (group of groups; track group.id) {
+              <option [value]="group.id">{{ group.name }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
           <label>Account Name</label>
           <input
             type="text"
@@ -125,6 +152,15 @@
         <button class="close-btn" (click)="closeBulkAddModal()">×</button>
       </div>
       <div class="modal-body">
+        <div class="form-group">
+          <label>Group</label>
+          <select [(ngModel)]="bulkAddGroupId" class="form-input">
+            <option [value]="0" disabled>Select a group</option>
+            @for (group of groups; track group.id) {
+              <option [value]="group.id">{{ group.name }}</option>
+            }
+          </select>
+        </div>
         <p class="help-text">Paste a comma-separated list of account names:</p>
         <textarea
           [(ngModel)]="bulkAccountsText"

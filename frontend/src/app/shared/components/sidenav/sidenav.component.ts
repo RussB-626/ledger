@@ -8,22 +8,25 @@ import { Observable } from 'rxjs';
 import { UserService } from '../../../core/services/user.service';
 import { ApiService } from '../../../core/services/api.service';
 import { PageDataService } from '../../../core/services/page-data.service';
-import { User } from '../../../core/models/index';
+import { User, Group } from '../../../core/models/index';
 import { CreateTransactionModalComponent } from '../create-transaction-modal/create-transaction-modal.component';
 import { UserManagementPanelComponent } from '../user-management-panel/user-management-panel.component';
+import { GroupManagementPanelComponent } from '../group-management-panel/group-management-panel.component';
 
 @Component({
   selector: 'app-sidenav',
   templateUrl: './sidenav.component.html',
   styleUrls: ['./sidenav.component.scss'],
   standalone: true,
-  imports: [CommonModule, CreateTransactionModalComponent, UserManagementPanelComponent]
+  imports: [CommonModule, CreateTransactionModalComponent, UserManagementPanelComponent, GroupManagementPanelComponent]
 })
 export class SidenavComponent implements OnInit {
   activeUser$: Observable<User | null>;
   allUsers$: Observable<User[]>;
+  activeGroup$: Observable<Group | null>;
   showCreateTransactionModal = false;
   userManagementPanelOpen = false;
+  groupManagementPanelOpen = false;
   isExpanded = false;
 
   constructor(
@@ -34,6 +37,7 @@ export class SidenavComponent implements OnInit {
   ) {
     this.activeUser$ = this.userService.activeUser$;
     this.allUsers$ = this.userService.allUsers$;
+    this.activeGroup$ = this.userService.activeGroup$;
   }
 
   ngOnInit(): void {
@@ -58,6 +62,14 @@ export class SidenavComponent implements OnInit {
 
   closeUserManagementPanel(): void {
     this.userManagementPanelOpen = false;
+  }
+
+  openGroupManagementPanel(): void {
+    this.groupManagementPanelOpen = true;
+  }
+
+  closeGroupManagementPanel(): void {
+    this.groupManagementPanelOpen = false;
   }
 
   openCreateTransactionModal(): void {
@@ -100,5 +112,11 @@ export class SidenavComponent implements OnInit {
     const user = this.userService.getActiveUserSync();
     if (!user || !user.name) return '?';
     return user.name.charAt(0).toUpperCase();
+  }
+
+  getActiveGroupName(): string {
+    const group = this.userService.getActiveGroupSync();
+    if (!group || !group.name) return '?';
+    return group.name.substring(0, 1).toUpperCase();
   }
 }

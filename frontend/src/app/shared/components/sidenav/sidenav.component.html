@@ -36,6 +36,13 @@
 
   <!-- User Section (Bottom) -->
   <div class="sidenav-bottom">
+    <div class="group-section">
+      <button class="group-initial-btn" (click)="openGroupManagementPanel()" [title]="(activeGroup$ | async)?.name || 'Select Group'">
+        <i class="bi bi-folder"></i>
+      </button>
+      <span class="group-name" [class.hidden]="!isExpanded">{{ (activeGroup$ | async)?.name }}</span>
+    </div>
+
     <div class="user-section">
       <button class="user-initial-btn" (click)="openUserManagementPanel()" [title]="(activeUser$ | async)?.name || 'Select User'">
         <span class="user-initial">{{ getActiveUserInitial() }}</span>
@@ -51,6 +58,11 @@
     (transactionCreated)="onTransactionCreated()"
   ></app-create-transaction-modal>
 }
+
+<app-group-management-panel
+  [isOpen]="groupManagementPanelOpen"
+  (closed)="closeGroupManagementPanel()"
+></app-group-management-panel>
 
 <app-user-management-panel
   [isOpen]="userManagementPanelOpen"

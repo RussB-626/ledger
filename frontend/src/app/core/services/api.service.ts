@@ -12,6 +12,7 @@ import {
   Account,
   Category,
   Description,
+  Group,
   PageData,
   CategoryTotals,
   MonthlyDifference,
@@ -50,6 +51,33 @@ export class ApiService {
   updateUserPreferences(userId: number, preferences: any): Observable<User> {
     return this.http.put<ApiResponse<User>>(`${this.baseUrl}/users/${userId}/preferences`, preferences)
       .pipe(map(response => response.data!));
+  }
+
+  // ====== GROUPS ======
+
+  getGroups(userId: number): Observable<Group[]> {
+    return this.http.get<ApiResponse<Group[]>>(`${this.baseUrl}/users/${userId}/groups`)
+      .pipe(map(response => response.data || []));
+  }
+
+  createGroup(userId: number, name: string): Observable<Group> {
+    return this.http.post<ApiResponse<Group>>(`${this.baseUrl}/users/${userId}/groups`, { name })
+      .pipe(map(response => response.data!));
+  }
+
+  updateGroup(userId: number, groupId: number, name: string): Observable<Group> {
+    return this.http.put<ApiResponse<Group>>(`${this.baseUrl}/users/${userId}/groups/${groupId}`, { name })
+      .pipe(map(response => response.data!));
+  }
+
+  reorderGroups(userId: number, groups: Array<{ id: number; sort_order: number }>): Observable<Group[]> {
+    return this.http.put<ApiResponse<Group[]>>(`${this.baseUrl}/users/${userId}/groups/reorder/batch`, { groups })
+      .pipe(map(response => response.data || []));
+  }
+
+  deleteGroup(userId: number, groupId: number): Observable<{ success: boolean }> {
+    return this.http.delete<ApiResponse<{ success: boolean }>>(`${this.baseUrl}/users/${userId}/groups/${groupId}`)
+      .pipe(map(response => response.data || { success: false }));
   }
 
   // ====== TRANSACTIONS ======
@@ -111,17 +139,25 @@ export class ApiService {
       .pipe(map(response => response.data || []));
   }
 
-  createAccount(userId: number, name: string): Observable<Account> {
+  createAccount(userId: number, name: string, groupId?: number): Observable<Account> {
+    const body: any = { name };
+    if (groupId) {
+      body.group_id = groupId;
+    }
     return this.http.post<ApiResponse<Account>>(
       `${this.baseUrl}/users/${userId}/accounts`,
-      { name }
+      body
     ).pipe(map(response => response.data!));
   }
 
-  updateAccount(userId: number, accountId: number, name: string): Observable<Account> {
+  updateAccount(userId: number, accountId: number, name: string, groupId?: number): Observable<Account> {
+    const body: any = { name };
+    if (groupId) {
+      body.group_id = groupId;
+    }
     return this.http.put<ApiResponse<Account>>(
       `${this.baseUrl}/users/${userId}/accounts/${accountId}`,
-      { name }
+      body
     ).pipe(map(response => response.data!));
   }
 
@@ -131,10 +167,21 @@ export class ApiService {
     ).pipe(map(response => response.data || { success: false }));
   }
 
-  bulkCreateAccounts(userId: number, names: string[]): Observable<Account[]> {
+  bulkCreateAccounts(userId: number, names: string[], groupId?: number): Observable<Account[]> {
+    const body: any = { names };
+    if (groupId) {
+      body.group_id = groupId;
+    }
     return this.http.post<ApiResponse<Account[]>>(
       `${this.baseUrl}/users/${userId}/accounts/bulk`,
-      { names }
+      body
+    ).pipe(map(response => response.data || []));
+  }
+
+  reorderAccounts(userId: number, accounts: Array<{ id: number; sort_order: number }>): Observable<Account[]> {
+    return this.http.put<ApiResponse<Account[]>>(
+      `${this.baseUrl}/users/${userId}/accounts/reorder/batch`,
+      { accounts }
     ).pipe(map(response => response.data || []));
   }
 
@@ -258,10 +305,14 @@ export class ApiService {
 
   // ====== BULK UPLOAD ======
 
-  bulkUploadTransactions(userId: number, transactions: any[]): Observable<any> {
+  bulkUploadTransactions(userId: number, transactions: any[], groupId?: number): Observable<any> {
+    const body: any = { transactions };
+    if (groupId) {
+      body.group_id = groupId;
+    }
     return this.http.post<ApiResponse<any>>(
       `${this.baseUrl}/users/${userId}/transactions/bulk-upload`,
-      { transactions }
+      body
     ).pipe(map(response => response.data!));
   }
 

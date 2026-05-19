@@ -21,6 +21,7 @@ router.get(
   '/:userId/page-data',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
+    const groupId = req.query.groupId ? parseInt(req.query.groupId as string, 10) : undefined;
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -28,7 +29,7 @@ router.get(
       return;
     }
 
-    const pageData = await transactionsController.getPageData(userId);
+    const pageData = await transactionsController.getPageData(userId, groupId);
     const response: ApiResponse<PageData> = { data: pageData };
     res.json(response);
   })
@@ -40,6 +41,7 @@ router.get(
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
     const year = req.query.year ? parseInt(req.query.year as string, 10) : undefined;
+    const groupId = req.query.groupId ? parseInt(req.query.groupId as string, 10) : undefined;
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -47,7 +49,7 @@ router.get(
       return;
     }
 
-    const transactions = await transactionsController.getTransactionsByYear(userId, year);
+    const transactions = await transactionsController.getTransactionsByYear(userId, year, groupId);
     const response: ApiResponse<Transaction[]> = { data: transactions };
     res.json(response);
   })
@@ -58,6 +60,7 @@ router.get(
   '/:userId/transactions/pending',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
+    const groupId = req.query.groupId ? parseInt(req.query.groupId as string, 10) : undefined;
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -65,7 +68,7 @@ router.get(
       return;
     }
 
-    const transactions = await transactionsController.getPendingTransactions(userId);
+    const transactions = await transactionsController.getPendingTransactions(userId, groupId);
     const response: ApiResponse<Transaction[]> = { data: transactions };
     res.json(response);
   })

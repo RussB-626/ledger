@@ -1,0 +1,119 @@
+<div class="tab-content">
+  <div class="tab-header">
+    <h2>Groups Management</h2>
+    <div class="button-group">
+      <button class="add-btn" (click)="openGroupModal('create')">+ Add Group</button>
+      <button class="bulk-add-btn" (click)="openBulkAddModal()">Bulk Add</button>
+    </div>
+  </div>
+
+  @if (groups.length > 0) {
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Group Name</th>
+          <th>Sort Order</th>
+          <th style="text-align: right;">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (group of groups; track group.id) {
+          <tr>
+            <td>{{ group.name }}</td>
+            <td>{{ group.sort_order }}</td>
+            <td class="actions">
+              <button
+                class="action-btn reorder-btn"
+                (click)="moveGroupUp(group)"
+                [disabled]="groups[0]?.id === group.id"
+                title="Move Up"
+              >
+                ↑
+              </button>
+              <button
+                class="action-btn reorder-btn"
+                (click)="moveGroupDown(group)"
+                [disabled]="groups[groups.length - 1]?.id === group.id"
+                title="Move Down"
+              >
+                ↓
+              </button>
+              <button
+                class="action-btn delete-btn"
+                (click)="openDeleteConfirmation(group.id, group.name)"
+                title="Delete"
+              >
+                ✕
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <div class="empty-state">
+      <p>No groups found. Create your first group!</p>
+    </div>
+  }
+</div>
+
+<!-- Add/Edit Group Modal -->
+@if (groupModal.isOpen) {
+  <div class="modal-overlay" (click)="closeGroupModal()"></div>
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>{{ groupModal.mode === 'create' ? 'Add Group' : 'Edit Group' }}</h3>
+    <div class="form-group">
+      <label>Group Name</label>
+      <input
+        type="text"
+        [(ngModel)]="groupFormData.name"
+        placeholder="Enter group name"
+        class="form-input"
+      />
+    </div>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeGroupModal()">Cancel</button>
+      <button class="btn-save" (click)="saveGroup()">Save</button>
+    </div>
+  </div>
+}
+
+<!-- Bulk Add Modal -->
+@if (bulkAddModal.isOpen) {
+  <div class="modal-overlay" (click)="closeBulkAddModal()"></div>
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Bulk Add Groups</h3>
+    <p class="instructions">Enter group names (one per line):</p>
+    <textarea
+      [(ngModel)]="bulkGroupsText"
+      placeholder="Group 1&#10;Group 2&#10;Group 3"
+      class="bulk-textarea"
+      rows="6"
+    ></textarea>
+    @if (bulkAddError) {
+      <div class="error-message">{{ bulkAddError }}</div>
+    }
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeBulkAddModal()" [disabled]="bulkAddLoading">
+        Cancel
+      </button>
+      <button class="btn-save" (click)="saveBulkGroups()" [disabled]="bulkAddLoading">
+        {{ bulkAddLoading ? 'Adding...' : 'Add Groups' }}
+      </button>
+    </div>
+  </div>
+}
+
+<!-- Delete Confirmation Modal -->
+@if (deleteConfirmation.isOpen) {
+  <div class="modal-overlay" (click)="closeDeleteConfirmation()"></div>
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>Delete Group</h3>
+    <p>Are you sure you want to delete <strong>{{ deleteConfirmation.itemName }}</strong>?</p>
+    <p class="warning">This will also delete all accounts in this group and their transactions.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" (click)="closeDeleteConfirmation()">Cancel</button>
+      <button class="btn-delete" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
+}

@@ -19,6 +19,18 @@
         <button class="close-btn" (click)="closeBulkUploadModal()">×</button>
       </div>
       <div class="modal-body">
+        <!-- Group selector -->
+        <div class="form-group">
+          <label for="bulk-upload-group">Default Group for New Accounts</label>
+          <select id="bulk-upload-group" [(ngModel)]="bulkUploadGroupId" class="form-input">
+            <option [value]="0" disabled>Select a group</option>
+            @for (group of groups; track group.id) {
+              <option [value]="group.id">{{ group.name }}</option>
+            }
+          </select>
+          <p class="help-text-small">New accounts created during import will be added to this group.</p>
+        </div>
+
         @if (bulkUploadParsedData.length === 0) {
           <!-- File upload section -->
           <div class="upload-section">

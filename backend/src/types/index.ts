@@ -42,11 +42,21 @@ export interface Transaction {
   created_at: string;
 }
 
+// Group entity: Account groups per user
+export interface Group {
+  id: number;
+  user_id: number;
+  name: string;
+  sort_order: number;
+}
+
 // Account entity
 export interface Account {
   id: number;
   user_id: number;
+  group_id: number;
   name: string;
+  sort_order: number;
 }
 
 // Category entity with type and is_ignored flags
@@ -79,6 +89,7 @@ export interface ApiResponse<T> {
 export interface PageData {
   transactions: Transaction[];
   pendingTransactions: Transaction[];
+  groups: Group[];
   accounts: Account[];
   categories: Category[];
   txnDescriptions: Description[];
@@ -132,10 +143,32 @@ export interface UpdateTransactionRequest {
 // Request for creating/updating account
 export interface CreateAccountRequest {
   name: string;
+  group_id: number; // Required: account must belong to a group
 }
 
 export interface UpdateAccountRequest {
+  name?: string;
+  group_id?: number; // Optional: can move account to different group
+}
+
+// Request for creating group
+export interface CreateGroupRequest {
   name: string;
+}
+
+// Request for updating group
+export interface UpdateGroupRequest {
+  name?: string;
+}
+
+// Request for reordering groups
+export interface ReorderGroupsRequest {
+  groups: Array<{ id: number; sort_order: number }>;
+}
+
+// Request for reordering accounts
+export interface ReorderAccountsRequest {
+  accounts: Array<{ id: number; sort_order: number }>;
 }
 
 // Request for creating/updating category

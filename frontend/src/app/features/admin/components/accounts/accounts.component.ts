@@ -5,7 +5,7 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
-import { Account, User } from '../../../../core/models/index';
+import { Account, User, Group } from '../../../../core/models/index';
 
 interface ModalState {
   isOpen: boolean;
@@ -15,6 +15,7 @@ interface ModalState {
 
 interface AccountModalData {
   name: string;
+  group_id: number;
 }
 
 @Component({
@@ -28,17 +29,19 @@ export class AccountsComponent implements OnInit, OnDestroy {
   @Input() activeUser: User | null = null;
 
   accounts: Account[] = [];
+  groups: Group[] = [];
   itemsPerPage = 10;
   accountsPage = 1;
   searchAccounts = '';
 
   accountModal: ModalState = { isOpen: false, mode: 'create' };
-  accountFormData: AccountModalData = { name: '' };
+  accountFormData: AccountModalData = { name: '', group_id: 0 };
 
   bulkAddModal = { isOpen: false };
   bulkAccountsText = '';
   bulkAddError = '';
   bulkAddLoading = false;
+  bulkAddGroupId = 0;
 
   deleteConfirmation: {
     isOpen: boolean;
@@ -57,6 +60,17 @@ export class AccountsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
+    this.pageDataService.groups$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(groups => {
+        this.groups = groups;
+        if (groups.length > 0 && this.accountFormData.group_id === 0) {
+          this.accountFormData.group_id = groups[0].id;
+          this.bulkAddGroupId = groups[0].id;
+        }
+        this.cdr.markForCheck();
+      });
+
     this.loadAccounts();
   }
 
@@ -80,30 +94,30 @@ export class AccountsComponent implements OnInit, OnDestroy {
   openAccountModal(mode: 'create' | 'edit', account?: Account): void {
     this.accountModal = { isOpen: true, mode, itemId: account?.id };
     if (mode === 'edit' && account) {
-      this.accountFormData = { name: account.name };
+      this.accountFormData = { name: account.name, group_id: account.group_id };
     } else {
-      this.accountFormData = { name: '' };
+      this.accountFormData = { name: '', group_id: this.groups.length > 0 ? this.groups[0].id : 0 };
     }
   }
 
   closeAccountModal(): void {
     this.accountModal = { isOpen: false, mode: 'create' };
-    this.accountFormData = { name: '' };
+    this.accountFormData = { name: '', group_id: 0 };
   }
 
   saveAccount(): void {
-    if (!this.activeUser || !this.accountFormData.name.trim()) return;
+    if (!this.activeUser || !this.accountFormData.name.trim() || !this.accountFormData.group_id) return;
 
     if (this.accountModal.mode === 'create') {
       this.apiService
-        .createAccount(this.activeUser.id, this.accountFormData.name)
+        .createAccount(this.activeUser.id, this.accountFormData.name, this.accountFormData.group_id)
         .subscribe(() => {
           this.closeAccountModal();
           this.loadAccounts();
         });
     } else if (this.accountModal.itemId) {
       this.apiService
-        .updateAccount(this.activeUser.id, this.accountModal.itemId, this.accountFormData.name)
+        .updateAccount(this.activeUser.id, this.accountModal.itemId, this.accountFormData.name, this.accountFormData.group_id)
         .subscribe(() => {
           this.closeAccountModal();
           this.loadAccounts();
@@ -116,6 +130,7 @@ export class AccountsComponent implements OnInit, OnDestroy {
     this.bulkAccountsText = '';
     this.bulkAddError = '';
     this.bulkAddLoading = false;
+    this.bulkAddGroupId = this.groups.length > 0 ? this.groups[0].id : 0;
   }
 
   closeBulkAddModal(): void {
@@ -125,8 +140,8 @@ export class AccountsComponent implements OnInit, OnDestroy {
   }
 
   saveBulkAccounts(): void {
-    if (!this.activeUser || !this.bulkAccountsText.trim()) {
-      this.bulkAddError = 'Please paste account names';
+    if (!this.activeUser || !this.bulkAccountsText.trim() || !this.bulkAddGroupId) {
+      this.bulkAddError = this.bulkAddGroupId ? 'Please paste account names' : 'Please select a group';
       return;
     }
 
@@ -143,7 +158,7 @@ export class AccountsComponent implements OnInit, OnDestroy {
     this.bulkAddLoading = true;
     this.bulkAddError = '';
 
-    this.apiService.bulkCreateAccounts(this.activeUser.id, accountNames)
+    this.apiService.bulkCreateAccounts(this.activeUser.id, accountNames, this.bulkAddGroupId)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
@@ -199,5 +214,65 @@ export class AccountsComponent implements OnInit, OnDestroy {
 
   getTotalPages(): number {
     return Math.ceil(this.getFilteredAccounts().length / this.itemsPerPage);
+  }
+
+  isFirstAccountInGroup(account: Account): boolean {
+    const groupAccounts = this.accounts
+      .filter(a => a.group_id === account.group_id)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    return groupAccounts.length > 0 && groupAccounts[0].id === account.id;
+  }
+
+  isLastAccountInGroup(account: Account): boolean {
+    const groupAccounts = this.accounts
+      .filter(a => a.group_id === account.group_id)
+      .sort((a, b) => a.sort_order - b.sort_order);
+    return groupAccounts.length > 0 && groupAccounts[groupAccounts.length - 1].id === account.id;
+  }
+
+  moveAccountUp(account: Account): void {
+    if (!this.activeUser) return;
+
+    const groupAccounts = this.accounts
+      .filter(a => a.group_id === account.group_id)
+      .sort((a, b) => a.sort_order - b.sort_order);
+
+    const index = groupAccounts.findIndex(a => a.id === account.id);
+    if (index <= 0) return;
+
+    // Swap with previous account
+    const temp = groupAccounts[index].sort_order;
+    groupAccounts[index].sort_order = groupAccounts[index - 1].sort_order;
+    groupAccounts[index - 1].sort_order = temp;
+
+    // Send reorder request to backend
+    const reorderData = groupAccounts.map((a, i) => ({ id: a.id, sort_order: i + 1 }));
+    this.apiService.reorderAccounts(this.activeUser.id, reorderData)
+      .subscribe(() => {
+        this.loadAccounts();
+      });
+  }
+
+  moveAccountDown(account: Account): void {
+    if (!this.activeUser) return;
+
+    const groupAccounts = this.accounts
+      .filter(a => a.group_id === account.group_id)
+      .sort((a, b) => a.sort_order - b.sort_order);
+
+    const index = groupAccounts.findIndex(a => a.id === account.id);
+    if (index >= groupAccounts.length - 1) return;
+
+    // Swap with next account
+    const temp = groupAccounts[index].sort_order;
+    groupAccounts[index].sort_order = groupAccounts[index + 1].sort_order;
+    groupAccounts[index + 1].sort_order = temp;
+
+    // Send reorder request to backend
+    const reorderData = groupAccounts.map((a, i) => ({ id: a.id, sort_order: i + 1 }));
+    this.apiService.reorderAccounts(this.activeUser.id, reorderData)
+      .subscribe(() => {
+        this.loadAccounts();
+      });
   }
 }

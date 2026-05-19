@@ -13,7 +13,7 @@ import { PageDataService } from './core/services/page-data.service';
 import { ThemeService } from './core/services/theme.service';
 import { SharedModule } from './shared/shared.module';
 import { CreateNewUserComponent } from './shared/components/create-new-user/create-new-user.component';
-import { User } from './core/models/index';
+import { User, Group } from './core/models/index';
 
 @Component({
   selector: 'app-root',
@@ -126,6 +126,31 @@ export class AppComponent implements OnInit, OnDestroy {
       next: (pageData) => {
         this.ngZone.run(() => {
           this.pageDataService.setPageData(pageData);
+
+          // Initialize groups
+          const groups = pageData.groups || [];
+          if (groups.length > 0) {
+            this.pageDataService.setGroups(groups);
+
+            // Restore active group from localStorage or select first group
+            const storedGroupId = localStorage.getItem('ledger_active_group_id');
+            let activeGroup: Group | null = null;
+
+            if (storedGroupId) {
+              // Try to find the stored group in the current groups list
+              activeGroup = groups.find(g => g.id === parseInt(storedGroupId, 10)) || null;
+            }
+
+            // If no stored group found, select first group by sort_order
+            if (!activeGroup && groups.length > 0) {
+              activeGroup = groups.sort((a, b) => a.sort_order - b.sort_order)[0];
+            }
+
+            if (activeGroup) {
+              this.userService.setActiveGroup(activeGroup);
+            }
+          }
+
           this.loading = false;
           this.cdr.markForCheck();
         });

@@ -12,6 +12,13 @@
   <div class="tabs">
     <button
       class="tab-btn"
+      [class.active]="activeTab === 'groups'"
+      (click)="selectTab('groups')"
+    >
+      Groups
+    </button>
+    <button
+      class="tab-btn"
       [class.active]="activeTab === 'accounts'"
       (click)="selectTab('accounts')"
     >
@@ -60,6 +67,11 @@
       Backups
     </button>
   </div>
+
+  <!-- GROUPS TAB -->
+  @if (activeTab === 'groups') {
+    <app-groups [activeUser]="activeUser"></app-groups>
+  }
 
   <!-- ACCOUNTS TAB -->
   @if (activeTab === 'accounts') {

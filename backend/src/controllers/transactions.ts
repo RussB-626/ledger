@@ -16,19 +16,27 @@ import { getOrCreateDescription } from './references';
 
 // ====== TRANSACTION RETRIEVAL ======
 
-// Get transactions by year (defaults to current year)
-export async function getTransactionsByYear(userId: number, year?: number): Promise<Transaction[]> {
+// Get transactions by year (defaults to current year), optionally filtered by group
+export async function getTransactionsByYear(userId: number, year?: number, groupId?: number): Promise<Transaction[]> {
   const connection = await pool.getConnection();
   try {
     const targetYear = year || new Date().getFullYear();
 
-    const [rows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
-       FROM transactions
-       WHERE user_id = ? AND YEAR(date) = ?
-       ORDER BY date DESC`,
-      [userId, targetYear]
-    );
+    let query = `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
+                 FROM transactions
+                 WHERE user_id = ? AND YEAR(date) = ?`;
+    const params: (number | string)[] = [userId, targetYear];
+
+    if (groupId) {
+      query += ` AND account IN (
+                   SELECT a.name FROM accounts a WHERE a.user_id = ? AND a.group_id = ?
+                 )`;
+      params.push(userId, groupId);
+    }
+
+    query += ` ORDER BY date DESC`;
+
+    const [rows] = await connection.query<RowDataPacket[]>(query, params);
 
     return await enrichTransactionsWithDescriptions(connection, rows as Transaction[]);
   } finally {
@@ -36,17 +44,25 @@ export async function getTransactionsByYear(userId: number, year?: number): Prom
   }
 }
 
-// Get all pending transactions (across all years)
-export async function getPendingTransactions(userId: number): Promise<Transaction[]> {
+// Get all pending transactions (across all years), optionally filtered by group
+export async function getPendingTransactions(userId: number, groupId?: number): Promise<Transaction[]> {
   const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
-       FROM transactions
-       WHERE user_id = ? AND pending = 1
-       ORDER BY date DESC`,
-      [userId]
-    );
+    let query = `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
+                 FROM transactions
+                 WHERE user_id = ? AND pending = 1`;
+    const params: (number | string)[] = [userId];
+
+    if (groupId) {
+      query += ` AND account IN (
+                   SELECT a.name FROM accounts a WHERE a.user_id = ? AND a.group_id = ?
+                 )`;
+      params.push(userId, groupId);
+    }
+
+    query += ` ORDER BY date DESC`;
+
+    const [rows] = await connection.query<RowDataPacket[]>(query, params);
 
     return await enrichTransactionsWithDescriptions(connection, rows as Transaction[]);
   } finally {
@@ -321,36 +337,54 @@ export async function deleteTransaction(userId: number, transactionId: number): 
 // ====== PAGE DATA (INITIAL LOAD) ======
 
 // Get all data needed for initial page load (current year transactions + balances + references)
-export async function getPageData(userId: number): Promise<PageData> {
+export async function getPageData(userId: number, groupId?: number): Promise<PageData> {
   const connection = await pool.getConnection();
   try {
     const currentYear = new Date().getFullYear();
 
-    // Get transactions for current year
-    const [txnRows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
-       FROM transactions
-       WHERE user_id = ? AND YEAR(date) = ?
-       ORDER BY date DESC`,
-      [userId, currentYear]
+    // Get groups
+    const [groupRows] = await connection.query<RowDataPacket[]>(
+      'SELECT id, user_id, name, sort_order FROM groups WHERE user_id = ? ORDER BY sort_order ASC',
+      [userId]
     );
+
+    // Get transactions for current year (optionally filtered by group)
+    let txnQuery = `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
+                    FROM transactions
+                    WHERE user_id = ? AND YEAR(date) = ?`;
+    const txnParams: (number | string)[] = [userId, currentYear];
+
+    if (groupId) {
+      txnQuery += ` AND account IN (SELECT a.name FROM accounts a WHERE a.user_id = ? AND a.group_id = ?)`;
+      txnParams.push(userId, groupId);
+    }
+
+    txnQuery += ` ORDER BY date DESC`;
+
+    const [txnRows] = await connection.query<RowDataPacket[]>(txnQuery, txnParams);
 
     const transactions = await enrichTransactionsWithDescriptions(connection, txnRows as Transaction[]);
 
-    // Get all pending transactions
-    const [pendingRows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
-       FROM transactions
-       WHERE user_id = ? AND pending = 1
-       ORDER BY date DESC`,
-      [userId]
-    );
+    // Get all pending transactions (optionally filtered by group)
+    let pendingQuery = `SELECT id, user_id, DATE_FORMAT(date, '%Y-%m-%d') as date, account, category, description_id, note, amount, type, pending, created_at
+                        FROM transactions
+                        WHERE user_id = ? AND pending = 1`;
+    const pendingParams: (number | string)[] = [userId];
+
+    if (groupId) {
+      pendingQuery += ` AND account IN (SELECT a.name FROM accounts a WHERE a.user_id = ? AND a.group_id = ?)`;
+      pendingParams.push(userId, groupId);
+    }
+
+    pendingQuery += ` ORDER BY date DESC`;
+
+    const [pendingRows] = await connection.query<RowDataPacket[]>(pendingQuery, pendingParams);
 
     const pendingTransactions = await enrichTransactionsWithDescriptions(connection, pendingRows as Transaction[]);
 
     // Get accounts
     const [accountRows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, name FROM accounts WHERE user_id = ? ORDER BY name ASC',
+      'SELECT id, user_id, group_id, name, sort_order FROM accounts WHERE user_id = ? ORDER BY group_id ASC, sort_order ASC',
       [userId]
     );
 
@@ -405,6 +439,7 @@ export async function getPageData(userId: number): Promise<PageData> {
     return {
       transactions,
       pendingTransactions,
+      groups: groupRows as any[],
       accounts: accountRows as any[],
       categories: categoryRows.map(row => ({
         ...row,

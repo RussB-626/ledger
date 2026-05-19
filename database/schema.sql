@@ -25,12 +25,25 @@ CREATE TABLE users (
   created_at          TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Accounts table: Bank/savings account names per user
+-- Groups table: Account groups per user for organization
+CREATE TABLE groups (
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT NOT NULL,
+  name       VARCHAR(100) NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
+  FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+  UNIQUE KEY unique_user_group (user_id, name)
+);
+
+-- Accounts table: Bank/savings account names per user, grouped by groups
 CREATE TABLE accounts (
-  id      INT AUTO_INCREMENT PRIMARY KEY,
-  user_id INT NOT NULL,
-  name    VARCHAR(100) NOT NULL,
+  id         INT AUTO_INCREMENT PRIMARY KEY,
+  user_id    INT NOT NULL,
+  group_id   INT NOT NULL,
+  name       VARCHAR(100) NOT NULL,
+  sort_order INT NOT NULL DEFAULT 0,
   FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (group_id) REFERENCES groups(id) ON DELETE CASCADE,
   UNIQUE KEY unique_user_account (user_id, name)
 );
 

@@ -9,7 +9,7 @@ import { map, startWith } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
 import { UserService } from '../../../core/services/user.service';
 import { PageDataService } from '../../../core/services/page-data.service';
-import { Account, Category, Description, TransactionType } from '../../../core/models/index';
+import { Account, Category, Description, TransactionType, Group } from '../../../core/models/index';
 import { ClickOutsideDirective } from '../../directives/click-outside.directive';
 
 @Component({
@@ -32,9 +32,12 @@ export class CreateTransactionModalComponent implements OnInit {
 
   editingTransaction: any = null;
 
+  groups: Group[] = [];
   accounts: Account[] = [];
   categories: Category[] = [];
   descriptions: Description[] = [];
+  selectedGroup: Group | null = null;
+  selectedTransferGroup: Group | null = null;
 
   filteredDescriptions$: Observable<string[]> | null = null;
 
@@ -149,20 +152,35 @@ export class CreateTransactionModalComponent implements OnInit {
 
     const pageData = this.pageDataService.getPageDataSync();
     if (pageData) {
+      this.groups = pageData.groups || [];
       this.accounts = pageData.accounts;
       this.categories = pageData.categories;
       this.descriptions = pageData.txnDescriptions;
     }
+
+    // Set initial group selections to active group
+    const activeGroup = this.userService.getActiveGroupSync();
+    if (activeGroup) {
+      this.selectedGroup = activeGroup;
+      this.selectedTransferGroup = activeGroup;
+    }
   }
 
   getAccountsByType(type: 'all' | 'fromAccount' | 'toAccount' = 'all'): Account[] {
-    if (type === 'toAccount') {
-      return this.accounts.filter(a => true); // All accounts can be transfer targets
+    let filtered = this.accounts;
+
+    // Filter by selected group for withdrawal/deposit
+    if (type === 'all' && this.selectedGroup) {
+      filtered = filtered.filter(a => a.group_id === this.selectedGroup!.id);
     }
-    if (type === 'fromAccount') {
-      return this.accounts.filter(a => true); // All accounts can be transfer sources
+
+    if (type === 'toAccount' && this.selectedTransferGroup) {
+      return filtered.filter(a => a.group_id === this.selectedTransferGroup!.id);
     }
-    return this.accounts;
+    if (type === 'fromAccount' && this.selectedGroup) {
+      return filtered.filter(a => a.group_id === this.selectedGroup!.id);
+    }
+    return filtered;
   }
 
   getCategoriesByType(categoryType: 'expense' | 'income' | 'transfer'): Category[] {

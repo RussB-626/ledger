@@ -21,7 +21,7 @@ export async function getAccountsByUserId(userId: number): Promise<Account[]> {
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, name FROM accounts WHERE user_id = ? ORDER BY name ASC',
+      'SELECT id, user_id, group_id, name, sort_order FROM accounts WHERE user_id = ? ORDER BY group_id ASC, sort_order ASC',
       [userId]
     );
     return rows as Account[];
@@ -33,14 +33,27 @@ export async function getAccountsByUserId(userId: number): Promise<Account[]> {
 export async function createAccount(userId: number, req: CreateAccountRequest): Promise<Account> {
   const connection = await pool.getConnection();
   try {
+    if (!req.group_id) {
+      throw new Error('group_id is required when creating an account');
+    }
+
+    // Get the next sort_order for this group
+    const [maxOrderResult] = await connection.query<RowDataPacket[]>(
+      'SELECT MAX(sort_order) as maxOrder FROM accounts WHERE user_id = ? AND group_id = ?',
+      [userId, req.group_id]
+    );
+    const nextOrder = ((maxOrderResult[0] as any)?.maxOrder ?? 0) + 1;
+
     const [result] = await connection.query<ResultSetHeader>(
-      'INSERT INTO accounts (user_id, name) VALUES (?, ?)',
-      [userId, req.name]
+      'INSERT INTO accounts (user_id, group_id, name, sort_order) VALUES (?, ?, ?, ?)',
+      [userId, req.group_id, req.name, nextOrder]
     );
     return {
       id: result.insertId,
       user_id: userId,
-      name: req.name
+      group_id: req.group_id,
+      name: req.name,
+      sort_order: nextOrder
     };
   } finally {
     connection.release();
@@ -54,9 +67,27 @@ export async function updateAccount(
 ): Promise<Account | null> {
   const connection = await pool.getConnection();
   try {
+    const updates: string[] = [];
+    const values: (string | number)[] = [];
+
+    if (req.name !== undefined) {
+      updates.push('name = ?');
+      values.push(req.name);
+    }
+    if (req.group_id !== undefined) {
+      updates.push('group_id = ?');
+      values.push(req.group_id);
+    }
+
+    if (updates.length === 0) {
+      return null;
+    }
+
+    values.push(accountId, userId);
+
     const [result] = await connection.query<ResultSetHeader>(
-      'UPDATE accounts SET name = ? WHERE id = ? AND user_id = ?',
-      [req.name, accountId, userId]
+      `UPDATE accounts SET ${updates.join(', ')} WHERE id = ? AND user_id = ?`,
+      values
     );
 
     if (result.affectedRows === 0) {
@@ -64,7 +95,7 @@ export async function updateAccount(
     }
 
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, name FROM accounts WHERE id = ?',
+      'SELECT id, user_id, group_id, name, sort_order FROM accounts WHERE id = ?',
       [accountId]
     );
 
@@ -82,6 +113,26 @@ export async function deleteAccount(userId: number, accountId: number): Promise<
       [accountId, userId]
     );
     return result.affectedRows > 0;
+  } finally {
+    connection.release();
+  }
+}
+
+// Batch reorder accounts (update sort_order for multiple accounts)
+export async function reorderAccounts(
+  userId: number,
+  accountsWithOrder: Array<{ id: number; sort_order: number }>
+): Promise<Account[]> {
+  const connection = await pool.getConnection();
+  try {
+    for (const account of accountsWithOrder) {
+      await connection.query(
+        'UPDATE accounts SET sort_order = ? WHERE id = ? AND user_id = ?',
+        [account.sort_order, account.id, userId]
+      );
+    }
+
+    return await getAccountsByUserId(userId);
   } finally {
     connection.release();
   }

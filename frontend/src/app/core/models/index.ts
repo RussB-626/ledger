@@ -40,10 +40,19 @@ export interface Transaction {
   created_at: string;
 }
 
-export interface Account {
+export interface Group {
   id: number;
   user_id: number;
   name: string;
+  sort_order: number;
+}
+
+export interface Account {
+  id: number;
+  user_id: number;
+  group_id: number;
+  name: string;
+  sort_order: number;
 }
 
 export interface Category {
@@ -67,6 +76,7 @@ export interface Description {
 export interface PageData {
   transactions: Transaction[];
   pendingTransactions: Transaction[];
+  groups: Group[];
   accounts: Account[];
   categories: Category[];
   txnDescriptions: Description[];

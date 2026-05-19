@@ -3,7 +3,7 @@
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { PageData, Transaction, Account, Category, Description } from '../models/index';
+import { PageData, Transaction, Account, Category, Description, Group } from '../models/index';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +17,9 @@ export class PageDataService {
 
   private pendingTransactionsSubject = new BehaviorSubject<Transaction[]>([]);
   pendingTransactions$: Observable<Transaction[]> = this.pendingTransactionsSubject.asObservable();
+
+  private groupsSubject = new BehaviorSubject<Group[]>([]);
+  groups$: Observable<Group[]> = this.groupsSubject.asObservable();
 
   private accountsSubject = new BehaviorSubject<Account[]>([]);
   accounts$: Observable<Account[]> = this.accountsSubject.asObservable();
@@ -48,6 +51,7 @@ export class PageDataService {
     this.pageDataSubject.next(pageData);
     this.transactionsSubject.next(pageData.transactions);
     this.pendingTransactionsSubject.next(pageData.pendingTransactions);
+    this.groupsSubject.next(pageData.groups);
     this.accountsSubject.next(pageData.accounts);
     this.categoriesSubject.next(pageData.categories);
     this.descriptionsSubject.next(pageData.txnDescriptions);
@@ -61,6 +65,20 @@ export class PageDataService {
    */
   getPageDataSync(): PageData | null {
     return this.pageDataSubject.value;
+  }
+
+  /**
+   * Set groups
+   */
+  setGroups(groups: Group[]): void {
+    this.groupsSubject.next(groups);
+  }
+
+  /**
+   * Get groups synchronously
+   */
+  getGroupsSync(): Group[] {
+    return this.groupsSubject.value;
   }
 
   /**
@@ -183,6 +201,7 @@ export class PageDataService {
     this.pageDataSubject.next(null);
     this.transactionsSubject.next([]);
     this.pendingTransactionsSubject.next([]);
+    this.groupsSubject.next([]);
     this.accountsSubject.next([]);
     this.categoriesSubject.next([]);
     this.descriptionsSubject.next([]);

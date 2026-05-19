@@ -28,7 +28,7 @@ router.post(
   '/:userId/accounts/bulk',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
-    const { names } = req.body as { names?: string[] };
+    const { names, group_id } = req.body as { names?: string[], group_id?: number };
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -42,6 +42,12 @@ router.post(
       return;
     }
 
+    if (!group_id) {
+      const response: ApiResponse<never> = { error: 'group_id is required' };
+      res.status(400).json(response);
+      return;
+    }
+
     const createdAccounts: Account[] = [];
 
     for (const name of names) {
@@ -49,7 +55,7 @@ router.post(
       if (!trimmedName) continue;
 
       try {
-        const account = await referencesController.createAccount(userId, { name: trimmedName });
+        const account = await referencesController.createAccount(userId, { name: trimmedName, group_id });
         createdAccounts.push(account);
       } catch {
         // Skip accounts that already exist or fail to create
@@ -95,6 +101,12 @@ router.post(
 
     if (!createReq.name) {
       const response: ApiResponse<never> = { error: 'Account name is required' };
+      res.status(400).json(response);
+      return;
+    }
+
+    if (!createReq.group_id) {
+      const response: ApiResponse<never> = { error: 'group_id is required' };
       res.status(400).json(response);
       return;
     }
@@ -154,6 +166,31 @@ router.delete(
     }
 
     const response: ApiResponse<{ success: boolean }> = { data: { success: true } };
+    res.json(response);
+  })
+);
+
+// PUT /api/users/:userId/accounts/reorder/batch - Batch reorder accounts
+router.put(
+  '/:userId/accounts/reorder/batch',
+  asyncHandler(async (req: Request, res: Response) => {
+    const userId = parseInt(req.params.userId, 10);
+    const { accounts } = req.body as { accounts?: Array<{ id: number; sort_order: number }> };
+
+    if (isNaN(userId)) {
+      const response: ApiResponse<never> = { error: 'Invalid user ID' };
+      res.status(400).json(response);
+      return;
+    }
+
+    if (!Array.isArray(accounts) || accounts.length === 0) {
+      const response: ApiResponse<never> = { error: 'Accounts array with id and sort_order is required' };
+      res.status(400).json(response);
+      return;
+    }
+
+    const reorderedAccounts = await referencesController.reorderAccounts(userId, accounts);
+    const response: ApiResponse<Account[]> = { data: reorderedAccounts };
     res.json(response);
   })
 );

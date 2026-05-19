@@ -1,0 +1,26 @@
+@if (isOpen) {
+  <div class="panel-overlay" (click)="closePanel()"></div>
+
+  <aside class="group-management-panel">
+    <div class="panel-header">
+      <h2>Groups</h2>
+    </div>
+
+    <div class="panel-content">
+      <div class="groups-list">
+        @for (group of groups$ | async; track group.id) {
+          <button
+            class="group-item"
+            [class.active]="(activeGroup$ | async)?.id === group.id"
+            (click)="switchGroup(group)"
+          >
+            <span class="group-icon">
+              <i class="bi bi-folder"></i>
+            </span>
+            <span class="group-name">{{ group.name }}</span>
+          </button>
+        }
+      </div>
+    </div>
+  </aside>
+}

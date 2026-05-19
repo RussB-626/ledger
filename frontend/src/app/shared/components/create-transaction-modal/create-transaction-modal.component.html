@@ -52,10 +52,20 @@
         </div>
 
         <div class="form-group">
+          <label for="withdrawal-group">Group</label>
+          <select id="withdrawal-group" [(ngModel)]="selectedGroup" [ngModelOptions]="{standalone: true}">
+            <option [ngValue]="null">Select Group</option>
+            @for (group of groups; track group.id) {
+              <option [ngValue]="group">{{ group.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="withdrawal-account">Account</label>
           <select id="withdrawal-account" formControlName="account" required>
             <option value="">Select Account</option>
-            @for (account of accounts; track account.id) {
+            @for (account of getAccountsByType('all'); track account.id) {
               <option [value]="account.name">
                 {{ account.name }}
               </option>
@@ -134,10 +144,20 @@
         </div>
 
         <div class="form-group">
+          <label for="deposit-group">Group</label>
+          <select id="deposit-group" [(ngModel)]="selectedGroup" [ngModelOptions]="{standalone: true}">
+            <option [ngValue]="null">Select Group</option>
+            @for (group of groups; track group.id) {
+              <option [ngValue]="group">{{ group.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
           <label for="deposit-account">Account</label>
           <select id="deposit-account" formControlName="account" required>
             <option value="">Select Account</option>
-            @for (account of accounts; track account.id) {
+            @for (account of getAccountsByType('all'); track account.id) {
               <option [value]="account.name">
                 {{ account.name }}
               </option>
@@ -213,6 +233,28 @@
             formControlName="date"
             required
           />
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="transfer-from-group">From Group</label>
+            <select id="transfer-from-group" [(ngModel)]="selectedGroup" [ngModelOptions]="{standalone: true}">
+              <option [ngValue]="null">Select Group</option>
+              @for (group of groups; track group.id) {
+                <option [ngValue]="group">{{ group.name }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="transfer-to-group">To Group</label>
+            <select id="transfer-to-group" [(ngModel)]="selectedTransferGroup" [ngModelOptions]="{standalone: true}">
+              <option [ngValue]="null">Select Group</option>
+              @for (group of groups; track group.id) {
+                <option [ngValue]="group">{{ group.name }}</option>
+              }
+            </select>
+          </div>
         </div>
 
         <div class="form-group">

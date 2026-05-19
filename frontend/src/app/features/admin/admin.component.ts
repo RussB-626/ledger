@@ -8,6 +8,7 @@ import { UserService } from '../../core/services/user.service';
 import { ApiService } from '../../core/services/api.service';
 import { PageDataService } from '../../core/services/page-data.service';
 import { User } from '../../core/models/index';
+import { GroupsComponent } from './components/groups/groups.component';
 import { AccountsComponent } from './components/accounts/accounts.component';
 import { CategoriesComponent } from './components/categories/categories.component';
 import { DescriptionsComponent } from './components/descriptions/descriptions.component';
@@ -24,6 +25,7 @@ import { BackupsComponent } from './components/backups/backups.component';
   imports: [
     CommonModule,
     FormsModule,
+    GroupsComponent,
     AccountsComponent,
     CategoriesComponent,
     DescriptionsComponent,
@@ -35,7 +37,7 @@ import { BackupsComponent } from './components/backups/backups.component';
 })
 export class AdminComponent implements OnInit, OnDestroy {
   activeUser: User | null = null;
-  activeTab: 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups' | 'themes' = 'accounts';
+  activeTab: 'groups' | 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups' | 'themes' = 'groups';
 
   private destroy$ = new Subject<void>();
 
@@ -61,7 +63,7 @@ export class AdminComponent implements OnInit, OnDestroy {
   }
 
 
-  selectTab(tab: 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups' | 'themes'): void {
+  selectTab(tab: 'groups' | 'accounts' | 'categories' | 'descriptions' | 'transactions' | 'other' | 'backups' | 'themes'): void {
     this.activeTab = tab;
   }
 

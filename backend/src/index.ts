@@ -6,6 +6,7 @@ import express from 'express';
 import path from 'path';
 import { errorHandler } from './middleware/errorHandler';
 import userRoutes from './routes/users';
+import groupRoutes from './routes/groups';
 import transactionRoutes from './routes/transactions';
 import referenceRoutes from './routes/references';
 import backupRoutes from './routes/backups';
@@ -30,6 +31,7 @@ app.use(express.static(frontendPath));
 
 // Routes
 app.use('/api/users', userRoutes);
+app.use('/api/users/:userId/groups', groupRoutes);
 app.use('/api/users', transactionRoutes);
 app.use('/api/users', referenceRoutes);
 app.use('/api/users', backupRoutes);
