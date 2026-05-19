@@ -122,6 +122,13 @@
     &:hover {
       background: rgba(0, 217, 255, 0.08);
     }
+
+    &.group-separator {
+      td {
+        padding-top: 16px;
+        border-top: 2px solid var(--color-primary);
+      }
+    }
   }
 
   .actions {

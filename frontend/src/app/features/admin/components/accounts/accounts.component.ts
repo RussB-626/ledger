@@ -230,6 +230,12 @@ export class AccountsComponent implements OnInit, OnDestroy {
     return groupAccounts.length > 0 && groupAccounts[groupAccounts.length - 1].id === account.id;
   }
 
+  isFirstAccountInPage(account: Account, index: number): boolean {
+    if (index === 0) return true;
+    const paginatedAccounts = this.getPaginatedAccounts();
+    return paginatedAccounts[index - 1]?.group_id !== account.group_id;
+  }
+
   moveAccountUp(account: Account): void {
     if (!this.activeUser) return;
 

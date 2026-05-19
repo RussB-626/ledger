@@ -27,8 +27,8 @@
         </tr>
       </thead>
       <tbody>
-        @for (account of getPaginatedAccounts(); track account.id) {
-          <tr>
+        @for (account of getPaginatedAccounts(); track account.id; let i = $index) {
+          <tr [class.group-separator]="isFirstAccountInPage(account, i)">
             <td>{{ groups.find(g => g.id === account.group_id)?.name || 'Unknown' }}</td>
             <td>{{ account.name }}</td>
             <td style="text-align: center;">{{ account.sort_order }}</td>
