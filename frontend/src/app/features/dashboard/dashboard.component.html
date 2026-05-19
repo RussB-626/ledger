@@ -1,27 +1,26 @@
 <div class="dashboard-container">
-  @if ((pageData$ | async); as pageData) {
-  <div class="dashboard-content">
-    <!-- Top Row: Accounts Component with Split Layout (Full Width) -->
-    <app-accounts
-      [pageData]="pageData"
-      (editTransaction)="onEditTransaction($event)">
-    </app-accounts>
+  @if (pageData$ | async; as pageData) {
+    <div class="dashboard-content">
+      <!-- Top Row: Accounts Component with Split Layout (Full Width) -->
+      <app-accounts
+        [pageData]="pageData"
+        (editTransaction)="onEditTransaction($event)"
+      >
+      </app-accounts>
 
-    <!-- Bottom Row: 50/50 Split -->
-    <div class="bottom-content-row">
-      <!-- Left: Financial Summary Section -->
-      <app-fin-summary [pageData]="pageData"></app-fin-summary>
+      <!-- Bottom Row: 50/50 Split -->
+      <div class="bottom-content-row">
+        <!-- Left: Financial Summary Section -->
+        <app-fin-summary [pageData]="pageData"></app-fin-summary>
 
-      <!-- Right: Recurring Expenses -->
-      <div class="card">
+        <!-- Right: Recurring Expenses -->
         <app-rec-expenses [pageData]="pageData"></app-rec-expenses>
       </div>
     </div>
-  </div>
   } @else {
-  <div class="loading-state">
-    <p>Loading dashboard...</p>
-  </div>
+    <div class="loading-state">
+      <p>Loading dashboard...</p>
+    </div>
   }
 
   <!-- Transaction Edit Modal -->
