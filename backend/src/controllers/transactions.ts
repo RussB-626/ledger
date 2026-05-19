@@ -469,24 +469,35 @@ export async function getPageData(userId: number, groupId?: number): Promise<Pag
 export async function getCategoryTotals(
   userId: number,
   year: number,
-  month: number
+  month: number,
+  groupId?: number
 ): Promise<CategoryTotals> {
   const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.query<RowDataPacket[]>(
-      `SELECT
+    let query = `SELECT
         t.category,
         t.type,
         SUM(t.amount) as total
-       FROM transactions t
-       WHERE t.user_id = ? AND YEAR(t.date) = ? AND MONTH(t.date) = ?
-       AND NOT EXISTS (
+       FROM transactions t`;
+
+    if (groupId !== undefined) {
+      query += ` JOIN accounts a ON t.account = a.name AND a.user_id = ?
+                WHERE a.group_id = ? AND t.user_id = ? AND YEAR(t.date) = ? AND MONTH(t.date) = ?`;
+    } else {
+      query += ` WHERE t.user_id = ? AND YEAR(t.date) = ? AND MONTH(t.date) = ?`;
+    }
+
+    query += ` AND NOT EXISTS (
          SELECT 1 FROM categories c
          WHERE c.user_id = ? AND c.name = t.category AND c.is_ignored = 1
        )
-       GROUP BY t.category, t.type`,
-      [userId, year, month, userId]
-    );
+       GROUP BY t.category, t.type`;
+
+    const params = groupId !== undefined
+      ? [userId, groupId, userId, year, month, userId]
+      : [userId, year, month, userId];
+
+    const [rows] = await connection.query<RowDataPacket[]>(query, params);
 
     const expenses: Record<string, number> = {};
     const incomes: Record<string, number> = {};
@@ -512,23 +523,34 @@ export async function getCategoryTotals(
 export async function getMonthlyDifference(
   userId: number,
   year: number,
-  month: number
+  month: number,
+  groupId?: number
 ): Promise<MonthlyDifference> {
   const connection = await pool.getConnection();
   try {
-    const [rows] = await connection.query<RowDataPacket[]>(
-      `SELECT
+    let query = `SELECT
         t.type,
         SUM(t.amount) as total
-       FROM transactions t
-       WHERE t.user_id = ? AND YEAR(t.date) = ? AND MONTH(t.date) = ?
-       AND NOT EXISTS (
+       FROM transactions t`;
+
+    if (groupId !== undefined) {
+      query += ` JOIN accounts a ON t.account = a.name AND a.user_id = ?
+                WHERE a.group_id = ? AND t.user_id = ? AND YEAR(t.date) = ? AND MONTH(t.date) = ?`;
+    } else {
+      query += ` WHERE t.user_id = ? AND YEAR(t.date) = ? AND MONTH(t.date) = ?`;
+    }
+
+    query += ` AND NOT EXISTS (
          SELECT 1 FROM categories c
          WHERE c.user_id = ? AND c.name = t.category AND c.is_ignored = 1
        )
-       GROUP BY t.type`,
-      [userId, year, month, userId]
-    );
+       GROUP BY t.type`;
+
+    const params = groupId !== undefined
+      ? [userId, groupId, userId, year, month, userId]
+      : [userId, year, month, userId];
+
+    const [rows] = await connection.query<RowDataPacket[]>(query, params);
 
     let income = 0;
     let expenses = 0;

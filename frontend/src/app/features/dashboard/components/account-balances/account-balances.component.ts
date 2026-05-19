@@ -1,6 +1,8 @@
-import { Component, Input, Output, EventEmitter, OnInit, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit, SimpleChanges, OnChanges, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { PageData, User } from '../../../../core/models/index';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { PageData, User, Group, Account } from '../../../../core/models/index';
 import { UserService } from '../../../../core/services/user.service';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
@@ -17,25 +19,37 @@ interface BalanceRow {
   standalone: true,
   imports: [CommonModule, FormatCurrencyPipe]
 })
-export class AccountBalancesComponent implements OnInit, OnChanges {
+export class AccountBalancesComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pageData!: PageData;
   @Output() accountSelected = new EventEmitter<string>();
 
   activeUser: User | null = null;
+  activeGroup: Group | null = null;
   selectedAccountName: string | null = null;
+  private destroy$ = new Subject<void>();
 
   constructor(private userService: UserService) {
     this.activeUser = this.userService.getActiveUser();
   }
 
   ngOnInit(): void {
-    this.selectFirstAccount();
+    this.userService.activeGroup$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(group => {
+        this.activeGroup = group;
+        this.selectFirstAccount();
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['pageData'] && !changes['pageData'].firstChange) {
       this.selectFirstAccount();
     }
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private selectFirstAccount(): void {
@@ -49,8 +63,15 @@ export class AccountBalancesComponent implements OnInit, OnChanges {
   get balanceRows(): BalanceRow[] {
     const rows: BalanceRow[] = [];
 
-    // Add all accounts with their balances (or 0 if no transactions)
-    for (const account of this.pageData.accounts) {
+    if (!this.activeGroup) return rows;
+
+    // Filter accounts by active group
+    const groupAccounts = this.pageData.accounts.filter(
+      account => account.group_id === this.activeGroup!.id
+    );
+
+    // Add all accounts in the group with their balances (or 0 if no transactions)
+    for (const account of groupAccounts) {
       const balance = this.pageData.balances[account.name] ?? 0;
       rows.push({
         accountName: account.name,
@@ -58,8 +79,10 @@ export class AccountBalancesComponent implements OnInit, OnChanges {
       });
     }
 
-    // Add totals row
-    const totalBalance = Object.values(this.pageData.balances).reduce((sum, balance) => sum + balance, 0);
+    // Add totals row for this group only
+    const totalBalance = groupAccounts.reduce((sum, account) => {
+      return sum + (this.pageData.balances[account.name] ?? 0);
+    }, 0);
     rows.push({
       accountName: 'TOTAL',
       balance: totalBalance,

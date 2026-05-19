@@ -280,6 +280,7 @@ router.get(
     const type = req.query.type as string | undefined;
     const year = req.query.year ? parseInt(req.query.year as string, 10) : undefined;
     const month = req.query.month ? parseInt(req.query.month as string, 10) : undefined;
+    const groupId = req.query.groupId ? parseInt(req.query.groupId as string, 10) : undefined;
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -289,7 +290,7 @@ router.get(
 
     // If year and month are provided, return category totals (analytics)
     if (year !== undefined && month !== undefined) {
-      const categoryTotals = await transactionsController.getCategoryTotals(userId, year, month);
+      const categoryTotals = await transactionsController.getCategoryTotals(userId, year, month, groupId);
       const response: ApiResponse<CategoryTotals> = { data: categoryTotals };
       res.json(response);
       return;

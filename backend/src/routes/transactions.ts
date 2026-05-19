@@ -217,6 +217,7 @@ router.get(
     const userId = parseInt(req.params.userId, 10);
     const year = req.query.year ? parseInt(req.query.year as string, 10) : new Date().getFullYear();
     const month = req.query.month ? parseInt(req.query.month as string, 10) : new Date().getMonth() + 1;
+    const groupId = req.query.groupId ? parseInt(req.query.groupId as string, 10) : undefined;
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -224,7 +225,7 @@ router.get(
       return;
     }
 
-    const difference = await transactionsController.getMonthlyDifference(userId, year, month);
+    const difference = await transactionsController.getMonthlyDifference(userId, year, month, groupId);
     const response: ApiResponse<MonthlyDifference> = { data: difference };
     res.json(response);
   })

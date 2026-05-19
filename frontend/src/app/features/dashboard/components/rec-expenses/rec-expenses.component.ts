@@ -1,9 +1,9 @@
-import { Component, Input, OnChanges, SimpleChanges, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject, forkJoin } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { PageData, Transaction } from '../../../../core/models/index';
+import { PageData, Transaction, Group, Account } from '../../../../core/models/index';
 import { UserService } from '../../../../core/services/user.service';
 import { ApiService } from '../../../../core/services/api.service';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
@@ -15,7 +15,7 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pip
   standalone: true,
   imports: [CommonModule, FormsModule, FormatCurrencyPipe]
 })
-export class RecExpensesComponent implements OnChanges, OnDestroy {
+export class RecExpensesComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pageData!: PageData;
 
   selectedTab: 'monthly' | 'yearly' = 'monthly';
@@ -23,6 +23,8 @@ export class RecExpensesComponent implements OnChanges, OnDestroy {
   selectedMonth: number;
   monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   yearlyTransactions: Transaction[] = [];
+  activeGroup: Group | null = null;
+  groupAccounts: Account[] = [];
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -33,7 +35,26 @@ export class RecExpensesComponent implements OnChanges, OnDestroy {
     const now = new Date();
     this.selectedYear = now.getFullYear();
     this.selectedMonth = now.getMonth() + 1;
-    this.loadYearlyTransactions();
+  }
+
+  ngOnInit(): void {
+    this.userService.activeGroup$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(group => {
+        this.activeGroup = group;
+        this.updateGroupAccounts();
+        this.loadYearlyTransactions();
+      });
+  }
+
+  private updateGroupAccounts(): void {
+    if (!this.activeGroup || !this.pageData?.accounts) {
+      this.groupAccounts = [];
+      return;
+    }
+    this.groupAccounts = this.pageData.accounts.filter(
+      account => account.group_id === this.activeGroup!.id
+    );
   }
 
   ngOnDestroy(): void {
@@ -43,7 +64,7 @@ export class RecExpensesComponent implements OnChanges, OnDestroy {
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['pageData'] && this.pageData) {
-      // Page data updated, filtering will happen through getter
+      this.updateGroupAccounts();
     }
   }
 
@@ -58,12 +79,14 @@ export class RecExpensesComponent implements OnChanges, OnDestroy {
   private getTransactionsForMonth(year: number, month: number, descriptionId: number): Transaction[] {
     const monthNum = Number(month);
     const yearNum = Number(year);
+    const groupAccountNames = this.groupAccounts.map(a => a.name);
 
     return this.yearlyTransactions.filter(txn => {
       const [txnYear, txnMonth] = txn.date.split('-').map(Number);
       return txn.description_id === descriptionId &&
              txnYear === yearNum &&
-             txnMonth === monthNum;
+             txnMonth === monthNum &&
+             groupAccountNames.includes(txn.account);
     });
   }
 
@@ -93,9 +116,12 @@ export class RecExpensesComponent implements OnChanges, OnDestroy {
 
   getYearTotal(descriptionId: number): number {
     const yearNum = Number(this.selectedYear);
+    const groupAccountNames = this.groupAccounts.map(a => a.name);
     return this.yearlyTransactions.filter(txn => {
       const [txnYear] = txn.date.split('-').map(Number);
-      return txn.description_id === descriptionId && txnYear === yearNum;
+      return txn.description_id === descriptionId &&
+             txnYear === yearNum &&
+             groupAccountNames.includes(txn.account);
     }).reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
       return sum + (isNaN(amount) ? 0 : amount);
@@ -103,9 +129,12 @@ export class RecExpensesComponent implements OnChanges, OnDestroy {
   }
 
   getCurrentYearTotal(descriptionId: number): number {
+    const groupAccountNames = this.groupAccounts.map(a => a.name);
     return this.yearlyTransactions.filter(txn => {
       const [txnYear] = txn.date.split('-').map(Number);
-      return txn.description_id === descriptionId && txnYear === Number(this.selectedYear);
+      return txn.description_id === descriptionId &&
+             txnYear === Number(this.selectedYear) &&
+             groupAccountNames.includes(txn.account);
     }).reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
       return sum + (isNaN(amount) ? 0 : amount);
@@ -114,9 +143,12 @@ export class RecExpensesComponent implements OnChanges, OnDestroy {
 
   getPriorYearTotal(descriptionId: number): number {
     const priorYear = Number(this.selectedYear) - 1;
+    const groupAccountNames = this.groupAccounts.map(a => a.name);
     return this.yearlyTransactions.filter(txn => {
       const [txnYear] = txn.date.split('-').map(Number);
-      return txn.description_id === descriptionId && txnYear === priorYear;
+      return txn.description_id === descriptionId &&
+             txnYear === priorYear &&
+             groupAccountNames.includes(txn.account);
     }).reduce((sum, txn) => {
       const amount = typeof txn.amount === 'string' ? parseFloat(txn.amount) : txn.amount;
       return sum + (isNaN(amount) ? 0 : amount);

@@ -1,10 +1,12 @@
-import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, OnInit, OnChanges, SimpleChanges, ChangeDetectorRef, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { forkJoin } from 'rxjs';
+import { forkJoin, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
-import { PageData, CategoryTotals, MonthlyDifference, User } from '../../../../core/models/index';
+import { PageDataService } from '../../../../core/services/page-data.service';
+import { PageData, CategoryTotals, MonthlyDifference, User, Group, Account } from '../../../../core/models/index';
 import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pipe';
 
 @Component({
@@ -14,7 +16,7 @@ import { FormatCurrencyPipe } from '../../../../shared/pipes/format-currency.pip
   standalone: true,
   imports: [CommonModule, FormsModule, FormatCurrencyPipe]
 })
-export class FinSummaryComponent implements OnInit, OnChanges {
+export class FinSummaryComponent implements OnInit, OnChanges, OnDestroy {
   @Input() pageData!: PageData;
 
   selectedYear: number;
@@ -23,8 +25,10 @@ export class FinSummaryComponent implements OnInit, OnChanges {
   categoryTotals: CategoryTotals | null = null;
   monthlyDifference: MonthlyDifference | null = null;
   activeUser: User | null = null;
+  activeGroup: Group | null = null;
   loading = false;
   Object = Object;
+  private destroy$ = new Subject<void>();
 
   readonly monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -34,6 +38,7 @@ export class FinSummaryComponent implements OnInit, OnChanges {
   constructor(
     private apiService: ApiService,
     private userService: UserService,
+    private pageDataService: PageDataService,
     private cdr: ChangeDetectorRef
   ) {
     const today = new Date();
@@ -43,7 +48,12 @@ export class FinSummaryComponent implements OnInit, OnChanges {
   }
 
   ngOnInit(): void {
-    this.loadCategoryTotals();
+    this.userService.activeGroup$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(group => {
+        this.activeGroup = group;
+        this.loadCategoryTotals();
+      });
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -53,14 +63,19 @@ export class FinSummaryComponent implements OnInit, OnChanges {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private loadCategoryTotals(): void {
     const activeUser = this.userService.getActiveUserSync();
-    if (!activeUser) return;
+    if (!activeUser || !this.activeGroup) return;
 
     this.loading = true;
     forkJoin({
-      totals: this.apiService.getCategoryTotals(activeUser.id, this.selectedYear, this.selectedMonth),
-      difference: this.apiService.getMonthlyDifference(activeUser.id, this.selectedYear, this.selectedMonth)
+      totals: this.apiService.getCategoryTotals(activeUser.id, this.selectedYear, this.selectedMonth, this.activeGroup.id),
+      difference: this.apiService.getMonthlyDifference(activeUser.id, this.selectedYear, this.selectedMonth, this.activeGroup.id)
     }).subscribe({
       next: ({ totals, difference }) => {
         this.categoryTotals = totals;

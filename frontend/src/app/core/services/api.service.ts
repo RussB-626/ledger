@@ -281,10 +281,14 @@ export class ApiService {
 
   // ====== ANALYTICS ======
 
-  getCategoryTotals(userId: number, year: number, month: number): Observable<CategoryTotals> {
-    const params = new HttpParams()
+  getCategoryTotals(userId: number, year: number, month: number, groupId?: number): Observable<CategoryTotals> {
+    let params = new HttpParams()
       .set('year', year.toString())
       .set('month', month.toString());
+
+    if (groupId !== undefined) {
+      params = params.set('groupId', groupId.toString());
+    }
 
     return this.http.get<ApiResponse<CategoryTotals>>(
       `${this.baseUrl}/users/${userId}/categories`,
@@ -292,10 +296,14 @@ export class ApiService {
     ).pipe(map(response => response.data!));
   }
 
-  getMonthlyDifference(userId: number, year: number, month: number): Observable<MonthlyDifference> {
-    const params = new HttpParams()
+  getMonthlyDifference(userId: number, year: number, month: number, groupId?: number): Observable<MonthlyDifference> {
+    let params = new HttpParams()
       .set('year', year.toString())
       .set('month', month.toString());
+
+    if (groupId !== undefined) {
+      params = params.set('groupId', groupId.toString());
+    }
 
     return this.http.get<ApiResponse<MonthlyDifference>>(
       `${this.baseUrl}/users/${userId}/monthly-difference`,
