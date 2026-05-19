@@ -246,10 +246,13 @@ export class ApiService {
 
   // ====== DESCRIPTIONS ======
 
-  getDescriptions(userId: number, recurring?: 'monthly' | 'yearly'): Observable<Description[]> {
+  getDescriptions(userId: number, recurring?: 'monthly' | 'yearly', groupId?: number): Observable<Description[]> {
     let params = new HttpParams();
     if (recurring) {
       params = params.set('recurring', recurring);
+    }
+    if (groupId !== undefined) {
+      params = params.set('groupId', groupId.toString());
     }
 
     return this.http.get<ApiResponse<Description[]>>(
@@ -286,10 +289,10 @@ export class ApiService {
     ).pipe(map(response => response.data || { success: false }));
   }
 
-  bulkCreateDescriptions(userId: number, descriptions: string[], isMonthly: boolean = false, isYearly: boolean = false): Observable<Description[]> {
+  bulkCreateDescriptions(userId: number, descriptions: string[], monthlyGroupIds: number[] = [], yearlyGroupIds: number[] = []): Observable<Description[]> {
     return this.http.post<ApiResponse<Description[]>>(
       `${this.baseUrl}/users/${userId}/txn-descriptions/bulk`,
-      { descriptions, is_monthly: isMonthly, is_yearly: isYearly }
+      { descriptions, monthly_group_ids: monthlyGroupIds, yearly_group_ids: yearlyGroupIds }
     ).pipe(map(response => response.data || []));
   }
 

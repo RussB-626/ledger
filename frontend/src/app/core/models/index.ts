@@ -69,8 +69,8 @@ export interface Description {
   id: number;
   user_id: number;
   description: string;
-  is_monthly: boolean;
-  is_yearly: boolean;
+  monthly_group_ids: number[];
+  yearly_group_ids: number[];
 }
 
 export interface PageData {

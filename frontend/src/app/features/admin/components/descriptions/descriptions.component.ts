@@ -15,8 +15,8 @@ interface ModalState {
 
 interface DescriptionModalData {
   description: string;
-  is_monthly: boolean;
-  is_yearly: boolean;
+  monthly_group_ids: number[];
+  yearly_group_ids: number[];
 }
 
 @Component({
@@ -35,7 +35,7 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
   searchDescriptions = '';
 
   descriptionModal: ModalState = { isOpen: false, mode: 'create' };
-  descriptionFormData: DescriptionModalData = { description: '', is_monthly: false, is_yearly: false };
+  descriptionFormData: DescriptionModalData = { description: '', monthly_group_ids: [], yearly_group_ids: [] };
 
   bulkDescriptionModal = { isOpen: false };
   bulkDescriptionsText = '';
@@ -86,17 +86,17 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
     if (mode === 'edit' && description) {
       this.descriptionFormData = {
         description: description.description,
-        is_monthly: description.is_monthly,
-        is_yearly: description.is_yearly
+        monthly_group_ids: description.monthly_group_ids,
+        yearly_group_ids: description.yearly_group_ids
       };
     } else {
-      this.descriptionFormData = { description: '', is_monthly: false, is_yearly: false };
+      this.descriptionFormData = { description: '', monthly_group_ids: [], yearly_group_ids: [] };
     }
   }
 
   closeDescriptionModal(): void {
     this.descriptionModal = { isOpen: false, mode: 'create' };
-    this.descriptionFormData = { description: '', is_monthly: false, is_yearly: false };
+    this.descriptionFormData = { description: '', monthly_group_ids: [], yearly_group_ids: [] };
   }
 
   saveDescription(): void {
@@ -104,8 +104,8 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
 
     const payload = {
       description: this.descriptionFormData.description,
-      is_monthly: this.descriptionFormData.is_monthly,
-      is_yearly: this.descriptionFormData.is_yearly
+      monthly_group_ids: this.descriptionFormData.monthly_group_ids,
+      yearly_group_ids: this.descriptionFormData.yearly_group_ids
     };
 
     if (this.descriptionModal.mode === 'create') {
@@ -159,7 +159,7 @@ export class DescriptionsComponent implements OnInit, OnDestroy {
     this.bulkDescriptionLoading = true;
     this.bulkDescriptionError = '';
 
-    this.apiService.bulkCreateDescriptions(this.activeUser.id, descriptions, this.bulkDescriptionIsMonthly, this.bulkDescriptionIsYearly)
+    this.apiService.bulkCreateDescriptions(this.activeUser.id, descriptions, [], [])
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {

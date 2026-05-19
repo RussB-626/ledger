@@ -75,8 +75,8 @@ export interface Description {
   id: number;
   user_id: number;
   description: string;
-  is_monthly: boolean;
-  is_yearly: boolean;
+  monthly_group_ids: number[];
+  yearly_group_ids: number[];
 }
 
 // API Response format: all endpoints return { data?, error? }
@@ -191,14 +191,14 @@ export interface UpdateCategoryRequest {
 // Request for creating/updating description
 export interface CreateDescriptionRequest {
   description: string;
-  is_monthly?: boolean;
-  is_yearly?: boolean;
+  monthly_group_ids?: number[];
+  yearly_group_ids?: number[];
 }
 
 export interface UpdateDescriptionRequest {
   description?: string;
-  is_monthly?: boolean;
-  is_yearly?: boolean;
+  monthly_group_ids?: number[];
+  yearly_group_ids?: number[];
 }
 
 // Request for creating user

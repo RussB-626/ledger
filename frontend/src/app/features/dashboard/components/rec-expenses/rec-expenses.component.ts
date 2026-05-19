@@ -69,11 +69,17 @@ export class RecExpensesComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   get monthlyDescriptions() {
-    return this.pageData?.txnDescriptions.filter(d => d.is_monthly) || [];
+    if (!this.pageData?.txnDescriptions || !this.activeGroup) {
+      return [];
+    }
+    return this.pageData.txnDescriptions.filter(d => d.monthly_group_ids.includes(this.activeGroup!.id));
   }
 
   get yearlyDescriptions() {
-    return this.pageData?.txnDescriptions.filter(d => d.is_yearly) || [];
+    if (!this.pageData?.txnDescriptions || !this.activeGroup) {
+      return [];
+    }
+    return this.pageData.txnDescriptions.filter(d => d.yearly_group_ids.includes(this.activeGroup!.id));
   }
 
   private getTransactionsForMonth(year: number, month: number, descriptionId: number): Transaction[] {

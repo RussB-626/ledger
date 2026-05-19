@@ -60,14 +60,14 @@ CREATE TABLE categories (
   UNIQUE KEY unique_user_category (user_id, name)
 );
 
--- Descriptions table: Transaction descriptions with monthly and yearly flags
+-- Descriptions table: Transaction descriptions with monthly and yearly recurring group IDs
 -- MUST be created before transactions table (FK dependency)
 CREATE TABLE descriptions (
-  id          INT AUTO_INCREMENT PRIMARY KEY,
-  user_id     INT NOT NULL,
-  description VARCHAR(255) NOT NULL,
-  is_monthly  TINYINT(1) NOT NULL DEFAULT 0,
-  is_yearly   TINYINT(1) NOT NULL DEFAULT 0,
+  id                INT AUTO_INCREMENT PRIMARY KEY,
+  user_id           INT NOT NULL,
+  description       VARCHAR(255) NOT NULL,
+  monthly_group_ids JSON NOT NULL DEFAULT '[]',
+  yearly_group_ids  JSON NOT NULL DEFAULT '[]',
   FOREIGN KEY (user_id) REFERENCES users(id),
   UNIQUE KEY unique_user_description (user_id, description)
 );

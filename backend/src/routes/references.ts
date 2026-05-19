@@ -395,7 +395,7 @@ router.post(
   '/:userId/txn-descriptions/bulk',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
-    const { descriptions, is_monthly, is_yearly } = req.body as { descriptions?: string[], is_monthly?: boolean, is_yearly?: boolean };
+    const { descriptions, monthly_group_ids, yearly_group_ids } = req.body as { descriptions?: string[], monthly_group_ids?: number[], yearly_group_ids?: number[] };
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -424,8 +424,8 @@ router.post(
         try {
           const description = await referencesController.createDescription(userId, {
             description: trimmedDesc,
-            is_monthly: is_monthly ?? false,
-            is_yearly: is_yearly ?? false
+            monthly_group_ids: monthly_group_ids ?? [],
+            yearly_group_ids: yearly_group_ids ?? []
           });
           createdDescriptions.push(description);
         } catch {
@@ -441,12 +441,13 @@ router.post(
   })
 );
 
-// GET /api/users/:userId/txn-descriptions - Get all descriptions (or filtered by monthly/yearly flags)
+// GET /api/users/:userId/txn-descriptions - Get all descriptions (or filtered by monthly/yearly flags and groupId)
 router.get(
   '/:userId/txn-descriptions',
   asyncHandler(async (req: Request, res: Response) => {
     const userId = parseInt(req.params.userId, 10);
     const recurring = req.query.recurring as string | undefined; // 'monthly' | 'yearly'
+    const groupId = req.query.groupId ? parseInt(req.query.groupId as string, 10) : undefined;
 
     if (isNaN(userId)) {
       const response: ApiResponse<never> = { error: 'Invalid user ID' };
@@ -457,7 +458,7 @@ router.get(
     let descriptions: Description[];
 
     if (recurring === 'monthly' || recurring === 'yearly') {
-      descriptions = await referencesController.getRecurringDescriptionsByUserId(userId, recurring);
+      descriptions = await referencesController.getRecurringDescriptionsByUserId(userId, recurring, groupId);
     } else {
       descriptions = await referencesController.getDescriptionsByUserId(userId);
     }

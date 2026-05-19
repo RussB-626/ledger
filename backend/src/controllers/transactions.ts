@@ -396,7 +396,7 @@ export async function getPageData(userId: number, groupId?: number): Promise<Pag
 
     // Get descriptions
     const [descRows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, description, is_monthly, is_yearly FROM descriptions WHERE user_id = ? ORDER BY description ASC',
+      'SELECT id, user_id, description, monthly_group_ids, yearly_group_ids FROM descriptions WHERE user_id = ? ORDER BY description ASC',
       [userId]
     );
 
@@ -463,8 +463,8 @@ export async function getPageData(userId: number, groupId?: number): Promise<Pag
       })) as any[],
       txnDescriptions: descRows.map(row => ({
         ...row,
-        is_monthly: Boolean(row.is_monthly),
-        is_yearly: Boolean(row.is_yearly)
+        monthly_group_ids: JSON.parse((row as any).monthly_group_ids || '[]'),
+        yearly_group_ids: JSON.parse((row as any).yearly_group_ids || '[]')
       })) as any[],
       balances,
       years,
@@ -724,8 +724,8 @@ export async function bulkUploadTransactions(
       for (const descriptionText of uniqueDescriptions) {
         if (!existingDescSet.has(descriptionText)) {
           const [result] = await connection.query<ResultSetHeader>(
-            'INSERT INTO descriptions (user_id, description, is_monthly, is_yearly) VALUES (?, ?, 0, 0)',
-            [userId, descriptionText]
+            'INSERT INTO descriptions (user_id, description, monthly_group_ids, yearly_group_ids) VALUES (?, ?, ?, ?)',
+            [userId, descriptionText, JSON.stringify([]), JSON.stringify([])]
           );
           const newId = (result as any).insertId;
           descriptionMap.set(descriptionText, newId);

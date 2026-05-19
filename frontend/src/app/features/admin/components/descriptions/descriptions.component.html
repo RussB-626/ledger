@@ -30,8 +30,8 @@
         @for (desc of getPaginatedDescriptions(); track desc.id) {
           <tr>
             <td>{{ desc.description }}</td>
-            <td class="checkbox-col">{{ desc.is_monthly ? '✓' : '' }}</td>
-            <td class="checkbox-col">{{ desc.is_yearly ? '✓' : '' }}</td>
+            <td class="checkbox-col">{{ desc.monthly_group_ids.length > 0 ? '✓' : '' }}</td>
+            <td class="checkbox-col">{{ desc.yearly_group_ids.length > 0 ? '✓' : '' }}</td>
             <td class="actions">
               <button
                 class="action-btn edit-btn"
@@ -112,23 +112,9 @@
           />
         </div>
 
-        <div class="checkbox-group">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="descriptionFormData.is_monthly"
-              class="checkbox-input"
-            />
-            Mark as Monthly
-          </label>
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="descriptionFormData.is_yearly"
-              class="checkbox-input"
-            />
-            Mark as Yearly
-          </label>
+        <div class="form-group">
+          <label>Recurring Groups (Coming Soon)</label>
+          <p style="font-size: 0.9em; color: #999;">Group selection for monthly/yearly recurring expenses will be available soon.</p>
         </div>
       </div>
       <div class="modal-footer">
@@ -156,23 +142,10 @@
           rows="6"
         ></textarea>
 
-        <div class="checkbox-group">
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="bulkDescriptionIsMonthly"
-              class="checkbox-input"
-            />
-            Mark as Monthly
-          </label>
-          <label class="checkbox-label">
-            <input
-              type="checkbox"
-              [(ngModel)]="bulkDescriptionIsYearly"
-              class="checkbox-input"
-            />
-            Mark as Yearly
-          </label>
+        <div style="padding: 10px; background: #f0f0f0; border-radius: 4px; margin-bottom: 15px;">
+          <p style="font-size: 0.9em; color: #666; margin: 0;">
+            Group selection for monthly/yearly recurring expenses will be available soon.
+          </p>
         </div>
 
         @if (bulkDescriptionError) {

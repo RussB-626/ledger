@@ -393,32 +393,42 @@ export async function getDescriptionsByUserId(userId: number): Promise<Descripti
   const connection = await pool.getConnection();
   try {
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, description, is_monthly, is_yearly FROM descriptions WHERE user_id = ? ORDER BY description ASC',
+      'SELECT id, user_id, description, monthly_group_ids, yearly_group_ids FROM descriptions WHERE user_id = ? ORDER BY description ASC',
       [userId]
     );
     return rows.map(row => ({
       ...row,
-      is_monthly: Boolean(row.is_monthly),
-      is_yearly: Boolean(row.is_yearly)
+      monthly_group_ids: JSON.parse((row as any).monthly_group_ids || '[]'),
+      yearly_group_ids: JSON.parse((row as any).yearly_group_ids || '[]')
     })) as Description[];
   } finally {
     connection.release();
   }
 }
 
-// Get recurring descriptions by type (monthly or yearly)
-export async function getRecurringDescriptionsByUserId(userId: number, type: 'monthly' | 'yearly'): Promise<Description[]> {
+// Get recurring descriptions by type and group (monthly or yearly)
+export async function getRecurringDescriptionsByUserId(userId: number, type: 'monthly' | 'yearly', groupId?: number): Promise<Description[]> {
   const connection = await pool.getConnection();
   try {
-    const column = type === 'monthly' ? 'is_monthly' : 'is_yearly';
-    const [rows] = await connection.query<RowDataPacket[]>(
-      `SELECT id, user_id, description, is_monthly, is_yearly FROM descriptions WHERE user_id = ? AND ${column} = 1 ORDER BY description ASC`,
-      [userId]
-    );
+    const column = type === 'monthly' ? 'monthly_group_ids' : 'yearly_group_ids';
+
+    let query = `SELECT id, user_id, description, monthly_group_ids, yearly_group_ids FROM descriptions WHERE user_id = ?`;
+    const params: (number | string)[] = [userId];
+
+    if (groupId !== undefined) {
+      query += ` AND JSON_CONTAINS(${column}, JSON_ARRAY(?))`;
+      params.push(groupId);
+    } else {
+      query += ` AND JSON_LENGTH(${column}) > 0`;
+    }
+
+    query += ` ORDER BY description ASC`;
+
+    const [rows] = await connection.query<RowDataPacket[]>(query, params);
     return rows.map(row => ({
       ...row,
-      is_monthly: Boolean(row.is_monthly),
-      is_yearly: Boolean(row.is_yearly)
+      monthly_group_ids: JSON.parse((row as any).monthly_group_ids || '[]'),
+      yearly_group_ids: JSON.parse((row as any).yearly_group_ids || '[]')
     })) as Description[];
   } finally {
     connection.release();
@@ -444,8 +454,8 @@ export async function getOrCreateDescription(
 
     // Create new description if not exists
     const [result] = await connection.query<ResultSetHeader>(
-      'INSERT INTO descriptions (user_id, description, is_monthly, is_yearly) VALUES (?, ?, ?, ?)',
-      [userId, descriptionText, 0, 0]
+      'INSERT INTO descriptions (user_id, description, monthly_group_ids, yearly_group_ids) VALUES (?, ?, ?, ?)',
+      [userId, descriptionText, JSON.stringify([]), JSON.stringify([])]
     );
 
     return result.insertId;
@@ -461,16 +471,16 @@ export async function createDescription(
   const connection = await pool.getConnection();
   try {
     const [result] = await connection.query<ResultSetHeader>(
-      'INSERT INTO descriptions (user_id, description, is_monthly, is_yearly) VALUES (?, ?, ?, ?)',
-      [userId, req.description, req.is_monthly ? 1 : 0, req.is_yearly ? 1 : 0]
+      'INSERT INTO descriptions (user_id, description, monthly_group_ids, yearly_group_ids) VALUES (?, ?, ?, ?)',
+      [userId, req.description, JSON.stringify(req.monthly_group_ids ?? []), JSON.stringify(req.yearly_group_ids ?? [])]
     );
 
     return {
       id: result.insertId,
       user_id: userId,
       description: req.description,
-      is_monthly: req.is_monthly ?? false,
-      is_yearly: req.is_yearly ?? false
+      monthly_group_ids: req.monthly_group_ids ?? [],
+      yearly_group_ids: req.yearly_group_ids ?? []
     };
   } finally {
     connection.release();
@@ -491,13 +501,13 @@ export async function updateDescription(
       updates.push('description = ?');
       values.push(req.description);
     }
-    if (req.is_monthly !== undefined) {
-      updates.push('is_monthly = ?');
-      values.push(req.is_monthly ? 1 : 0);
+    if (req.monthly_group_ids !== undefined) {
+      updates.push('monthly_group_ids = ?');
+      values.push(JSON.stringify(req.monthly_group_ids));
     }
-    if (req.is_yearly !== undefined) {
-      updates.push('is_yearly = ?');
-      values.push(req.is_yearly ? 1 : 0);
+    if (req.yearly_group_ids !== undefined) {
+      updates.push('yearly_group_ids = ?');
+      values.push(JSON.stringify(req.yearly_group_ids));
     }
 
     if (updates.length === 0) {
@@ -516,7 +526,7 @@ export async function updateDescription(
     }
 
     const [rows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, description, is_monthly, is_yearly FROM descriptions WHERE id = ?',
+      'SELECT id, user_id, description, monthly_group_ids, yearly_group_ids FROM descriptions WHERE id = ?',
       [descriptionId]
     );
 
@@ -529,8 +539,8 @@ export async function updateDescription(
       id: row.id,
       user_id: row.user_id,
       description: row.description,
-      is_monthly: Boolean(row.is_monthly),
-      is_yearly: Boolean(row.is_yearly)
+      monthly_group_ids: JSON.parse((row as any).monthly_group_ids || '[]'),
+      yearly_group_ids: JSON.parse((row as any).yearly_group_ids || '[]')
     };
   } finally {
     connection.release();
