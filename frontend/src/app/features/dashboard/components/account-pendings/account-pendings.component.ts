@@ -7,7 +7,7 @@ import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
-import { PageData, Transaction, User } from '../../../../core/models/index';
+import { PageData, Transaction, User, Group } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
 @Component({
   selector: 'app-account-pendings',
@@ -22,6 +22,7 @@ export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
   @Output() editTransaction = new EventEmitter<Transaction>();
 
   activeUser: User | null = null;
+  activeGroup: Group | null = null;
   searchTerm: string = '';
 
   // Pagination properties
@@ -55,6 +56,13 @@ export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe((result) => {
         this.isMobileView = result.matches;
+        this.cdr.markForCheck();
+      });
+
+    this.userService.activeGroup$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((group) => {
+        this.activeGroup = group;
         this.cdr.markForCheck();
       });
   }
@@ -120,12 +128,12 @@ export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
     if (!this.transactionToConfirm) return;
 
     const activeUser = this.userService.getActiveUserSync();
-    if (!activeUser) return;
+    if (!activeUser || !this.activeGroup) return;
 
     this.apiService.updateTransaction(activeUser.id, this.transactionToConfirm.id, { pending: false }).subscribe({
       next: () => {
         // Refresh page data
-        this.apiService.getPageData(activeUser.id).subscribe({
+        this.apiService.getPageData(activeUser.id, this.activeGroup!.id).subscribe({
           next: (pageData) => {
             this.pageDataService.setPageData(pageData);
             this.cdr.markForCheck();
@@ -156,12 +164,12 @@ export class AccountPendingsComponent implements OnInit, OnChanges, OnDestroy {
     if (!this.transactionToConfirm) return;
 
     const activeUser = this.userService.getActiveUserSync();
-    if (!activeUser) return;
+    if (!activeUser || !this.activeGroup) return;
 
     this.apiService.deleteTransaction(activeUser.id, this.transactionToConfirm.id).subscribe({
       next: () => {
         // Refresh page data
-        this.apiService.getPageData(activeUser.id).subscribe({
+        this.apiService.getPageData(activeUser.id, this.activeGroup!.id).subscribe({
           next: (pageData) => {
             this.pageDataService.setPageData(pageData);
             this.cdr.markForCheck();

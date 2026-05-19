@@ -1,7 +1,7 @@
 // Sidenav component with user switcher and navigation
 // Per CLAUDE.md: Sidenav with logo, Dashboard/Admin tabs, New Transaction button, User dropdown
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { Observable } from 'rxjs';
@@ -21,6 +21,8 @@ import { GroupManagementPanelComponent } from '../group-management-panel/group-m
   imports: [CommonModule, CreateTransactionModalComponent, UserManagementPanelComponent, GroupManagementPanelComponent]
 })
 export class SidenavComponent implements OnInit {
+  @ViewChild(CreateTransactionModalComponent) createTransactionModal?: CreateTransactionModalComponent;
+
   activeUser$: Observable<User | null>;
   allUsers$: Observable<User[]>;
   activeGroup$: Observable<Group | null>;
@@ -41,14 +43,11 @@ export class SidenavComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    const saved = localStorage.getItem('sidenav-expanded');
-    this.isExpanded = saved ? JSON.parse(saved) : false;
     this.updateBodyAttribute();
   }
 
   toggleSidenav(): void {
     this.isExpanded = !this.isExpanded;
-    localStorage.setItem('sidenav-expanded', JSON.stringify(this.isExpanded));
     this.updateBodyAttribute();
   }
 
@@ -74,6 +73,9 @@ export class SidenavComponent implements OnInit {
 
   openCreateTransactionModal(): void {
     this.showCreateTransactionModal = true;
+    if (this.createTransactionModal) {
+      this.createTransactionModal.openForNewTransaction();
+    }
   }
 
   closeCreateTransactionModal(): void {

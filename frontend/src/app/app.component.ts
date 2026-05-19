@@ -80,34 +80,13 @@ export class AppComponent implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           this.userService.setAllUsers(users);
 
-          // Try to restore active user from localStorage
-          const storedUserId = localStorage.getItem('ledger_active_user_id');
-          if (storedUserId) {
-            const userId = parseInt(storedUserId, 10);
-            const user = users.find(u => u.id === userId);
-            if (user) {
-              this.userService.setActiveUser(user);
-              this.themeService.applyTheme(user.theme || 'default');
-              this.loadPageData(userId);
-            } else {
-              // User was deleted, select first user
-              if (users.length > 0) {
-                this.userService.setActiveUser(users[0]);
-                this.themeService.applyTheme(users[0].theme || 'default');
-                this.loadPageData(users[0].id);
-              } else {
-                this.showUserCreationModal();
-              }
-            }
+          // Select first user
+          if (users.length > 0) {
+            this.userService.setActiveUser(users[0]);
+            this.themeService.applyTheme(users[0].theme || 'default');
+            this.loadPageData(users[0].id);
           } else {
-            // No stored user, select first user
-            if (users.length > 0) {
-              this.userService.setActiveUser(users[0]);
-              this.themeService.applyTheme(users[0].theme || 'default');
-              this.loadPageData(users[0].id);
-            } else {
-              this.showUserCreationModal();
-            }
+            this.showUserCreationModal();
           }
         });
       },
@@ -127,25 +106,12 @@ export class AppComponent implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           this.pageDataService.setPageData(pageData);
 
-          // Initialize groups
+          // Initialize groups - select first group by sort_order
           const groups = pageData.groups || [];
           if (groups.length > 0) {
             this.pageDataService.setGroups(groups);
 
-            // Restore active group from localStorage or select first group
-            const storedGroupId = localStorage.getItem('ledger_active_group_id');
-            let activeGroup: Group | null = null;
-
-            if (storedGroupId) {
-              // Try to find the stored group in the current groups list
-              activeGroup = groups.find(g => g.id === parseInt(storedGroupId, 10)) || null;
-            }
-
-            // If no stored group found, select first group by sort_order
-            if (!activeGroup && groups.length > 0) {
-              activeGroup = groups.sort((a, b) => a.sort_order - b.sort_order)[0];
-            }
-
+            const activeGroup = groups.sort((a, b) => a.sort_order - b.sort_order)[0];
             if (activeGroup) {
               this.userService.setActiveGroup(activeGroup);
             }

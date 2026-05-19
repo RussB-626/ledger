@@ -82,15 +82,23 @@ export class ApiService {
 
   // ====== TRANSACTIONS ======
 
-  getPageData(userId: number): Observable<PageData> {
-    return this.http.get<ApiResponse<PageData>>(`${this.baseUrl}/users/${userId}/page-data`)
+  getPageData(userId: number, groupId?: number): Observable<PageData> {
+    let params = new HttpParams();
+    if (groupId !== undefined) {
+      params = params.set('groupId', groupId.toString());
+    }
+
+    return this.http.get<ApiResponse<PageData>>(`${this.baseUrl}/users/${userId}/page-data`, { params })
       .pipe(map(response => response.data!));
   }
 
-  getTransactionsByYear(userId: number, year?: number): Observable<Transaction[]> {
+  getTransactionsByYear(userId: number, year?: number, groupId?: number): Observable<Transaction[]> {
     let params = new HttpParams();
     if (year !== undefined) {
       params = params.set('year', year.toString());
+    }
+    if (groupId !== undefined) {
+      params = params.set('groupId', groupId.toString());
     }
 
     return this.http.get<ApiResponse<Transaction[]>>(
@@ -99,9 +107,15 @@ export class ApiService {
     ).pipe(map(response => response.data || []));
   }
 
-  getPendingTransactions(userId: number): Observable<Transaction[]> {
+  getPendingTransactions(userId: number, groupId?: number): Observable<Transaction[]> {
+    let params = new HttpParams();
+    if (groupId !== undefined) {
+      params = params.set('groupId', groupId.toString());
+    }
+
     return this.http.get<ApiResponse<Transaction[]>>(
-      `${this.baseUrl}/users/${userId}/transactions/pending`
+      `${this.baseUrl}/users/${userId}/transactions/pending`,
+      { params }
     ).pipe(map(response => response.data || []));
   }
 

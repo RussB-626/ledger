@@ -64,7 +64,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .subscribe((group) => {
         const activeUser = this.userService.getActiveUserSync();
         if (activeUser && group) {
-          this.apiService.getPageData(activeUser.id).subscribe({
+          this.apiService.getPageData(activeUser.id, group.id).subscribe({
             next: (pageData) => {
               this.pageDataService.setPageData(pageData);
             },
@@ -80,8 +80,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
         const activeUser = this.userService.getActiveUserSync();
-        if (activeUser) {
-          this.apiService.getPageData(activeUser.id).subscribe({
+        const activeGroup = this.userService.getActiveGroupSync();
+        if (activeUser && activeGroup) {
+          this.apiService.getPageData(activeUser.id, activeGroup.id).subscribe({
             next: (pageData) => {
               this.pageDataService.setPageData(pageData);
             },
@@ -107,10 +108,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   onTransactionUpdated(): void {
     this.showEditTransactionModal = false;
     this.editingTransaction = null;
-    // Refresh page data
+    // Refresh page data filtered by active group
     const activeUser = this.userService.getActiveUserSync();
-    if (activeUser) {
-      this.apiService.getPageData(activeUser.id).subscribe({
+    const activeGroup = this.userService.getActiveGroupSync();
+    if (activeUser && activeGroup) {
+      this.apiService.getPageData(activeUser.id, activeGroup.id).subscribe({
         next: (pageData) => {
           this.pageDataService.setPageData(pageData);
         },

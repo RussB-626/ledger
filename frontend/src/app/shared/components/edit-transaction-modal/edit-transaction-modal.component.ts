@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ApiService } from '../../../core/services/api.service';
 import { UserService } from '../../../core/services/user.service';
 import { PageDataService } from '../../../core/services/page-data.service';
-import { Account, Category, Description, Transaction, TransactionType } from '../../../core/models/index';
+import { Account, Category, Description, Transaction, TransactionType, Group } from '../../../core/models/index';
 import { ClickOutsideDirective } from '../../directives/click-outside.directive';
 
 @Component({
@@ -34,6 +34,8 @@ export class EditTransactionModalComponent implements OnInit, OnChanges {
   accounts: Account[] = [];
   categories: Category[] = [];
   descriptions: Description[] = [];
+  groups: Group[] = [];
+  selectedGroup: Group | null = null;
 
   constructor(
     private apiService: ApiService,
@@ -66,6 +68,7 @@ export class EditTransactionModalComponent implements OnInit, OnChanges {
       this.accounts = pageData.accounts;
       this.categories = pageData.categories;
       this.descriptions = pageData.txnDescriptions;
+      this.groups = pageData.groups || [];
     }
   }
 
@@ -92,6 +95,15 @@ export class EditTransactionModalComponent implements OnInit, OnChanges {
     this.note = this.transaction.note || '';
     this.pending = this.transaction.pending || false;
 
+    // Find the group for the current account
+    const accountObj = this.accounts.find(a => a.name === this.account);
+    if (accountObj && accountObj.group_id) {
+      const matchingGroup = this.groups.find(g => g.id === accountObj.group_id);
+      if (matchingGroup) {
+        this.selectedGroup = matchingGroup;
+      }
+    }
+
     this.cdr.markForCheck();
   }
 
@@ -99,6 +111,21 @@ export class EditTransactionModalComponent implements OnInit, OnChanges {
     this.type = newType;
     // Update category options based on type
     this.cdr.markForCheck();
+  }
+
+  onGroupChange(): void {
+    // Clear account when group changes (accounts belong to groups)
+    // Keep category selected (categories are user-level, available to all groups)
+    this.account = '';
+    this.cdr.markForCheck();
+  }
+
+  getAccountsByGroup(): Account[] {
+    if (!this.selectedGroup) {
+      return this.accounts;
+    }
+    const filtered = this.accounts.filter(a => a.group_id === this.selectedGroup!.id);
+    return filtered;
   }
 
   getCategoriesByType(): Category[] {
@@ -169,7 +196,7 @@ export class EditTransactionModalComponent implements OnInit, OnChanges {
     });
   }
 
-  private validateForm(): boolean {
+  isFormValid(): boolean {
     return !!(
       this.date &&
       this.account &&
@@ -178,6 +205,10 @@ export class EditTransactionModalComponent implements OnInit, OnChanges {
       this.description &&
       this.amount > 0
     );
+  }
+
+  private validateForm(): boolean {
+    return this.isFormValid();
   }
 
   close(): void {

@@ -185,12 +185,5 @@ export class ThemeService {
     root.style.setProperty('--color-zero', colors.zero);
     root.style.setProperty('--icon-filter', colors.iconFilter || 'none');
     root.style.setProperty('--button-icon-filter', colors.buttonIconFilter || 'none');
-
-    // Store current theme
-    localStorage.setItem('selected-theme', themeId);
-  }
-
-  getStoredTheme(): string {
-    return localStorage.getItem('selected-theme') || 'default';
   }
 }

@@ -53,8 +53,17 @@ export class AccountBalancesComponent implements OnInit, OnChanges, OnDestroy {
   }
 
   private selectFirstAccount(): void {
-    if (this.pageData?.accounts && this.pageData.accounts.length > 0) {
-      const firstAccountName = this.pageData.accounts[0].name;
+    if (!this.activeGroup || !this.pageData?.accounts) {
+      return;
+    }
+
+    // Filter accounts by active group, then select first one
+    const groupAccounts = this.pageData.accounts.filter(
+      account => account.group_id === this.activeGroup!.id
+    );
+
+    if (groupAccounts.length > 0) {
+      const firstAccountName = groupAccounts[0].name;
       this.selectedAccountName = firstAccountName;
       this.accountSelected.emit(firstAccountName);
     }

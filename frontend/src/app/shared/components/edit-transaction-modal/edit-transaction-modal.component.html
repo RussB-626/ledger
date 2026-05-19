@@ -66,13 +66,24 @@
           </div>
         </div>
 
+        <!-- Group Row -->
+        <div class="form-group">
+          <label for="group">Group</label>
+          <select id="group" [(ngModel)]="selectedGroup" name="group" [ngModelOptions]="{standalone: true}" (change)="onGroupChange()">
+            <option [ngValue]="null">Select Group</option>
+            @for (group of groups; track group.id) {
+              <option [ngValue]="group">{{ group.name }}</option>
+            }
+          </select>
+        </div>
+
         <!-- Account and Category Row -->
         <div class="form-row">
           <div class="form-group">
             <label for="account">Account</label>
             <select id="account" [(ngModel)]="account" name="account" required>
               <option value="">Select Account</option>
-              @for (acc of accounts; track acc.id) {
+              @for (acc of getAccountsByGroup(); track acc.id) {
                 <option [value]="acc.name">{{ acc.name }}</option>
               }
             </select>
@@ -156,7 +167,7 @@
       <button
         class="btn-primary"
         (click)="submit()"
-        [disabled]="loading"
+        [disabled]="loading || !isFormValid()"
       >
         {{ loading ? 'Updating...' : 'Save changes' }}
       </button>

@@ -383,11 +383,10 @@ export async function getPageData(userId: number, groupId?: number): Promise<Pag
 
     const pendingTransactions = await enrichTransactionsWithDescriptions(connection, pendingRows as Transaction[]);
 
-    // Get accounts
-    const [accountRows] = await connection.query<RowDataPacket[]>(
-      'SELECT id, user_id, group_id, name, sort_order FROM accounts WHERE user_id = ? ORDER BY group_id ASC, sort_order ASC',
-      [userId]
-    );
+    // Get all accounts (NOT filtered by group - needed for transaction modals to show all accounts)
+    const accountQuery = 'SELECT id, user_id, group_id, name, sort_order FROM accounts WHERE user_id = ? ORDER BY group_id ASC, sort_order ASC';
+
+    const [accountRows] = await connection.query<RowDataPacket[]>(accountQuery, [userId]);
 
     // Get categories
     const [categoryRows] = await connection.query<RowDataPacket[]>(
@@ -401,18 +400,31 @@ export async function getPageData(userId: number, groupId?: number): Promise<Pag
       [userId]
     );
 
-    // Get balances
-    const [balanceRows] = await connection.query<RowDataPacket[]>(
-      `SELECT
-        account,
-        SUM(CASE WHEN type = 'D' OR type = 'TD' THEN amount ELSE 0 END) as deposits,
-        SUM(CASE WHEN type = 'W' OR type = 'TW' THEN amount ELSE 0 END) as withdrawals
-       FROM transactions
-       WHERE user_id = ?
-       GROUP BY account
-       ORDER BY account ASC`,
-      [userId]
-    );
+    // Get balances (optionally filtered by group)
+    let balanceQuery = `SELECT
+        t.account,
+        SUM(CASE WHEN t.type = 'D' OR t.type = 'TD' THEN t.amount ELSE 0 END) as deposits,
+        SUM(CASE WHEN t.type = 'W' OR t.type = 'TW' THEN t.amount ELSE 0 END) as withdrawals
+       FROM transactions t`;
+
+    if (groupId) {
+      balanceQuery += ` JOIN accounts a ON t.account = a.name AND a.user_id = ?`;
+    }
+
+    balanceQuery += ` WHERE t.user_id = ?`;
+    const balanceParams: number[] = [];
+
+    if (groupId) {
+      balanceParams.push(userId);
+      balanceQuery += ` AND a.group_id = ?`;
+      balanceParams.push(userId, groupId);
+    } else {
+      balanceParams.push(userId);
+    }
+
+    balanceQuery += ` GROUP BY t.account ORDER BY t.account ASC`;
+
+    const [balanceRows] = await connection.query<RowDataPacket[]>(balanceQuery, balanceParams);
 
     const balances: Record<string, number> = {};
     for (const row of balanceRows) {

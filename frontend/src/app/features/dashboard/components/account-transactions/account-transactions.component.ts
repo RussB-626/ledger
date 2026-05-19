@@ -10,7 +10,7 @@ import { takeUntil } from 'rxjs/operators';
 import { ApiService } from '../../../../core/services/api.service';
 import { UserService } from '../../../../core/services/user.service';
 import { PageDataService } from '../../../../core/services/page-data.service';
-import { PageData, Transaction, User } from '../../../../core/models/index';
+import { PageData, Transaction, User, Group } from '../../../../core/models/index';
 import { ConfirmationModalComponent } from '../../../../shared/components/confirmation-modal/confirmation-modal.component';
 @Component({
   selector: 'app-account-transactions',
@@ -25,6 +25,7 @@ export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestro
   @Output() editTransaction = new EventEmitter<Transaction>();
 
   activeUser: User | null = null;
+  activeGroup: Group | null = null;
   transactions: Transaction[] = [];
   selectedYear: number;
   selectedMonth: string = 'All';
@@ -69,6 +70,13 @@ export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestro
         this.cdr.markForCheck();
       });
 
+    this.userService.activeGroup$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((group) => {
+        this.activeGroup = group;
+        this.loadTransactions();
+      });
+
     if (this.pageData) {
       this.updateTransactionsFromPageData();
     }
@@ -111,10 +119,10 @@ export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestro
 
   private loadTransactions(): void {
     const activeUser = this.userService.getActiveUserSync();
-    if (!activeUser) return;
+    if (!activeUser || !this.activeGroup) return;
 
     this.loading = true;
-    this.apiService.getTransactionsByYear(activeUser.id, this.selectedYear).subscribe({
+    this.apiService.getTransactionsByYear(activeUser.id, this.selectedYear, this.activeGroup.id).subscribe({
       next: (transactions) => {
         this.transactions = transactions;
         this.loading = false;

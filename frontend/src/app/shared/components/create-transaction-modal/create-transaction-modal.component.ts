@@ -1,7 +1,7 @@
 // Create Transaction Modal component
 // Per CLAUDE.md: 3 tabs (Withdrawal/Deposit/Transfer), form fields as specified, description autocomplete
 
-import { Component, EventEmitter, Output, OnInit } from '@angular/core';
+import { Component, EventEmitter, Output, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
@@ -48,18 +48,29 @@ export class CreateTransactionModalComponent implements OnInit {
     private fb: FormBuilder,
     private userService: UserService,
     private apiService: ApiService,
-    private pageDataService: PageDataService
+    private pageDataService: PageDataService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.initializeForms();
     this.loadReferenceData();
+    this.resetFormToActiveGroup();
   }
 
   setEditingTransaction(transaction: any): void {
     this.editingTransaction = transaction;
     this.loadReferenceData();
     this.populateFormsForEdit();
+  }
+
+  openForNewTransaction(): void {
+    this.editingTransaction = null;
+    this.activeTab = 'withdrawal';
+    this.error = null;
+    this.initializeForms();
+    this.loadReferenceData();
+    this.resetFormToActiveGroup();
   }
 
   private populateFormsForEdit(): void {
@@ -160,9 +171,24 @@ export class CreateTransactionModalComponent implements OnInit {
 
     // Set initial group selections to active group
     const activeGroup = this.userService.getActiveGroupSync();
+    if (activeGroup && this.groups.length > 0) {
+      const matchingGroup = this.groups.find(g => g.id === activeGroup.id);
+      if (matchingGroup) {
+        this.selectedGroup = matchingGroup;
+        this.selectedTransferGroup = matchingGroup;
+      }
+    }
+  }
+
+  private resetFormToActiveGroup(): void {
+    const activeGroup = this.userService.getActiveGroupSync();
     if (activeGroup) {
-      this.selectedGroup = activeGroup;
-      this.selectedTransferGroup = activeGroup;
+      const matchingGroup = this.groups.find(g => g.id === activeGroup.id);
+      if (matchingGroup) {
+        this.selectedGroup = matchingGroup;
+        this.selectedTransferGroup = matchingGroup;
+      }
+      this.cdr.markForCheck();
     }
   }
 
