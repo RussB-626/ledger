@@ -42,6 +42,10 @@ export class RecExpensesComponent implements OnInit, OnChanges, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(group => {
         this.activeGroup = group;
+        // Reset selectors when group changes
+        const now = new Date();
+        this.selectedYear = now.getFullYear();
+        this.selectedMonth = now.getMonth() + 1;
         this.updateGroupAccounts();
         this.loadYearlyTransactions();
       });
@@ -220,11 +224,11 @@ export class RecExpensesComponent implements OnInit, OnChanges, OnDestroy {
 
   private loadYearlyTransactions(): void {
     const user = this.userService.getActiveUser();
-    if (!user) return;
+    if (!user || !this.activeGroup) return;
 
     forkJoin({
-      currentYear: this.apiService.getTransactionsByYear(user.id, this.selectedYear),
-      priorYear: this.apiService.getTransactionsByYear(user.id, this.selectedYear - 1)
+      currentYear: this.apiService.getTransactionsByYear(user.id, this.selectedYear, this.activeGroup.id),
+      priorYear: this.apiService.getTransactionsByYear(user.id, this.selectedYear - 1, this.activeGroup.id)
     })
       .pipe(takeUntil(this.destroy$))
       .subscribe(({ currentYear, priorYear }) => {

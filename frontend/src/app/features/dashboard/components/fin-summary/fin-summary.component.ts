@@ -52,6 +52,10 @@ export class FinSummaryComponent implements OnInit, OnChanges, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(group => {
         this.activeGroup = group;
+        // Reset selectors when group changes
+        const today = new Date();
+        this.selectedYear = today.getFullYear();
+        this.selectedMonth = today.getMonth() + 1;
         this.loadCategoryTotals();
       });
   }

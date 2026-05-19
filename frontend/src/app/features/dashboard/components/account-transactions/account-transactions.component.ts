@@ -74,6 +74,11 @@ export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestro
       .pipe(takeUntil(this.destroy$))
       .subscribe((group) => {
         this.activeGroup = group;
+        // Reset selectors when group changes
+        this.selectedYear = new Date().getFullYear();
+        this.selectedMonth = 'All';
+        this.currentPage = 1;
+        this.searchTerm = '';
         this.loadTransactions();
       });
 
@@ -152,12 +157,12 @@ export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestro
     if (!this.transactionToDelete) return;
 
     const activeUser = this.userService.getActiveUserSync();
-    if (!activeUser) return;
+    if (!activeUser || !this.activeGroup) return;
 
     this.apiService.deleteTransaction(activeUser.id, this.transactionToDelete.id).subscribe({
       next: () => {
         // Refresh page data to update balances and other components
-        this.apiService.getPageData(activeUser.id).subscribe({
+        this.apiService.getPageData(activeUser.id, this.activeGroup!.id).subscribe({
           next: (pageData) => {
             this.pageDataService.setPageData(pageData);
             this.cdr.markForCheck();
@@ -329,12 +334,12 @@ export class AccountTransactionsComponent implements OnInit, OnChanges, OnDestro
     if (!this.transactionToRemovePending) return;
 
     const activeUser = this.userService.getActiveUserSync();
-    if (!activeUser) return;
+    if (!activeUser || !this.activeGroup) return;
 
     this.apiService.updateTransaction(activeUser.id, this.transactionToRemovePending.id, { pending: false }).subscribe({
       next: () => {
         // Refresh page data
-        this.apiService.getPageData(activeUser.id).subscribe({
+        this.apiService.getPageData(activeUser.id, this.activeGroup!.id).subscribe({
           next: (pageData) => {
             this.pageDataService.setPageData(pageData);
             this.cdr.markForCheck();
