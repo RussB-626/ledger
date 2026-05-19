@@ -29,6 +29,7 @@
     @if (!isOnAdminPage()) {
       <div class="group-section-top">
         <button class="group-initial-btn" (click)="openGroupManagementPanel()" [title]="(activeGroup$ | async)?.name || 'Select Group'">
+          <i class="bi bi-folder2"></i>
           <span class="group-initial">{{ getActiveGroupInitial() }}</span>
         </button>
         <span class="group-name" [class.hidden]="!isExpanded">{{ (activeGroup$ | async)?.name }}</span>
