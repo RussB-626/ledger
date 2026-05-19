@@ -1,151 +1,175 @@
 <div class="card">
-<div class="rec-expenses-container">
-  <div class="section-header">
-    <h3>Recurring Expenses</h3>
+  <div class="rec-expenses-container">
+    <div class="section-header">
+      <h3>Recurring Expenses</h3>
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button
-        class="tab-btn"
-        [class.active]="selectedTab === 'monthly'"
-        (click)="onTabChange('monthly')"
-      >
-        Monthly
-      </button>
-      <button
-        class="tab-btn"
-        [class.active]="selectedTab === 'yearly'"
-        (click)="onTabChange('yearly')"
-      >
-        Yearly
-      </button>
+      <!-- Tabs -->
+      <div class="tabs">
+        <button
+          class="tab-btn"
+          [class.active]="selectedTab === 'monthly'"
+          (click)="onTabChange('monthly')"
+        >
+          Monthly
+        </button>
+        <button
+          class="tab-btn"
+          [class.active]="selectedTab === 'yearly'"
+          (click)="onTabChange('yearly')"
+        >
+          Yearly
+        </button>
+      </div>
+
+      <!-- Monthly Selectors -->
+      @if (selectedTab === "monthly") {
+        <div class="selectors">
+          <div class="selector-group">
+            <label for="re-year">Year:</label>
+            <select
+              id="re-year"
+              [(ngModel)]="selectedYear"
+              (change)="onYearOrMonthChange()"
+            >
+              @for (year of pageData.years; track year) {
+                <option [value]="year">
+                  {{ year }}
+                </option>
+              }
+            </select>
+          </div>
+          <div class="selector-group">
+            <label for="re-month">Month:</label>
+            <select
+              id="re-month"
+              [(ngModel)]="selectedMonth"
+              (change)="onYearOrMonthChange()"
+            >
+              @for (
+                month of [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                track month
+              ) {
+                <option [value]="month">
+                  {{ monthNames[month - 1] }}
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+      }
+
+      <!-- Yearly Selectors -->
+      @if (selectedTab === "yearly") {
+        <div class="selectors">
+          <div class="selector-group">
+            <label for="re-year-yearly">Year:</label>
+            <select
+              id="re-year-yearly"
+              [(ngModel)]="selectedYear"
+              (change)="onYearOrMonthChange()"
+            >
+              @for (year of pageData.years; track year) {
+                <option [value]="year">
+                  {{ year }}
+                </option>
+              }
+            </select>
+          </div>
+        </div>
+      }
     </div>
 
-    <!-- Monthly Selectors -->
-    @if (selectedTab === 'monthly') {
-      <div class="selectors">
-        <div class="selector-group">
-          <label for="re-year">Year:</label>
-          <select
-            id="re-year"
-            [(ngModel)]="selectedYear"
-            (change)="onYearOrMonthChange()"
-          >
-            @for (year of pageData.years; track year) {
-              <option [value]="year">
-                {{ year }}
-              </option>
-            }
-          </select>
-        </div>
-        <div class="selector-group">
-          <label for="re-month">Month:</label>
-          <select
-            id="re-month"
-            [(ngModel)]="selectedMonth"
-            (change)="onYearOrMonthChange()"
-          >
-            @for (month of [1,2,3,4,5,6,7,8,9,10,11,12]; track month) {
-              <option [value]="month">
-                {{ monthNames[month - 1] }}
-              </option>
-            }
-          </select>
-        </div>
+    <!-- Monthly Tab Content -->
+    @if (selectedTab === "monthly") {
+      <div class="tab-content">
+        @if (monthlyDescriptions.length > 0) {
+          <div class="table-wrapper">
+            <table class="rec-expenses-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th class="text-right">{{ getPriorMonthNameWithYear() }}</th>
+                  <th class="text-right">
+                    {{ monthNames[selectedMonth - 1] }}
+                  </th>
+                  <th class="text-right">Total {{ selectedYear }}</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (desc of monthlyDescriptions; track desc.id) {
+                  <tr>
+                    <td>{{ desc.description }}</td>
+                    <td class="text-right">
+                      {{ getPriorMonthTotal(desc.id) | formatCurrency }}
+                    </td>
+                    <td class="text-right">
+                      {{ getCurrentMonthTotal(desc.id) | formatCurrency }}
+                    </td>
+                    <td class="text-right">
+                      {{ getYearTotal(desc.id) | formatCurrency }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (monthlyDescriptions.length === 0) {
+          <div class="empty-state">
+            <p>No monthly recurring expenses tracked</p>
+          </div>
+        }
       </div>
     }
 
-    <!-- Yearly Selectors -->
-    @if (selectedTab === 'yearly') {
-      <div class="selectors">
-        <div class="selector-group">
-          <label for="re-year-yearly">Year:</label>
-          <select
-            id="re-year-yearly"
-            [(ngModel)]="selectedYear"
-            (change)="onYearOrMonthChange()"
-          >
-            @for (year of pageData.years; track year) {
-              <option [value]="year">
-                {{ year }}
-              </option>
-            }
-          </select>
-        </div>
+    <!-- Yearly Tab Content -->
+    @if (selectedTab === "yearly") {
+      <div class="tab-content">
+        @if (yearlyDescriptions.length > 0) {
+          <div class="table-wrapper">
+            <table class="rec-expenses-table">
+              <thead>
+                <tr>
+                  <th>Description</th>
+                  <th class="text-right">{{ selectedYear - 1 }}</th>
+                  <th class="text-right">{{ selectedYear }}</th>
+                  <th class="text-right">Difference</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (desc of yearlyDescriptions; track desc.id) {
+                  <tr>
+                    <td>{{ desc.description }}</td>
+                    <td class="text-right">
+                      {{ getPriorYearTotal(desc.id) | formatCurrency }}
+                    </td>
+                    <td class="text-right">
+                      {{ getCurrentYearTotal(desc.id) | formatCurrency }}
+                    </td>
+                    <td
+                      class="text-right"
+                      [style.color]="
+                        getYearDifference(desc.id) >= 0
+                          ? getPositiveColor()
+                          : getNegativeColor()
+                      "
+                    >
+                      {{ getYearDifference(desc.id) | formatCurrency }}
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (yearlyDescriptions.length === 0) {
+          <div class="empty-state">
+            <p>No yearly recurring expenses tracked</p>
+          </div>
+        }
       </div>
     }
   </div>
-
-  <!-- Monthly Tab Content -->
-  @if (selectedTab === 'monthly') {
-    <div class="tab-content">
-      @if (monthlyDescriptions.length > 0) {
-        <div class="table-wrapper">
-          <table class="rec-expenses-table">
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th class="text-right">{{ getPriorMonthNameWithYear() }}</th>
-                <th class="text-right">{{ monthNames[selectedMonth - 1] }}</th>
-                <th class="text-right">Total {{ selectedYear }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (desc of monthlyDescriptions; track desc.id) {
-                <tr>
-                  <td>{{ desc.description }}</td>
-                  <td class="text-right">{{ getPriorMonthTotal(desc.id) | formatCurrency }}</td>
-                  <td class="text-right">{{ getCurrentMonthTotal(desc.id) | formatCurrency }}</td>
-                  <td class="text-right">{{ getYearTotal(desc.id) | formatCurrency }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-
-      @if (monthlyDescriptions.length === 0) {
-        <div class="empty-state">
-          <p>No monthly recurring expenses tracked</p>
-        </div>
-      }
-    </div>
-  }
-
-  <!-- Yearly Tab Content -->
-  @if (selectedTab === 'yearly') {
-    <div class="tab-content">
-      @if (yearlyDescriptions.length > 0) {
-        <div class="table-wrapper">
-          <table class="rec-expenses-table">
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th class="text-right">{{ selectedYear - 1 }}</th>
-                <th class="text-right">{{ selectedYear }}</th>
-                <th class="text-right">Difference</th>
-              </tr>
-            </thead>
-            <tbody>
-              @for (desc of yearlyDescriptions; track desc.id) {
-                <tr>
-                  <td>{{ desc.description }}</td>
-                  <td class="text-right">{{ getPriorYearTotal(desc.id) | formatCurrency }}</td>
-                  <td class="text-right">{{ getCurrentYearTotal(desc.id) | formatCurrency }}</td>
-                  <td class="text-right" [style.color]="getYearDifference(desc.id) >= 0 ? getPositiveColor() : getNegativeColor()">{{ getYearDifference(desc.id) | formatCurrency }}</td>
-                </tr>
-              }
-            </tbody>
-          </table>
-        </div>
-      }
-
-      @if (yearlyDescriptions.length === 0) {
-        <div class="empty-state">
-          <p>No yearly recurring expenses tracked</p>
-        </div>
-      }
-    </div>
-  }
-</div>
 </div>

@@ -15,13 +15,6 @@
   border-radius: 8px;
   overflow: hidden;
   transition: border-color 0.2s ease;
-
-  app-rec-expenses {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-  }
 }
 
 .rec-expenses-container {
